@@ -339,7 +339,7 @@ If valid based on the lookup against the first 2 characters of CDE_CHAR from NW_
 --  Ex
     CASE WHEN Claim_Type NOT IN ('M','L','I','O') THEN 'NOT IN M,L,I,O'
 	     WHEN FacilityTypeCode IS NULL THEN 'NULL'
-         WHEN FacilityTypeCode NOT IN (SELECT LEFT(CDE_CHAR,2) FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+         WHEN FacilityTypeCode NOT IN (SELECT LEFT(CDE_CHAR,2) FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'SUP CODE REF LOOKUP IS INVALID'
          ELSE 'VALID' END FacilityTypeCode1X,
 		 
 --  TYPE OF ADMISSION		 
