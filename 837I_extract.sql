@@ -1,9 +1,11 @@
 SELECT
 TransSetControlNum,
-ImplementationConventionRef,
+--ImplementationConventionRef,
 SubmitterID,
 PatientControlNum,
+claim_type,
 NumDtl,
+FileName,
 
 --  CLAIM_FREQ_TYPE_CD
 --  TypeCode All
@@ -21,12 +23,13 @@ NumDtl,
 --  CLAIM_STATEMENT_DTM_PERIOD
 --  If String is of format “YYYYMMDD-YYYYMMDD” then 1 else 0
 --  DI
-    CASE WHEN Claim_Type in ('I','L') 
+    CASE WHEN Claim_Type IN ('I','L') 
 	AND StatementDTP IS NOT NULL 
 	AND ( SUBSTR(StatementDTP, 9, 1) = '-' AND TRY_TO_DATE(SUBSTR(StatementDTP, 1, 8),'YYYYMMDD') IS NOT NULL AND TRY_TO_DATE(SUBSTR(StatementDTP, 10, 8),'YYYYMMDD') IS NOT NULL )  
         THEN 1 ELSE 0 END StatementDTP1,
 --  Ex
-    CASE WHEN StatementDTP IS NULL THEN 'NULL'
+    CASE WHEN Claim_Type NOT IN ('I','L') THEN 'NOT APP' 
+         WHEN StatementDTP IS NULL THEN 'NULL'
          WHEN ( SUBSTR(StatementDTP, 9, 1) != '-' OR TRY_TO_DATE(SUBSTR(StatementDTP, 1, 8),'YYYYMMDD') IS NULL OR TRY_TO_DATE(SUBSTR(StatementDTP, 10, 8),'YYYYMMDD') IS NULL ) THEN 'INVALID' 
 		 ELSE 'VALID' END StatementDTP1X,
 
@@ -35,12 +38,13 @@ NumDtl,
 --  If String is of format “YYYYMMDD-YYYYMMDD” then 1 else 0
 --  DI		 
     CASE WHEN Claim_Type IN ('I','L') 
-	AND SUBSTR(FacilityTypeCode,1,2) = '11' 
+	--AND SUBSTR(FacilityTypeCode,1,2) = '11' 
 	AND AdmissionDTP IS NOT NULL 
 	AND ( SUBSTR(AdmissionDTP, 9, 1) = '-' AND TRY_TO_DATE(SUBSTR(AdmissionDTP, 1, 8),'YYYYMMDD') IS NOT NULL AND TRY_TO_DATE(SUBSTR(AdmissionDTP, 10, 8),'YYYYMMDD') IS NOT NULL )  
         THEN 1 ELSE 0 END AdmissionDTP1,
 --  Ex
-    CASE WHEN SUBSTR(FacilityTypeCode,1,2) != '11' THEN 'NOT HOSPITAL OR LTC'
+    CASE WHEN Claim_Type NOT IN ('I','L') THEN 'NOT APP'
+         --WHEN SUBSTR(FacilityTypeCode,1,2) != '11' THEN 'NOT HOSPITAL OR LTC'
 	     WHEN AdmissionDTP IS NULL THEN 'NULL'
          WHEN ( SUBSTR(AdmissionDTP, 9, 1) != '-' OR TRY_TO_DATE(SUBSTR(AdmissionDTP, 1, 8),'YYYYMMDD') IS NULL OR TRY_TO_DATE(SUBSTR(AdmissionDTP, 10, 8),'YYYYMMDD') IS NULL ) THEN 'INVALID' 
 		 ELSE 'VALID' END AdmissionDTP1X,
@@ -83,7 +87,7 @@ NumDtl,
 	AND DiagnosisCodeQual='ABJ'
         THEN 1 ELSE 0 END AdmittingDiagnosisCode1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT INPATIENT'
+    CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
 	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'DiagnosisCodeQual NOT ABJ'
          WHEN AdmittingDiagnosisCode IS NULL THEN 'NULL'
 		 WHEN AdmittingDiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWDEV.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
@@ -113,9 +117,9 @@ If valid based on the lookup against the first 2 characters of CDE_CHAR from NW_
         THEN 1 ELSE 0 END FacilityTypeCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('M','L','I','O') THEN 'NOT IN M,L,I,O'
+    CASE WHEN Claim_Type NOT IN ('M','L','I','O') THEN 'NOT APP'
 	     WHEN FacilityTypeCode IS NULL THEN 'NULL'
-         WHEN FacilityTypeCode NOT IN (SELECT LEFT(CDE_CHAR,2) FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+         WHEN FacilityTypeCode NOT IN (SELECT LEFT(CDE_CHAR,2) FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'SUP CODE REF LOOKUP IS INVALID'
          ELSE 'VALID' END FacilityTypeCode1X,
 		 
 --  TYPE OF ADMISSION		 
@@ -135,7 +139,7 @@ MPT_SENDPRO_TypeOfAdmission_Valid	If valid based on the lookup against the CDE_C
         THEN 1 ELSE 0 END AdmissionTypeCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT INPATIENT OR LTC'
+    CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
 	     WHEN AdmissionTypeCode IS NULL THEN 'NULL'
          WHEN AdmissionTypeCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_TYPE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END AdmissionTypeCode1X,
@@ -157,7 +161,7 @@ MPT_SENDPRO_SourceOfAdmission_Valid	  If valid based on the lookup against the C
         THEN 1 ELSE 0 END AdmissionSourceCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT INPATIENT OR LTC'
+    CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
 	     WHEN AdmissionSourceCode IS NULL THEN 'NULL'
          WHEN AdmissionSourceCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_SOURCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END AdmissionSourceCode1X,
@@ -179,10 +183,10 @@ MPT_SENDPRO_AmountValueNotNegative_ALL	Amount is greater than or equals 0 then 1
         THEN 1 ELSE 0 END SvcLineChargeAmt1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT IN L,I,O,M,D'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT APP'
 	     WHEN SvcLineChargeAmt IS NULL THEN 'NULL'
          WHEN SvcLineChargeAmt < 0 THEN 'INVALID'
-         ELSE 'VALID' END SvcLineChargeAmt1X, 
+         ELSE 'VALID' END SvcLineChargeAmt1X,
 
 --  SERVICE LINE REVENUE CODE
 /*
@@ -211,16 +215,94 @@ MPT_SENDPRO_ServiceLineRevenueCode_Valid	If valid based on the lookup against th
 
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M','D') 
-    
 	AND SvcLineRevenueCode IS NOT NULL
     AND SvcLineRevenueCode IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
         THEN 1 ELSE 0 END SvcLineRevenueCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT IN L,I,O,M,D'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT APP'
 	     WHEN SvcLineRevenueCode IS NULL THEN 'NULL'
          WHEN SvcLineRevenueCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END SvcLineRevenueCode1X,
+
+--  Occurrence Code
+/*
+12.7.7.	Occurrence Code (MPT_SENDPRO_OccurrenceCode_837I)
+12.7.7.1.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
+12.7.7.2.	MPT_SENDPRO_OccurrenceCode_Valid: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS.ProcedureCode, ProcedureCodeQual=’BH’
+12.7.7.3.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS. ProcedureCode, ProcedureCodeQual=’BH’
+
+MPT_SENDPRO_OccurrenceCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’CDE_OCCURRENCE’ then 1 else 0
+
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O') 
+	AND ProcedureCode IS NOT NULL
+    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_OCCURRENCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
+    AND ProcedureCodeQual = 'BH'
+        THEN 1 ELSE 0 END OccurrenceCode1,
+
+--  Ex
+    CASE 
+         WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
+		 WHEN ProcedureCode IS NULL THEN 'NULL'
+         WHEN ProcedureCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_OCCURRENCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+		 WHEN ProcedureCodeQual <> 'BH' THEN 'ProcedureCodeQual <> BH' 
+         ELSE 'VALID' END OccurrenceCode1X,
+
+--  Value Code
+/*
+12.7.9.	Value Code (MPT_SENDPRO_ValueCode_837I)
+4.1.1.1.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
+12.7.9.1.	MPT_SENDPRO_ValueCode_Valid: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS.ProcedureCode, ProcedureCodeQual=’BE’
+4.1.1.2.	
+12.7.9.2.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS.ProcedureCode, ProcedureCodeQual=’BE’
+
+MPT_SENDPRO_ValueCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’CDE_VALUE then 1 else 0
+
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O') 
+	AND ProcedureCode IS NOT NULL
+    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_VALUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
+    AND ProcedureCodeQual = 'BE'
+        THEN 1 ELSE 0 END ValueCode1,
+
+--  Ex
+    CASE 
+         WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
+		 WHEN ProcedureCode IS NULL THEN 'NULL'
+         WHEN ProcedureCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_VALUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID' 
+         WHEN ProcedureCodeQual <> 'BE' THEN 'ProcedureCodeQual <> BE'    
+         ELSE 'VALID' END ValueCode1X,
+
+--  Condition Code
+/*
+12.7.10.	Condition Code (MPT_SENDPRO_ConditionCode_837I)
+4.1.1.4.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
+4.1.1.5.	MPT_SENDPRO_ConditionCode_Valid: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS.ProcedureCode, ProcedureCodeQual=’BG’
+4.1.1.6.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS.ProcedureCode, ProcedureCodeQual=’BG’
+
+MPT_SENDPRO_ConditionCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’CDE_COND then 1 else 0
+
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O')
+	AND ProcedureCode IS NOT NULL
+    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_COND' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
+    AND ProcedureCodeQual = 'BG'
+        THEN 1 ELSE 0 END ConditionCode1,
+
+--  Ex
+    CASE 
+         WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
+		 WHEN ProcedureCode IS NULL THEN 'NULL'
+         WHEN ProcedureCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_COND' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+		 WHEN ProcedureCodeQual <> 'BG' THEN 'ProcedureCodeQual <> BG'
+         ELSE 'VALID' END ConditionCode1X,
 
 --  PATIENT STATUS CODE
 /*
@@ -247,7 +329,7 @@ MPT_SENDPRO_PatientStatusCode_Valid	If valid based on the lookup against the CDE
         THEN 1 ELSE 0 END PatientStatusCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT INPATIENT, LTC or OUTPATIENT'
+    CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT APP'
 	     WHEN PatientStatusCode IS NULL THEN 'NULL'
          WHEN PatientStatusCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PATIENT_STATUS' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END PatientStatusCode1X,
@@ -273,18 +355,41 @@ dpvt.PrincipalDiagnosisCode
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','P')
+    CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND PrincipalDiagnosisCode IS NOT NULL 
 	AND PrincipalDiagnosisCode IN (SELECT CDE_DIAG from MHDWDEV.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) 
-	--AND DiagnosisCodeQual='ABJ'
         THEN 1 ELSE 0 END PrincipalDiagnosisCode1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','P') THEN 'NOT INPATIENT, LTC, OUTPATIENT or PHARMACY'
-	     --WHEN PrincipalDiagnosisCode != 'ABJ' THEN 'DiagnosisCodeQual NOT ABJ'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN PrincipalDiagnosisCode IS NULL THEN 'NULL'
 		 WHEN PrincipalDiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWDEV.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
          ELSE 'VALID' END PrincipalDiagnosisCode1X,
 
+
+--  ICD10 Diagnosis
+
+/*
+12.7.13.	Diagnosis_ICD10 (MPT_SENDPRO_ICD10Diagnosis_Code)
+4.1.1.13.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_NCPDP
+4.1.1.14.	MPT_SENDPRO_Diagnosis_Code_Valid_ALL: RAW_SPRO_837D_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ClmOtherDiagnosis’
+4.1.1.15.	MPT_SENDPRO_StringIsNull_ALL: STG_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode
+
+MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_DIAG from "NW_B_DIAGNOSIS" where CDE_ICD_VERSION=10 then 1 else 0
+
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O','M','P')
+	AND DiagnosisCode IS NOT NULL 
+	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWDEV.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
+    AND DiagnosisType = 'ClmOtherDiagnosis'	
+        THEN 1 ELSE 0 END ICD10Diagnosis_Code1,
+--  Ex
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
+         WHEN DiagnosisCode IS NULL THEN 'NULL'
+		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWDEV.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
+         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'DiagnosisType <> ClmOtherDiagnosis'	
+         ELSE 'VALID' END ICD10Diagnosis_Code1X,
 
 --  Service Line Procedure Code
 /*
@@ -310,13 +415,60 @@ MultipleProcedureCode
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND MultipleProcedureCode IS NOT NULL 
-	AND MultipleProcedureCode IN (SELECT CDE_PROC from MHDWDEV.NW.NW_B_PROCEDURE where CDE_PROC NOT IN ('#','+','-'))
+	AND MultipleProcedureCode IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-'))
         THEN 1 ELSE 0 END MultipleProcedureCode1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT INPATIENT, LTC, OUTPATIENT or PROF'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN MultipleProcedureCode IS NULL THEN 'NULL'
-		 WHEN MultipleProcedureCode NOT IN (SELECT CDE_PROC from MHDWDEV.NW.NW_B_PROCEDURE where CDE_PROC NOT IN ('#','+','-')) THEN 'INVALID'
+		 WHEN MultipleProcedureCode NOT IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-')) THEN 'INVALID'
          ELSE 'VALID' END MultipleProcedureCode1X,
+
+--  CPT Code
+/*
+12.7.16.	CDT_Code_ICD10 (MPT_SENDPRO_CPT_Code)
+4.1.1.7.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P
+4.1.1.8.	MPT_SENDPRO_CPT_Code_Valid_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HC'; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HC'
+4.1.1.9.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, 
+
+MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where upper(proc_group) like CPT%' then 1 else 0
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O','M')
+	AND SvcLineProcCode IS NOT NULL 
+	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%')
+    AND SvcLineProcCodeQual = 'HC'
+        THEN 1 ELSE 0 END CPT_Code1,
+--  Ex
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
+         WHEN SvcLineProcCode IS NULL THEN 'NULL'
+		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%') THEN 'INVALID'
+         WHEN SvcLineProcCodeQual <> 'HC' THEN 'SvcLineProcCodeQual <> HC'
+         ELSE 'VALID' END CPT_Code1X,
+
+--  HIPPS Code
+/*
+12.7.17.	HIPPS_Code_ICD10 (MPT_SENDPRO_HIPPS_Code)
+4.1.1.10.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P
+4.1.1.11.	MPT_SENDPRO_HIPPS_Code_Valid_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HP'; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HP'
+4.1.1.12.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode ; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode
+
+MPT_SENDPRO_HIPPS_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where upper(proc_group) like HIPPS%' then 1 else 0
+
+*/
+
+--  DI
+    CASE WHEN Claim_Type IN ('L','I','O','M')
+	AND SvcLineProcCode IS NOT NULL 
+	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%')
+    AND SvcLineProcCodeQual = 'HP'
+        THEN 1 ELSE 0 END HIPPS_Code1,
+--  Ex
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
+         WHEN SvcLineProcCode IS NULL THEN 'NULL'
+		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWDEV.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%') THEN 'INVALID'
+         WHEN SvcLineProcCodeQual <> 'HP' THEN 'SvcLineProcCodeQual <> HP'
+         ELSE 'VALID' END HIPPS_Code1X,
 
 
 --  Service Line PROC MOD
@@ -353,7 +505,7 @@ MPT_SENDPRO_PROC_MOD_Valid_All	If valid based on the lookup against the CDE_CHAR
         THEN 1 ELSE 0 END SvcLineProcMod1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT INPATIENT, LTC, OUTPATIENT or PROF'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
 	     WHEN SvcLineProcMod01 IS NULL AND SvcLineProcMod02 IS NULL AND SvcLineProcMod03 IS NULL AND SvcLineProcMod04 IS NULL THEN 'NULL'
          WHEN SvcLineProcMod01 NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
               AND SvcLineProcMod02 NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) 
@@ -386,7 +538,7 @@ STG_SPRO_837D_CLAIM_SVCLN_LINEADJ_INFO.SvcLineAdjRevenueCode,
         THEN 1 ELSE 0 END SvcLineAdjRevenueCode1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT IN L,I,O,M,D'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT APP'
 	     WHEN SvcLineAdjRevenueCode IS NULL THEN 'NULL'
          WHEN SvcLineAdjRevenueCode NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END SvcLineAdjRevenueCode1X,
@@ -415,7 +567,7 @@ ProcedureCode
 	AND ProcedureCode IN (SELECT CDE_PROC from MHDWDEV.NW.NW_B_PROCEDURE where CDE_PROC NOT IN ('#','+','-'))
         THEN 1 ELSE 0 END ProcedureCode1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT INPATIENT, LTC, OUTPATIENT or PROF'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN ProcedureCode IS NULL THEN 'NULL'
 		 WHEN ProcedureCode NOT IN (SELECT CDE_PROC from MHDWDEV.NW.NW_B_PROCEDURE where CDE_PROC NOT IN ('#','+','-')) THEN 'INVALID'
          ELSE 'VALID' END ProcedureCode1X,
@@ -455,7 +607,7 @@ MPT_SENDPRO_PROC_MOD_Valid_All	If valid based on the lookup against the CDE_CHAR
         THEN 1 ELSE 0 END SvcLineAdjudicationProcMod1,
 
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT INPATIENT, LTC, OUTPATIENT or PROF'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
 	     WHEN SvcLineAdjudicationProcMod01 IS NULL AND SvcLineAdjudicationProcMod02 IS NULL AND SvcLineAdjudicationProcMod03 IS NULL AND SvcLineAdjudicationProcMod04 IS NULL THEN 'NULL'
          WHEN SvcLineAdjudicationProcMod01 NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
               AND SvcLineAdjudicationProcMod02 NOT IN (SELECT CDE_CHAR FROM MHDWDEV.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) 
@@ -470,13 +622,25 @@ MPT_SENDPRO_PROC_MOD_Valid_All	If valid based on the lookup against the CDE_CHAR
 
 FROM (
 select * from (
+
 select DISTINCT
 h."TransSetControlNum" as TransSetControlNum,
-h."ImplementationConventionRef" as ImplementationConventionRef,
+-- h."ImplementationConventionRef" as ImplementationConventionRef,
 h."SubmitterID" as SubmitterID,
 h."PatientControlNum" as PatientControlNum,
 to_number(d."NumDtl",4,0) as NumDtl,
-'I' as Claim_Type,
+h."FileName" as FileName,
+-- 'I' as Claim_Type,
+
+    CASE 
+        WHEN "FacilityTypeCode" IN ('11','12') THEN 'I'
+        WHEN "FacilityTypeCode" IN ('13','14','22','23','32','33','34','43','81','82','83','85','87','89') 
+            OR LEFT("FacilityTypeCode",1) = '7' THEN 'O'
+        WHEN "FacilityTypeCode" IN ('18','21','28','86') 
+            OR LEFT("FacilityTypeCode",1) = '6' THEN 'L'
+        ELSE 'X' 
+    END Claim_Type,
+
 --to_date(d."ServiceDTP",'YYYYMMDD') as DOS_FROM_DATE,
 to_date(substr(h."StatementDTP",1,8),'YYYYMMDD') as DOS_FROM_DATE,
 
@@ -485,7 +649,7 @@ h."AdmissionDTP" as AdmissionDTP,
 h."StatementDTP" as StatementDTP,
 
 to_number(d."SvcLineChargeAmt", 12,2) as SvcLineChargeAmt,
-a."AdjReasonCode01" as AdjReasonCode01,
+-- a."AdjReasonCode01" as AdjReasonCode01,
 
 h."BillingProvNPI" as BillingProvNPI,
 
@@ -508,12 +672,19 @@ d."SvcLineProcMod02" as SvcLineProcMod02,
 d."SvcLineProcMod03" as SvcLineProcMod03,
 d."SvcLineProcMod04" as SvcLineProcMod04,
 
-ctvd."ProcedureCode" as ProcedureCode,
-
 a."SvcLineAdjudicationProcMod01" as SvcLineAdjudicationProcMod01,
 a."SvcLineAdjudicationProcMod02" as SvcLineAdjudicationProcMod02,
 a."SvcLineAdjudicationProcMod03" as SvcLineAdjudicationProcMod03,
 a."SvcLineAdjudicationProcMod04" as SvcLineAdjudicationProcMod04,
+
+ctvd."ProcedureCode" as ProcedureCode, 
+ctvd."ProcedureCodeQual" as ProcedureCodeQual,
+
+d."SvcLineProcCode" as SvcLineProcCode, 
+d."SvcLineProcCodeQual" as SvcLineProcCodeQual,
+
+dia."DiagnosisCode" as DiagnosisCode,
+dia."DiagnosisType" as DiagnosisType,
 
 -- original list
 bpd."BillingProvNPIQual" as BillingProvNPIQual,
@@ -526,33 +697,33 @@ renpd."RenderingProvEntityIDCode" as RenderingProvEntityIDCode
 
 from MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM as h
 
-left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL as d
+left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_SERVICE_DTL as d
 on  h."TransSetControlNum" = d."TransSetControlNum"
 and h."SubmitterID"        = d."SubmitterID"
 and h."PatientControlNum"  = d."PatientControlNum"
 
-left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_SVCLN_LINEADJ_INFO as a
+left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_SVCLN_ADJUDICATION_DTL as a
 on  h."TransSetControlNum" = a."TransSetControlNum"
-and h."SubmitterID"        = a."SubmitterID"
+-- and h."SubmitterID"        = a."SubmitterID"
 and h."PatientControlNum"  = a."PatientControlNum"
 and d."NumDtl"             = a."NumDtl"
 
 left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
 on  h."TransSetControlNum" = dia."TransSetControlNum"
-and h."SubmitterID"        = dia."SubmitterID"
+-- and h."SubmitterID"        = dia."SubmitterID"
 and h."PatientControlNum"  = dia."PatientControlNum"
 and dia."DiagnosisCodeQual" = 'ABJ'
 
-left join MHDWDEV.SENDPRO.RAW_SPRO_837I_BILLING_PROVIDER_DETAILS bpd
+left join MHDWDEV.SENDPRO.RAW_SPRO_837I_BILLING_PROVIDER_DTL bpd
 on  h."TransSetControlNum" = bpd."TransSetControlNum"
 and h."SubmitterID"        = bpd."SubmitterID"
-and h."BillingProviderHierarchialLoopset_PK" = bpd."BillingProviderHierarchialLoopset_PK"
+-- and h."BillingProviderHierarchialLoopset_PK" = bpd."BillingProviderHierarchialLoopset_PK"
 and h."BillingProvEntityIDCode" = bpd."BillingProvEntityIDCode"
 and h."PatientControlNum"  = dia."PatientControlNum"
 
 left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_PVT dpvt
 on  h."TransSetControlNum" = dpvt."TransSetControlNum"
-and h."SubmitterID"        = dpvt."SubmitterID"
+-- and h."SubmitterID"        = dpvt."SubmitterID"
 and h."PatientControlNum"  = dpvt."PatientControlNum"
 --and dpvt."DiagnosisCodeQual" = 'ABJ'
 
@@ -561,16 +732,18 @@ on  h."TransSetControlNum" = bpd."TransSetControlNum"
 and h."SubmitterID"        = bpd."SubmitterID"
 and h."PatientControlNum"  = dia."PatientControlNum"
 
-left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS ctvd
-on  h."TransSetControlNum" = ctvd."TransSetControlNum"
-and h."SubmitterID"        = ctvd."SubmitterID"
-and h."PatientControlNum"  = ctvd."PatientControlNum"
-and d."NumDtl"             = ctvd."NumDtl"
+-- left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_PROC_COND_TREAT_VAL_DTLS ctvd
+ left join MHDWDEV.SENDPRO.RAW_SPRO_837I_CLAIM_ENC_ATTRIBUTE_DTL ctvd
+ on  h."TransSetControlNum" = ctvd."TransSetControlNum"
+-- and h."SubmitterID"        = ctvd."SubmitterID"
+ and h."PatientControlNum"  = ctvd."PatientControlNum"
+ and d."NumDtl"             = ctvd."NumDtl"
 
 order by
     TransSetControlNum,
-    ImplementationConventionRef,
+--    ImplementationConventionRef,
     h."SubmitterID",
+    FileName,
     h."PatientControlNum",
     to_number(d."NumDtl",4,0)
 ));
