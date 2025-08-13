@@ -3,6 +3,23 @@ GRANT SELECT ON MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA TO DI_TEAM_ROLE;
 
 select * from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA; 
 
+select count(1) 
+from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM as h
+left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_SERVICE_DTL as d
+--on  h."TransSetControlNum" = d."TransSetControlNum"
+on  h."FileName" = d."FileName"
+and h."SubmitterID"        = d."SubmitterID"
+and h."PatientControlNum"  = d."PatientControlNum";
+
+
+select "AdmissionDateHourDTP",
+substr(h."AdmissionDateHourDTP",1,8),'YYYYMMDD'
+from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM as h
+limit 10
+
+
+
+
 TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA;
 
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
@@ -48,9 +65,6 @@ Record_Type,
          WHEN ( SUBSTR(StatementDTP, 9, 1) != '-' OR TRY_TO_DATE(SUBSTR(StatementDTP, 1, 8),'YYYYMMDD') IS NULL OR TRY_TO_DATE(SUBSTR(StatementDTP, 10, 8),'YYYYMMDD') IS NULL ) THEN 'INVALID' 
 		 ELSE 'VALID' END StatementDTP1X,
 
-/*@@@-1 */
---0 AS AdmissionDTP1,
---'FIX THIS' AS AdmissionDTP1X,
 
 --  CLAIM_ADMISSION_DTM_PERIOD
 --  This field should have a value if the Parameter MPT_SENDPRO_Facility_Type_Code_837I = 11
