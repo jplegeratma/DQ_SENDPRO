@@ -16,6 +16,8 @@ order by FILENAME, CLAIM_TYPE, MEASURE, TYPE
 SELECT * 
 FROM MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_QA_7_QA
 
+GRANT SELECT ON MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA_UNPIV TO DI_TEAM_ROLE;
+
 DROP VIEW INF_B_SENDPRO_CLAIMS_DQ_7_QA_UNPIV;
 
 -- tue 5/13 - first 7
@@ -44,7 +46,6 @@ FROM (
     CLAIMFREQUENCYCODE1X AS Claim_Frequency_Code,
 	STATEMENTDTP1X AS Statement_Date,
 	ADMISSIONDTP1X AS Admission_Date,
-	BILLINGPROVNPI1X AS Billing_Provider_Date,
 	ADMITTINGDIAGNOSISCODE1X AS Admitting_Diagnosis_Code,
 	FACILITYTYPECODE1X AS Facility_Type_Code,
 	ADMISSIONTYPECODE1X AS Admission_Type_Code,
@@ -67,6 +68,7 @@ FROM (
 	PROCEDURECODE1X AS Procedure_Code,
 	SVCLINEADJUDICATIONPROCMOD1X AS Service_Line_Adj_Revenue_Code,
 
+	BILLINGPROVNPI1X AS Bill_Provider_NPI,
     BILL_PROVIDERINTERNALID1X Bill_Provider_Internal_ID,
     BILL_PROVIDERPIDSL1X Bill_Provider_PIDSL,
 
@@ -98,7 +100,6 @@ FOR MEASURE IN (
 	Claim_Frequency_Code,
 	Statement_Date,
 	Admission_Date,
-	Billing_Provider_Date,
 	Admitting_Diagnosis_Code,
 	Facility_Type_Code,
 	Admission_Type_Code,
@@ -120,6 +121,8 @@ FOR MEASURE IN (
 	Service_Line_Adjust_Revenue_Code,
 	Procedure_Code,
 	Service_Line_Adj_Revenue_Code,
+    
+	Bill_Provider_NPI,
     Bill_Provider_Internal_ID,
     Bill_Provider_PIDSL,
 
