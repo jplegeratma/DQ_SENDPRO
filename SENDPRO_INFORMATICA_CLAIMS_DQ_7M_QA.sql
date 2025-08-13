@@ -1,4 +1,4 @@
--- using ID_NPI 
+-- using  VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_PROVIDER
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
 
@@ -53,29 +53,18 @@ Record_Type,
 
 --  DI
     CASE
-	    WHEN BillingProvNPI IS NOT NULL 
-	    AND BillingProvNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = BillingProvNPI
-        
-        )
+	    WHEN BillingProvNPI IS NOT NULL
+		AND VALIDATE_NPI_LUHN_PY(BillingProvNPI)        
         THEN 1 ELSE 0 END BillingProvNPI,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (BillingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = BillingProvNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(BillingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END BillingProvNPIX,
 
 
---    CASE WHEN BillingProvNPI IS NOT NULL
---        THEN 1 ELSE 0 END BillingProvNPI,
-
---  Ex
---    CASE WHEN BillingProvNPI IS NULL THEN 'NULL'
---		 ELSE 'VALID' END BillingProvNPI1X,
 		 
 --  ADMITTING DIAGNOSIS
 --  Claim Type I
@@ -652,18 +641,18 @@ bp."ProviderPidsl" as ProviderPidsl_bp
     CASE
     --all Claim_Types
 	    WHEN ProviderPidsl IS NOT NULL
-	    AND ProviderPidsl IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl)
+	    AND ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl)
 	    AND ProviderPidsl_bp IS NOT NULL 
-	    AND ProviderPidsl_bp IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl_bp)
+	    AND ProviderPidsl_bp IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
         THEN 1 ELSE 0 END bill_ProviderPidsl1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ProviderPidsl IS NULL OR ProviderPidsl_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl) 
+		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl) 
          OR
-         NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl_bp)
+         NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
@@ -683,19 +672,14 @@ If valid then 1 else 0
     CASE
     --all Claim_Types
 	    WHEN ref_ReferringProvNPI IS NOT NULL 
-	    AND ref_ReferringProvNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ref_ReferringProvNPI
-        
-        )
+		AND VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI)        
         THEN 1 ELSE 0 END ref_ReferringProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ref_ReferringProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ref_ReferringProvNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END ref_ReferringProvNPI1X,
 
 /*
@@ -741,13 +725,13 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ref_ProviderPidsl IS NOT NULL
-        AND ref_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-            WHERE enc_prov_id = ref_ProviderPidsl
+        AND ref_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+            WHERE ID_PROVIDER = ref_ProviderPidsl
             AND ref_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END ref_ProviderPidsl1,
@@ -756,13 +740,13 @@ If valid then 1 else 0
     CASE  
          WHEN (ref_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-          WHERE enc_prov_id = ref_ProviderPidsl
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+          WHERE ID_PROVIDER = ref_ProviderPidsl
           AND ref_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END ref_ProviderPidsl1X,
@@ -781,20 +765,15 @@ If valid then 1 else 0
 --  DI
     CASE
     --all Claim_Types
-	    WHEN ren_RenderingProvNPI IS NOT NULL 
-	    AND ren_RenderingProvNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ren_RenderingProvNPI
-        
-        )
+	    WHEN ren_RenderingProvNPI IS NOT NULL
+		AND VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI)        
         THEN 1 ELSE 0 END ren_RenderingProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ren_RenderingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ren_RenderingProvNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END ren_RenderingProvNPI1X,
 
 /*
@@ -844,13 +823,13 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ren_ProviderPidsl IS NOT NULL
-        AND ren_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-            WHERE enc_prov_id = ren_ProviderPidsl
+        AND ren_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+            WHERE ID_PROVIDER = ren_ProviderPidsl
             AND ren_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END ren_ProviderPidsl1,
@@ -859,13 +838,13 @@ If valid then 1 else 0
     CASE  
          WHEN (ren_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-          WHERE enc_prov_id = ren_ProviderPidsl
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+          WHERE ID_PROVIDER = ren_ProviderPidsl
           AND ren_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END ren_ProviderPidsl1X,
@@ -883,19 +862,14 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE
     --all Claim_Types
 	    WHEN sup_SupervisingProvNPI IS NOT NULL 
-	    AND sup_SupervisingProvNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = sup_SupervisingProvNPI
-        
-        )
+		AND VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI)        
         THEN 1 ELSE 0 END sup_SupervisingProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (sup_SupervisingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = sup_SupervisingProvNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END sup_SupervisingProvNPI1X,
 
 /*
@@ -934,13 +908,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN sup_ProviderPidsl IS NOT NULL
-        AND sup_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-            WHERE enc_prov_id = sup_ProviderPidsl
+        AND sup_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+            WHERE ID_PROVIDER = sup_ProviderPidsl
             AND sup_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END sup_ProviderPidsl1,
@@ -949,13 +923,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (sup_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-          WHERE enc_prov_id = sup_ProviderPidsl
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+          WHERE ID_PROVIDER = sup_ProviderPidsl
           AND sup_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END sup_ProviderPidsl1X,
@@ -972,20 +946,15 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 
 --  DI
     CASE
-	    WHEN ord_OrderingProvID IS NOT NULL 
-	    AND ord_OrderingProvID IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ord_OrderingProvID
-        
-        )
+	    WHEN ord_OrderingProvID IS NOT NULL
+		AND VALIDATE_NPI_LUHN_PY(ord_OrderingProvID)        
         THEN 1 ELSE 0 END ord_OrderingProvID1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ord_OrderingProvID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ord_OrderingProvID) )
-         THEN 'INVALID'
+		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ord_OrderingProvID) ) THEN 'INVALID'
          ELSE 'VALID' END ord_OrderingProvID1X,
 
 /*
@@ -1023,13 +992,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN ord_ProviderPidsl IS NOT NULL
-        AND ord_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-            WHERE enc_prov_id = ord_ProviderPidsl
+        AND ord_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+            WHERE ID_PROVIDER = ord_ProviderPidsl
             AND ord_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END ord_ProviderPidsl1,
@@ -1038,13 +1007,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (ord_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
---          WHERE enc_prov_id NOT IN ('#','+','-') 
-          WHERE enc_prov_id = ord_ProviderPidsl
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+--          WHERE ID_PROVIDER NOT IN ('#','+','-') 
+          WHERE ID_PROVIDER = ord_ProviderPidsl
           AND ord_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION
             end))))
          THEN 'INVALID'
          ELSE 'VALID' END ord_ProviderPidsl1X,
@@ -1132,30 +1101,30 @@ h."ContractTypeCode" as ContractTypeCode,
 
 -- Billing Provider
 trim(h."ProviderInternalId") as ProviderInternalId,
-trim(h."ProviderPidsl") as ProviderPidsl,
+upper(trim(h."ProviderPidsl")) as ProviderPidsl,
 
 trim(bp."ProviderInternalId") as ProviderInternalId_bp,
-trim(bp."ProviderPidsl") as ProviderPidsl_bp,
+upper(trim(bp."ProviderPidsl")) as ProviderPidsl_bp,
 
 trim(ref."ReferringProvNPI")      as ref_ReferringProvNPI,
 trim(ref."ProviderInternalId")    as ref_ProviderInternalId,
-trim(ref."ProviderPidsl")         as ref_ProviderPidsl,
+upper(trim(ref."ProviderPidsl"))         as ref_ProviderPidsl,
 trim(ref."ProviderLocationCode")  as ref_ProviderLocationCode,
 
 trim(ren."RenderingProvNPI")      as ren_RenderingProvNPI,
 trim(ren."ProviderInternalId")    as ren_ProviderInternalId,
-trim(ren."ProviderPidsl")         as ren_ProviderPidsl,
+upper(trim(ren."ProviderPidsl"))         as ren_ProviderPidsl,
 trim(ren."ProviderLocationCode")  as ren_ProviderLocationCode,
 
 trim(sup."SupervisingProvNPI")    as sup_SupervisingProvNPI,
 trim(sup."ProviderInternalId")    as sup_ProviderInternalId,
-trim(sup."ProviderPidsl")         as sup_ProviderPidsl,
+upper(trim(sup."ProviderPidsl"))         as sup_ProviderPidsl,
 trim(sup."ProviderLocationCode")  as sup_ProviderLocationCode,
 
 -- this is confusing OrderingProvID is NPI
 trim(ord."OrderingProvID")        as ord_OrderingProvID,
 trim(ord."ProviderInternalId")    as ord_ProviderInternalId,
-trim(ord."ProviderPidsl")         as ord_ProviderPidsl,
+upper(trim(ord."ProviderPidsl"))         as ord_ProviderPidsl,
 trim(ord."ProviderLocationCode")  as ord_ProviderLocationCode
 
 from MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM as h
