@@ -1,4 +1,7 @@
+-- using ID_NPI
+
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
+
 SELECT DISTINCT
 RUN_DATE,
 claim_type,
@@ -220,7 +223,7 @@ If valid then 1 else 0
 	    WHEN ServProvNPI IS NOT NULL 
 	    AND ServProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ServProvNPI
         
         )
         THEN 1 ELSE 0 END ServProvNPI1,
@@ -228,7 +231,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (ServProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ServProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ServProvNPI1X,
 
@@ -278,7 +281,7 @@ If valid then 1 else 0
 	    WHEN PrescriberNPI IS NOT NULL 
 	    AND PrescriberNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = PrescriberNPI
         
         )
         THEN 1 ELSE 0 END PrescriberNPI1,
@@ -286,7 +289,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (PrescriberNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = PrescriberNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END PrescriberNPI1X,
 
