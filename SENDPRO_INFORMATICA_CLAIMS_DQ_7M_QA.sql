@@ -584,18 +584,18 @@ bp."ProviderInternalId" as ProviderInternalId_bp,
     CASE
     --all Claim_Types
 	    WHEN ProviderInternalId IS NOT NULL 
-	    AND ProviderInternalId IN (SELECT ENC_PROV_ID from MHDWQA.NW.NW_B_ENC_PROVIDER where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId)
+	    AND ProviderInternalId IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId)
 	    AND ProviderInternalId_bp IS NOT NULL 
-	    AND ProviderInternalId_bp IN (SELECT ENC_PROV_ID from MHDWQA.NW.NW_B_ENC_PROVIDER where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
+	    AND ProviderInternalId_bp IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
         THEN 1 ELSE 0 END bill_ProviderInternalId1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ProviderInternalId IS NULL OR ProviderInternalId_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.NW.NW_B_ENC_PROVIDER where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId) 
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId) 
          OR
-         NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.NW.NW_B_ENC_PROVIDER where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
+         NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderInternalId1X,
@@ -630,18 +630,18 @@ bp."ProviderPidsl" as ProviderPidsl_bp
     CASE
     --all Claim_Types
 	    WHEN ProviderPidsl IS NOT NULL
-	    AND ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_ENC_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl)
+	    AND ProviderPidsl IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl)
 	    AND ProviderPidsl_bp IS NOT NULL 
-	    AND ProviderPidsl_bp IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_ENC_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
+	    AND ProviderPidsl_bp IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl_bp)
         THEN 1 ELSE 0 END bill_ProviderPidsl1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ProviderPidsl IS NULL OR ProviderPidsl_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_ENC_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl) 
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl) 
          OR
-         NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_ENC_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
+         NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderPidsl_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
