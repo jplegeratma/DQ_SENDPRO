@@ -663,7 +663,7 @@ If valid then 1 else 0
 	    WHEN ref_ReferringProvNPI IS NOT NULL 
 	    AND ref_ReferringProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI
         
         )
         THEN 1 ELSE 0 END ref_ReferringProvNPI1,
@@ -672,7 +672,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ref_ReferringProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ref_ReferringProvNPI1X,
 
@@ -693,7 +693,7 @@ If valid then 1 else 0
 	    WHEN ref_ProviderInternalId IS NOT NULL 
 	    AND ref_ProviderInternalId IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
         
         )
         THEN 1 ELSE 0 END ref_ProviderInternalId1,
@@ -702,7 +702,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ref_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId) )
          THEN 'INVALID'
          ELSE 'VALID' END ref_ProviderInternalId1X,
 
@@ -719,7 +719,7 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ref_ProviderPidsl IS NOT NULL
-        AND ref_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+        AND ref_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
             WHERE enc_prov_id = ref_ProviderPidsl
             AND ref_ProviderLocationCode = (
@@ -734,7 +734,7 @@ If valid then 1 else 0
     CASE  
          WHEN (ref_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
           WHERE enc_prov_id = ref_ProviderPidsl
           AND ref_ProviderLocationCode = (
@@ -762,7 +762,7 @@ If valid then 1 else 0
 	    WHEN ren_RenderingProvNPI IS NOT NULL 
 	    AND ren_RenderingProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI
         
         )
         THEN 1 ELSE 0 END ren_RenderingProvNPI1,
@@ -771,7 +771,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ren_RenderingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ren_RenderingProvNPI1X,
 
@@ -793,7 +793,7 @@ If valid then 1 else 0
 	    WHEN ren_ProviderInternalId IS NOT NULL 
 	    AND ren_ProviderInternalId IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
         
         )
         THEN 1 ELSE 0 END ren_ProviderInternalId1,
@@ -802,7 +802,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ren_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId) )
          THEN 'INVALID'
          ELSE 'VALID' END ren_ProviderInternalId1X,
 
@@ -822,7 +822,7 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ren_ProviderPidsl IS NOT NULL
-        AND ren_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+        AND ren_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
             WHERE enc_prov_id = ren_ProviderPidsl
             AND ren_ProviderLocationCode = (
@@ -837,7 +837,7 @@ If valid then 1 else 0
     CASE  
          WHEN (ren_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
           WHERE enc_prov_id = ren_ProviderPidsl
           AND ren_ProviderLocationCode = (
@@ -863,7 +863,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 	    WHEN sup_SupervisingProvNPI IS NOT NULL 
 	    AND sup_SupervisingProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI
         
         )
         THEN 1 ELSE 0 END sup_SupervisingProvNPI1,
@@ -872,7 +872,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (sup_SupervisingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END sup_SupervisingProvNPI1X,
 
@@ -889,7 +889,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 	    WHEN sup_ProviderInternalId IS NOT NULL 
 	    AND sup_ProviderInternalId IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId
         
         )
         THEN 1 ELSE 0 END sup_ProviderInternalId1,
@@ -898,7 +898,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (sup_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId) )
          THEN 'INVALID'
          ELSE 'VALID' END sup_ProviderInternalId1X,
 
@@ -912,7 +912,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN sup_ProviderPidsl IS NOT NULL
-        AND sup_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+        AND sup_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
             WHERE enc_prov_id = sup_ProviderPidsl
             AND sup_ProviderLocationCode = (
@@ -927,7 +927,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (sup_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
           WHERE enc_prov_id = sup_ProviderPidsl
           AND sup_ProviderLocationCode = (
@@ -952,7 +952,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 	    WHEN ord_OrderingProvID IS NOT NULL 
 	    AND ord_OrderingProvID IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID
         
         )
         THEN 1 ELSE 0 END ord_OrderingProvID1,
@@ -961,7 +961,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (ord_OrderingProvID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID) )
          THEN 'INVALID'
          ELSE 'VALID' END ord_OrderingProvID1X,
 
@@ -978,7 +978,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 	    WHEN ord_ProviderInternalId IS NOT NULL 
 	    AND ord_ProviderInternalId IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_ProviderInternalId
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_ProviderInternalId
         
         )
         THEN 1 ELSE 0 END ord_ProviderInternalId1,
@@ -987,7 +987,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (ord_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_ProviderInternalId) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_ProviderInternalId) )
          THEN 'INVALID'
          ELSE 'VALID' END ord_ProviderInternalId1X,
 
@@ -1000,7 +1000,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN ord_ProviderPidsl IS NOT NULL
-        AND ord_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+        AND ord_ProviderPidsl IN (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
             WHERE enc_prov_id = ord_ProviderPidsl
             AND ord_ProviderLocationCode = (
@@ -1015,7 +1015,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (ord_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 ap 
+         (SELECT enc_prov_id from MHDWDEV.SENDPRO.spro_b_enc_provider_hist ap 
 --          WHERE enc_prov_id NOT IN ('#','+','-') 
           WHERE enc_prov_id = ord_ProviderPidsl
           AND ord_ProviderLocationCode = (
