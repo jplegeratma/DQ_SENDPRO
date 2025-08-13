@@ -17,7 +17,7 @@ from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA;
 
 --TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
 
--- using  VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_PROVIDER
+-- using  MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_PROVIDER
 -- and ID_PROVIDER_LOCATION
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
@@ -74,14 +74,14 @@ Record_Type,
 --  DI
     CASE
 	    WHEN BillingProvNPI IS NOT NULL
-		AND VALIDATE_NPI_LUHN_PY(BillingProvNPI)        
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI)        
         THEN 1 ELSE 0 END BillingProvNPI,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (BillingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(BillingProvNPI) ) THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END BillingProvNPIX,
 
 
@@ -692,14 +692,14 @@ If valid then 1 else 0
     CASE
     --all Claim_Types
 	    WHEN ref_ReferringProvNPI IS NOT NULL 
-		AND VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI)        
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI)        
         THEN 1 ELSE 0 END ref_ReferringProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ref_ReferringProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI) ) THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END ref_ReferringProvNPI1X,
 
 /*
@@ -790,14 +790,14 @@ If valid then 1 else 0
     CASE
     --all Claim_Types
 	    WHEN ren_RenderingProvNPI IS NOT NULL
-		AND VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI)        
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI)        
         THEN 1 ELSE 0 END ren_RenderingProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ren_RenderingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI) ) THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END ren_RenderingProvNPI1X,
 
 /*
@@ -889,14 +889,14 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE
     --all Claim_Types
 	    WHEN sup_SupervisingProvNPI IS NOT NULL 
-		AND VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI)        
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI)        
         THEN 1 ELSE 0 END sup_SupervisingProvNPI1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (sup_SupervisingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI) ) THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(sup_SupervisingProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END sup_SupervisingProvNPI1X,
 
 /*
@@ -976,14 +976,14 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 --  DI
     CASE
 	    WHEN ord_OrderingProvID IS NOT NULL
-		AND VALIDATE_NPI_LUHN_PY(ord_OrderingProvID)        
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ord_OrderingProvID)        
         THEN 1 ELSE 0 END ord_OrderingProvID1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ord_OrderingProvID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT VALIDATE_NPI_LUHN_PY(ord_OrderingProvID) ) THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ord_OrderingProvID) ) THEN 'INVALID'
          ELSE 'VALID' END ord_OrderingProvID1X,
 
 /*
