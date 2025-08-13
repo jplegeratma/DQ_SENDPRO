@@ -1,22 +1,81 @@
 select count(1)
-from inf_b_sendpro_provider_lookup;
+from inf_b_sendpro_provider_validate;
 
 select *
-from inf_b_sendpro_provider_lookup;
+from inf_b_sendpro_provider_validate;
 
---drop table inf_b_sendpro_provider_lookup;
 
-UPDATE inf_b_sendpro_provider_lookup t
+UPDATE inf_b_sendpro_provider_validate t
+SET internalId_lookup = NULL;
+-- 14588
+
+/*
+
+UPDATE inf_b_sendpro_provider_validate t
 SET internalId_lookup = s.ENC_PROV_ID
 FROM MHDWDEV.SENDPRO.spro_b_enc_provider_hist s
 WHERE s.ENC_PROV_ID NOT IN ('#', '+', '-')
   AND s.ENC_PROV_ID = t.InternalId;
 
-UPDATE inf_b_sendpro_provider_lookup t
+  from Priya
+  
+select ad.*
+from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM as h
+inner join MHDWQA.SENDPRO.RAW_SPRO_837I_ATTENDING_PROVIDER_DTL ad
+on h."FileName"         = ad."FileName" and
+   h.RAW_SPRO_CLAIM_SEQ = ad.RAW_SPRO_CLAIM_SEQ and
+   h."PatientControlNum"= ad."PatientControlNum" and
+   h."NumDtl"           = ad."NumDtl"
+left join MHDWDEV.SENDPRO.spro_b_enc837_provider_hist ap
+on ad."ProviderPidsl"= ap.enc_prov_id
+and ad."ProviderLocationCode"= (case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
+                                    when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
+                                    else ap.cde_enc_prov_id_loc end)
+where ad.RAW_SPRO_CLAIM_SEQ IS NOT NULL;
+  
+*/
+
+UPDATE inf_b_sendpro_provider_validate t
+SET internalId_lookup = s.ENC_PROV_ID
+FROM MHDWDEV.SENDPRO.spro_b_enc_provider_hist s
+WHERE s.ENC_PROV_ID NOT IN ('#', '+', '-')
+  AND s.ENC_PROV_ID = t.InternalId
+		          AND t.LocationCode = (
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
+             end);
+
+
+-- PIDSL
+UPDATE inf_b_sendpro_provider_validate t
 SET PIDSL_lookup = s.ID_PROVIDER_LOCATION
 FROM MHDWQA.NW.NW_B_PROVIDER s
 WHERE s.ID_PROVIDER_LOCATION NOT IN ('#', '+', '-')
   AND s.ID_PROVIDER_LOCATION = t.PIDSL;
+
+
+
+
+
+/*
+
+UPDATE inf_b_sendpro_provider_validate t
+SET LocationCode_lookup = s.CDE_ENC_PROV_ID_LOC
+FROM MHDWDEV.SENDPRO.spro_b_enc_provider_hist s
+WHERE t.LocationCode = CDE_ENC_PROV_ID_LOC
+AND t.LocationCode IS NOT NULL
+AND t.LocationCode = '110087758A';
+
+
+SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
+        
+		
+		          AND ref_ProviderLocationCode = (
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
+             end)
 
 UPDATE inf_b_sendpro_provider_lookup t
 SET LocationCode_lookup = s.ID_PROVIDER_LOCATION
@@ -36,8 +95,6 @@ SET NPI_lookup = CASE
     WHEN NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(NPI) THEN NULL
     ELSE NPI
 END;
-  
-/*
   
 UPDATE inf_b_sendpro_provider_lookup t
 SET LOCATIONCODE_lookup = 
@@ -94,12 +151,15 @@ WHERE s.ID_PROVIDER_LOCATION NOT IN ('#', '+', '-')
 */
 
 select *
-from inf_b_sendpro_provider_lookup;
+from inf_b_sendpro_provider_validate;
 
 
-create table inf_b_sendpro_provider_lookup
+drop table inf_b_sendpro_provider_validate;
+
+create table inf_b_sendpro_provider_validate
 as
-select internalId, NULL as internalId_lookup, Pidsl, NULL as Pidsl_lookup, LocationCode, NULL as LocationCode_lookup, NPI, NULL as NPI_lookup
+select internalId, NULL as internalId_lookup, Pidsl, NULL as Pidsl_lookup, LocationCode
+--select internalId, NULL as internalId_lookup, Pidsl, NULL as Pidsl_lookup, LocationCode, NULL as LocationCode_lookup
 from (
 WITH AF AS (
 
