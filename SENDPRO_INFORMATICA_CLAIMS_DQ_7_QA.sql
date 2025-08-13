@@ -41,6 +41,11 @@ TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA;
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
 --AS
 
+-- 7/22/25
+-- swithch to ID_PROVIDER_LOCATION to CDE_ENC_PROV_ID_LOC for Internal ID
+-- take SEQ out of Provider joins
+
+
 -- using  MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_B_PROVIDER
 -- and ID_PROVIDER_LOCATION
 -- move ap.ID_PROVIDER_LOCATION from PIDSL to INTERNAL_ID
@@ -908,9 +913,9 @@ and ad."ProviderLocationCode"= (
         SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = at_ProviderInternalId
 
           AND at_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)       
         )
         THEN 1 ELSE 0 END at_ProviderInternalId1,
@@ -922,9 +927,9 @@ and ad."ProviderLocationCode"= (
 		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = at_ProviderInternalId
 		 
 		           AND at_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)
 		 ))
          THEN 'INVALID'
@@ -1007,9 +1012,9 @@ If valid then 1 else 0
         
 		
 		          AND ref_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)
 
         )
@@ -1022,9 +1027,9 @@ If valid then 1 else 0
 		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
 		 
 		           AND ref_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)
          ))
          THEN 'INVALID'
@@ -1106,9 +1111,9 @@ If valid then 1 else 0
         SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
 
           AND ren_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)        
         )
         THEN 1 ELSE 0 END ren_ProviderInternalId1,
@@ -1120,9 +1125,9 @@ If valid then 1 else 0
 		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
 
 		           AND ren_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC
              end)
 		 ))
          THEN 'INVALID'
@@ -1201,9 +1206,9 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
         SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = oop_ProviderInternalId
         
 		          AND oop_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION 
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC 
              end)
         )
         THEN 1 ELSE 0 END oop_ProviderInternalId1,
@@ -1215,9 +1220,9 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = oop_ProviderInternalId
 
 		           AND oop_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION 
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC 
              end)
 		 ))
          THEN 'INVALID'
@@ -1278,9 +1283,9 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
         SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = op_ProviderInternalId
         
 		          AND op_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION 
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC 
              end)
         )
         THEN 1 ELSE 0 END op_ProviderInternalId1,
@@ -1292,9 +1297,9 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = op_ProviderInternalId
 		 
 		           AND op_ProviderLocationCode = (
-            case when length(ID_PROVIDER_LOCATION) <3 then lpad(ID_PROVIDER_LOCATION,3,'0')
-                 when length(ID_PROVIDER_LOCATION) >3 then substr(ID_PROVIDER_LOCATION,0,3)
-                 else ID_PROVIDER_LOCATION 
+            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
+                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
+                 else CDE_ENC_PROV_ID_LOC 
              end)
 			 
 		 ))
@@ -1470,31 +1475,31 @@ on bp."TransSetControlNum"  = h."TransSetControlNum" and
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_ATTENDING_PROVIDER_DTL atnd
 on h."FileName"         = atnd."FileName" and
-   h.RAW_SPRO_CLAIM_SEQ = atnd.RAW_SPRO_CLAIM_SEQ and
+--   h.RAW_SPRO_CLAIM_SEQ = atnd.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= atnd."PatientControlNum" and
    h."NumDtl"           = atnd."NumDtl"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_REFERRING_PROVIDER_DTL ref
 on h."FileName"         = ref."FileName" and
-   h.RAW_SPRO_CLAIM_SEQ = ref.RAW_SPRO_CLAIM_SEQ and
+--   h.RAW_SPRO_CLAIM_SEQ = ref.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= ref."PatientControlNum" and
    h."NumDtl"           = ref."NumDtl"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_RENDERING_PROVIDER_DTL ren
 on h."FileName"         = ren."FileName" and
-   h.RAW_SPRO_CLAIM_SEQ = ren.RAW_SPRO_CLAIM_SEQ and
+--   h.RAW_SPRO_CLAIM_SEQ = ren.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= ren."PatientControlNum" and
    h."NumDtl"           = ren."NumDtl"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL oop
 on h."FileName"         = oop."FileName" and
-   h.RAW_SPRO_CLAIM_SEQ = oop.RAW_SPRO_CLAIM_SEQ and
+--   h.RAW_SPRO_CLAIM_SEQ = oop.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= oop."PatientControlNum" and
    h."NumDtl"           = oop."NumDtl"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_OPERATING_PHYS_PROVIDER_DTL op
 on h."FileName"         = op."FileName" and
-   h.RAW_SPRO_CLAIM_SEQ = op.RAW_SPRO_CLAIM_SEQ and
+--   h.RAW_SPRO_CLAIM_SEQ = op.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= op."PatientControlNum" and
    h."NumDtl"           = op."NumDtl"
 
