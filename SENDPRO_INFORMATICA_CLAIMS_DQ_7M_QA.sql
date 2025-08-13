@@ -1,3 +1,5 @@
+-- using ID_NPI 
+
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
 
 SELECT DISTINCT
@@ -47,14 +49,34 @@ Record_Type,
 --  BillingProvNPI
 --  StringIsNull_ALL - String is not null then 1 else 0
 --  DI
-    CASE WHEN BillingProvNPI IS NOT NULL
-        THEN 1 ELSE 0 END BillingProvNPI1,
+--  changing to validate against ID_NPI
+
+--  DI
+    CASE
+	    WHEN BillingProvNPI IS NOT NULL 
+	    AND BillingProvNPI IN (
+        
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = BillingProvNPI
+        
+        )
+        THEN 1 ELSE 0 END BillingProvNPI,
 
 --  Ex
-    CASE WHEN BillingProvNPI IS NULL THEN 'NULL'
-		 ELSE 'VALID' END BillingProvNPI1X,
-		 
+    CASE  
+    --all Claim_Types
+         WHEN (BillingProvNPI IS NULL ) THEN 'NULL'
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = BillingProvNPI) )
+         THEN 'INVALID'
+         ELSE 'VALID' END BillingProvNPIX,
 
+
+--    CASE WHEN BillingProvNPI IS NOT NULL
+--        THEN 1 ELSE 0 END BillingProvNPI,
+
+--  Ex
+--    CASE WHEN BillingProvNPI IS NULL THEN 'NULL'
+--		 ELSE 'VALID' END BillingProvNPI1X,
+		 
 --  ADMITTING DIAGNOSIS
 --  Claim Type I
 --  Missing String Value Parameter: MPT_SENDPRO_StringIsNull_ALL - String is not null then 1 else 0
@@ -663,7 +685,7 @@ If valid then 1 else 0
 	    WHEN ref_ReferringProvNPI IS NOT NULL 
 	    AND ref_ReferringProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ref_ReferringProvNPI
         
         )
         THEN 1 ELSE 0 END ref_ReferringProvNPI1,
@@ -672,7 +694,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ref_ReferringProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ReferringProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ref_ReferringProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ref_ReferringProvNPI1X,
 
@@ -762,7 +784,7 @@ If valid then 1 else 0
 	    WHEN ren_RenderingProvNPI IS NOT NULL 
 	    AND ren_RenderingProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ren_RenderingProvNPI
         
         )
         THEN 1 ELSE 0 END ren_RenderingProvNPI1,
@@ -771,7 +793,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ren_RenderingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_RenderingProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ren_RenderingProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ren_RenderingProvNPI1X,
 
@@ -863,7 +885,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 	    WHEN sup_SupervisingProvNPI IS NOT NULL 
 	    AND sup_SupervisingProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = sup_SupervisingProvNPI
         
         )
         THEN 1 ELSE 0 END sup_SupervisingProvNPI1,
@@ -872,7 +894,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (sup_SupervisingProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_SupervisingProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = sup_SupervisingProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END sup_SupervisingProvNPI1X,
 
@@ -946,13 +968,14 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 
 */
+-- using OrderingProvID vs NPI
 
 --  DI
     CASE
 	    WHEN ord_OrderingProvID IS NOT NULL 
 	    AND ord_OrderingProvID IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID
+        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ord_OrderingProvID
         
         )
         THEN 1 ELSE 0 END ord_OrderingProvID1,
@@ -961,7 +984,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
     --all Claim_Types
          WHEN (ord_OrderingProvID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ord_OrderingProvID) )
+		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ord_OrderingProvID) )
          THEN 'INVALID'
          ELSE 'VALID' END ord_OrderingProvID1X,
 
@@ -1129,6 +1152,7 @@ trim(sup."ProviderInternalId")    as sup_ProviderInternalId,
 trim(sup."ProviderPidsl")         as sup_ProviderPidsl,
 trim(sup."ProviderLocationCode")  as sup_ProviderLocationCode,
 
+-- this is confusing OrderingProvID is NPI
 trim(ord."OrderingProvID")        as ord_OrderingProvID,
 trim(ord."ProviderInternalId")    as ord_ProviderInternalId,
 trim(ord."ProviderPidsl")         as ord_ProviderPidsl,
