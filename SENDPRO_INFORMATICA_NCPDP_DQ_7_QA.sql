@@ -98,7 +98,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                MEASURE,
                                                                TYPE,
-                                                               PATIENTCONTROLNUM,
+                                                               SubscriberMemberID,
                                                                NUMDTL)    AS rnk
 
   FROM (
@@ -190,7 +190,7 @@ ORDER BY
                                                                CLAIM_TYPE,
                                                                MEASURE,
                                                                TYPE,
-                                                               PATIENTCONTROLNUM,
+                                                               SubscriberMemberID,
                                                                RNK
 ;
 
