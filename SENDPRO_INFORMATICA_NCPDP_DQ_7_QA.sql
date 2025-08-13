@@ -1,4 +1,4 @@
--- using ID_NPI
+-- using  MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_PROVIDER
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
 
@@ -220,19 +220,14 @@ If valid then 1 else 0
 
 --  DI
     CASE
-	    WHEN ServProvNPI IS NOT NULL 
-	    AND ServProvNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ServProvNPI
-        
-        )
+	    WHEN ServProvNPI IS NOT NULL
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ServProvNPI)        
         THEN 1 ELSE 0 END ServProvNPI1,
 
 --  Ex
     CASE  
          WHEN (ServProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = ServProvNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ServProvNPI) ) THEN 'INVALID'
          ELSE 'VALID' END ServProvNPI1X,
 
 /*
@@ -279,18 +274,13 @@ If valid then 1 else 0
 --  DI
     CASE
 	    WHEN PrescriberNPI IS NOT NULL 
-	    AND PrescriberNPI IN (
-        
-        SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = PrescriberNPI
-        
-        )
+		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(PrescriberNPI)        
         THEN 1 ELSE 0 END PrescriberNPI1,
 
 --  Ex
     CASE  
          WHEN (PrescriberNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = PrescriberNPI) )
-         THEN 'INVALID'
+		 WHEN ( NOT MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(PrescriberNPI) ) THEN 'INVALID'
          ELSE 'VALID' END PrescriberNPI1X,
 
 /*
