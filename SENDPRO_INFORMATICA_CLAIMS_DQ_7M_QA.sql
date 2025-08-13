@@ -12,6 +12,10 @@ and h."PatientControlNum"  = d."PatientControlNum";
 select count(1)
 from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA;
 
+select run_date, count(run_date)
+from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
+group by run_date;
+
 
 --DROP TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA
 
