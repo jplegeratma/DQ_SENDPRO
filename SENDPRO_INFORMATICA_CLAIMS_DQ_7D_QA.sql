@@ -10,7 +10,10 @@ DROP TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA;
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA
 --AS
 
-TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA;
+--TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA;
+
+-- 8/7/25
+-- switch to incremental
 
 -- 7/22/25
 -- swithch to ID_PROVIDER_LOCATION to CDE_ENC_PROV_ID_LOC for Internal ID
@@ -663,6 +666,8 @@ on h."FileName"         = sup."FileName" and
 --   h.RAW_SPRO_CLAIM_SEQ = sup.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= sup."PatientControlNum" and
    h."NumDtl"           = sup."NumDtl"
+
+where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA )
    
 order by
     TransSetControlNum,
