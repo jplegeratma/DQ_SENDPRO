@@ -300,8 +300,6 @@ GROUP BY RUN_DATE, FILENAME, CLAIM_TYPE, PAHdrSendingEntityID, MEASURE, TYPE
 JOIN INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK
 ORDER BY FILENAME, CLAIM_TYPE, MEASURE, TYPE;
 
-
-
 --------------
 
 GRANT SELECT ON MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_BI_STATS_7_QA TO DI_TEAM_ROLE;
@@ -499,6 +497,9 @@ where "FileName" =
 
 TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA;
 
+
+-- 8/7/2025
+-- switching to incremental
 
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
 --AS
@@ -855,4 +856,7 @@ SELECT
     ON  h."SendProTransId"       = cd."SendProTransId" 
     AND h."FileName"             = cd."FileName" 
     AND h."PAHdrSendingEntityID" = cd."PAHdrSendingEntityID"   
-);
+
+    where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA )
+    
+    );
