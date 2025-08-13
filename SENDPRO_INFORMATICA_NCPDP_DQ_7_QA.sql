@@ -77,8 +77,39 @@ where FileName =
 select distinct FileName from MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_QA_7_QA
 order by FileName;
 
+DROP VIEW INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV_DETAIL;
+
 CREATE VIEW INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV_DETAIL
 AS
+
+-- limit rank to 10 lines
+SELECT *
+FROM (
+-- rank
+  SELECT *,
+                                            RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               PATIENTCONTROLNUM,
+                                                               NUMDTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT *
+  FROM (
+
+-- core unpiv
+
 SELECT RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE, SubscriberMemberID, Numdtl,
 PAHdrSendingEntityID,
 DOS,
@@ -143,7 +174,26 @@ FOR MEASURE IN (
     Prescriber_Provider_ID
  )
 ) AS UNPIV
-ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE;
+ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE
+
+)
+-- only first claim line
+    WHERE NUMDTL = 1
+    )
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+ORDER BY 
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               PATIENTCONTROLNUM,
+                                                               RNK
+;
+
 
 /*
 ------------
