@@ -220,7 +220,7 @@ If valid then 1 else 0
 	    WHEN ServProvNPI IS NOT NULL 
 	    AND ServProvNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI
         
         )
         THEN 1 ELSE 0 END ServProvNPI1,
@@ -228,7 +228,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (ServProvNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END ServProvNPI1X,
 
@@ -249,7 +249,7 @@ If valid then 1 else 0
 	    WHEN ServProvSecID IS NOT NULL 
 	    AND ServProvSecID IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID
         
         )
         THEN 1 ELSE 0 END ServProvSecID1,
@@ -257,7 +257,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (ServProvSecID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID) )
          THEN 'INVALID'
          ELSE 'VALID' END ServProvSecID1X,
 
@@ -278,7 +278,7 @@ If valid then 1 else 0
 	    WHEN PrescriberNPI IS NOT NULL 
 	    AND PrescriberNPI IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI
         
         )
         THEN 1 ELSE 0 END PrescriberNPI1,
@@ -286,7 +286,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (PrescriberNPI IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberNPI) )
          THEN 'INVALID'
          ELSE 'VALID' END PrescriberNPI1X,
 
@@ -308,7 +308,7 @@ If valid then 1 else 0
 	    WHEN PrescriberSecID IS NOT NULL 
 	    AND PrescriberSecID IN (
         
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID
+        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID
         
         )
         THEN 1 ELSE 0 END PrescriberSecID1,
@@ -316,7 +316,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (PrescriberSecID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc837_provider_hist_05082025 where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID) )
          THEN 'INVALID'
          ELSE 'VALID' END PrescriberSecID1X,
 
