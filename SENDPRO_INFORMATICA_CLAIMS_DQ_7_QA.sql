@@ -1,6 +1,14 @@
--- using  VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_PROVIDER
+
+GRANT SELECT ON MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA TO DI_TEAM_ROLE;
+
+select * from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA; 
 
 TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA;
+
+--CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
+--AS
+
+-- using  VALIDATE_NPI_LUHN_PY(BillingProvNPI) and MHDWQA.NW.NW_B_PROVIDER
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
 
@@ -798,18 +806,18 @@ bp."ProviderPidsl" as ProviderPidsl_bp
     CASE
     --all Claim_Types
 	    WHEN ProviderPidsl IS NOT NULL
-	    AND ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl)
+	    AND ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl)
 	    AND ProviderPidsl_bp IS NOT NULL 
-	    AND ProviderPidsl_bp IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
+	    AND ProviderPidsl_bp IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
         THEN 1 ELSE 0 END bill_ProviderPidsl1,
 
 --  Ex
     CASE  
     --all Claim_Types
          WHEN (ProviderPidsl IS NULL OR ProviderPidsl_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl) 
+		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl) 
          OR
-         NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
+         NOT EXISTS (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER NOT IN ('#','+','-') AND ID_PROVIDER = ProviderPidsl_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
@@ -893,13 +901,13 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN at_ProviderPidsl IS NOT NULL
-        AND at_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+        AND at_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
             WHERE ID_PROVIDER = at_ProviderPidsl
             AND at_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END at_ProviderPidsl1,
@@ -908,13 +916,13 @@ If valid then 1 else 0
     CASE  
          WHEN (at_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
           WHERE ID_PROVIDER = at_ProviderPidsl
           AND at_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END at_ProviderPidsl1X,
@@ -987,13 +995,13 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ref_ProviderPidsl IS NOT NULL
-        AND ref_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+        AND ref_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
             WHERE ID_PROVIDER = ref_ProviderPidsl
             AND ref_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END ref_ProviderPidsl1,
@@ -1002,13 +1010,13 @@ If valid then 1 else 0
     CASE  
          WHEN (ref_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
           WHERE ID_PROVIDER = ref_ProviderPidsl
           AND ref_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END ref_ProviderPidsl1X,
@@ -1085,13 +1093,13 @@ If valid then 1 else 0
 -- DI
     CASE
 	    WHEN ren_ProviderPidsl IS NOT NULL
-        AND ren_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+        AND ren_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
             WHERE ID_PROVIDER = ren_ProviderPidsl
             AND ren_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END ren_ProviderPidsl1,
@@ -1100,13 +1108,13 @@ If valid then 1 else 0
     CASE  
          WHEN (ren_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
           WHERE ID_PROVIDER = ren_ProviderPidsl
           AND ren_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END ren_ProviderPidsl1X,
@@ -1171,13 +1179,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN oop_ProviderPidsl IS NOT NULL
-        AND oop_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+        AND oop_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
             WHERE ID_PROVIDER = oop_ProviderPidsl
             AND oop_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION
              end)     
         )        
         THEN 1 ELSE 0 END oop_ProviderPidsl1,
@@ -1186,13 +1194,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (oop_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
           WHERE ID_PROVIDER = oop_ProviderPidsl
           AND oop_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END oop_ProviderPidsl1X,
@@ -1240,13 +1248,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- DI
     CASE
 	    WHEN op_ProviderPidsl IS NOT NULL
-        AND op_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+        AND op_ProviderPidsl IN (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
             WHERE ID_PROVIDER = op_ProviderPidsl
             AND op_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end)     
         )        
         THEN 1 ELSE 0 END op_ProviderPidsl1,
@@ -1255,13 +1263,13 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
     CASE  
          WHEN (op_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         (SELECT ID_PROVIDER from MHDWQA.NW.NW_PROVIDER ap 
+         (SELECT ID_PROVIDER from MHDWQA.NW.NW_B_PROVIDER ap 
 --          WHERE ID_PROVIDER NOT IN ('#','+','-') 
           WHERE ID_PROVIDER = op_ProviderPidsl
           AND op_ProviderLocationCode = (
-            case when length(ap.cde_enc_prov_id_loc) <3 then lpad(ap.cde_enc_prov_id_loc,3,'0')
-                 when length(ap.cde_enc_prov_id_loc) >3 then substr(ap.cde_enc_prov_id_loc,0,3)
-                 else ap.cde_enc_prov_id_loc 
+            case when length(ap.ID_PROVIDER_LOCATION) <3 then lpad(ap.ID_PROVIDER_LOCATION,3,'0')
+                 when length(ap.ID_PROVIDER_LOCATION) >3 then substr(ap.ID_PROVIDER_LOCATION,0,3)
+                 else ap.ID_PROVIDER_LOCATION 
              end))))         
          THEN 'INVALID'
          ELSE 'VALID' END op_ProviderPidsl1X,
@@ -1352,34 +1360,34 @@ h."ContractTypeCode" as ContractTypeCode,
 
 -- Providers
 trim(h."ProviderInternalId") as ProviderInternalId,
-trim(h."ProviderPidsl") as ProviderPidsl,
+upper(trim(h."ProviderPidsl")) as ProviderPidsl,
 
 trim(bp."ProviderInternalId") as ProviderInternalId_bp,
-trim(bp."ProviderPidsl") as ProviderPidsl_bp,
+upper(trim(bp."ProviderPidsl")) as ProviderPidsl_bp,
 
 trim(atnd."AttendingProvNPI")     as at_AttendingProvNPI,
 trim(atnd."ProviderInternalId")   as at_ProviderInternalId,
-trim(atnd."ProviderPidsl")        as at_ProviderPidsl,
+upper(trim(atnd."ProviderPidsl"))        as at_ProviderPidsl,
 trim(atnd."ProviderLocationCode") as at_ProviderLocationCode,
 
 trim(ref."ReferringProvNPI")      as ref_ReferringProvNPI,
 trim(ref."ProviderInternalId")    as ref_ProviderInternalId,
-trim(ref."ProviderPidsl")         as ref_ProviderPidsl,
+upper(trim(ref."ProviderPidsl"))         as ref_ProviderPidsl,
 trim(ref."ProviderLocationCode")  as ref_ProviderLocationCode,
 
 trim(ren."RenderingProvNPI")      as ren_RenderingProvNPI,
 trim(ren."ProviderInternalId")    as ren_ProviderInternalId,
-trim(ren."ProviderPidsl")         as ren_ProviderPidsl,
+upper(trim(ren."ProviderPidsl"))         as ren_ProviderPidsl,
 trim(ren."ProviderLocationCode")  as ren_ProviderLocationCode,
 
 trim(oop."OtherOperProvNPI")      as oop_OtherOperProvNPI,
 trim(oop."ProviderInternalId")    as oop_ProviderInternalId,
-trim(oop."ProviderPidsl")         as oop_ProviderPidsl,
+upper(trim(oop."ProviderPidsl"))         as oop_ProviderPidsl,
 trim(oop."ProviderLocationCode")  as oop_ProviderLocationCode,
 
 trim(op."OperatingProvNPI")       as op_OperatingProvNPI,
 trim(op."ProviderInternalId")     as op_ProviderInternalId,
-trim(op."ProviderPidsl")          as op_ProviderPidsl,
+upper(trim(op."ProviderPidsl"))          as op_ProviderPidsl,
 trim(op."ProviderLocationCode")   as op_ProviderLocationCode
 
 from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM as h
