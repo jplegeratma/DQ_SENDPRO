@@ -1366,8 +1366,7 @@ h."ClaimFrequencyCode" as ClaimFrequencyCode,
     END AS Record_Type,
     
 h."AdmissionDateHourDTP" as AdmissionDateHourDTP,
-substr(h."AdmissionDateHourDTP",1,8),'YYYYMMDD' as AdmissionDTP,
---to_date(substr(h."AdmissionDateHourDTP",1,8),'YYYYMMDD') as AdmissionDTP,
+substr(h."AdmissionDateHourDTP",1,8) as AdmissionDTP,
 
 h."StatementDTP" as StatementDTP,
 
