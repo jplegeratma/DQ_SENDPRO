@@ -41,6 +41,10 @@ TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA;
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
 --AS
 
+-- 8/7/25
+-- Use Incremental - filter for new filenames
+-- Remove truncate from Informatica
+
 -- 7/22/25
 -- swithch to ID_PROVIDER_LOCATION to CDE_ENC_PROV_ID_LOC for Internal ID
 -- take SEQ out of Provider joins
@@ -1501,6 +1505,8 @@ on h."FileName"         = op."FileName" and
 --   h.RAW_SPRO_CLAIM_SEQ = op.RAW_SPRO_CLAIM_SEQ and
    h."PatientControlNum"= op."PatientControlNum" and
    h."NumDtl"           = op."NumDtl"
+
+where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA )
 
 order by
     TransSetControlNum,
