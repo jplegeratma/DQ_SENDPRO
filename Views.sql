@@ -684,8 +684,15 @@ create or replace view MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL(
 	TYPE,
 	PATIENTCONTROLNUM,
 	NUMDTL,
-	RNK
+	RNK,
+	SUBMITTERNAME
 ) as
+
+SELECT DISTINCT A.*,
+S."SubmitterLastOrgName" AS SUBMITTERNAME
+FROM
+(
+
 -- limit rank to 10 lines
 SELECT *
 FROM (
@@ -840,6 +847,9 @@ ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE, MEASURE, TYPE
 )
 -- limit rank to 10 line
 WHERE rnk <= 10
+) A
+LEFT JOIN MHDWQA.SENDPRO.RAW_SPRO_837I_FILE_STATISTICS S
+    ON A.FILENAME = S."FileName" AND A.CLAIM_TYPE IN ('I','L','O')
 ORDER BY 
                                                                RUN_DATE,
                                                                FILENAME,
@@ -1246,8 +1256,15 @@ create or replace view MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837D_UNPIV_DETAIL(
 	TYPE,
 	PATIENTCONTROLNUM,
 	NUMDTL,
-	RNK
+	RNK,
+	SUBMITTERNAME
 ) as
+
+SELECT DISTINCT A.*,
+DS."SubmitterLastOrgName" AS SUBMITTERNAME
+FROM
+(
+
 -- limit rank to 10 lines
 SELECT *
 FROM (
@@ -1352,6 +1369,9 @@ ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE, MEASURE, TYPE
 )
 -- limit rank to 10 line
 WHERE rnk <= 10
+) A
+LEFT JOIN MHDWQA.SENDPRO.RAW_SPRO_837D_FILE_STATISTICS DS
+    ON A.FILENAME = DS."FileName" AND A.CLAIM_TYPE = 'D'
 ORDER BY 
                                                                RUN_DATE,
                                                                FILENAME,
@@ -2004,8 +2024,15 @@ create or replace view MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837M_UNPIV_DETAIL(
 	TYPE,
 	PATIENTCONTROLNUM,
 	NUMDTL,
-	RNK
+	RNK,
+	SUBMITTERNAME
 ) as
+
+SELECT DISTINCT A.*,
+PS."SubmitterLastOrgName" AS SUBMITTERNAME
+FROM
+(
+
 -- limit rank to 10 lines
 SELECT *
 FROM (
@@ -2152,6 +2179,10 @@ ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE, MEASURE, TYPE
 )
 -- limit rank to 10 line
 WHERE rnk <= 10
+
+) A
+LEFT JOIN MHDWQA.SENDPRO.RAW_SPRO_837P_FILE_STATISTICS PS
+    ON A.FILENAME = PS."FileName" AND A.CLAIM_TYPE = 'M'
 ORDER BY 
                                                                RUN_DATE,
                                                                FILENAME,
