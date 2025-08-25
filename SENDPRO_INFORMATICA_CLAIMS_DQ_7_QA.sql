@@ -552,13 +552,13 @@ MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC f
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('O','M','D')
+    CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND SvcLineProcCode IS NOT NULL 
 	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%')
     AND SvcLineProcCodeQual = 'HC'
         THEN 1 ELSE 0 END CPT_Code1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('O','M','D') THEN 'NOT APP'
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
 		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%') THEN 'INVALID'
 --         WHEN SvcLineProcCodeQual <> 'HC' THEN 'SvcLineProcCodeQual <> HC'
