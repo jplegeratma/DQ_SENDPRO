@@ -494,13 +494,13 @@ MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC f
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND SvcLineProcCode IS NOT NULL 
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%')
+	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
     AND SvcLineProcCodeQual = 'HC'
         THEN 1 ELSE 0 END CPT_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
-		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%') THEN 'INVALID'
+		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
 --         WHEN SvcLineProcCodeQual <> 'HC' THEN 'SvcLineProcCodeQual <> HC'
          WHEN SvcLineProcCodeQual <> 'HC' THEN 'INVALID'
          ELSE 'VALID' END CPT_Code1X,
@@ -522,13 +522,13 @@ MPT_SENDPRO_HIPPS_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND SvcLineProcCode IS NOT NULL 
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%')
+	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
     AND SvcLineProcCodeQual = 'HP'
         THEN 1 ELSE 0 END HIPPS_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
-		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%') THEN 'INVALID'
+		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
 --         WHEN SvcLineProcCodeQual <> 'HP' THEN 'SvcLineProcCodeQual <> HP'
          WHEN SvcLineProcCodeQual <> 'HP' THEN 'INVALID'
          ELSE 'VALID' END HIPPS_Code1X,
