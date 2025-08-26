@@ -386,10 +386,9 @@ MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC f
         THEN 1 ELSE 0 END CPT_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
+         WHEN SvcLineProcCodeQual <> 'HC' THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
 		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
---         WHEN SvcLineProcCodeQual <> 'HC' THEN 'SvcLineProcCodeQual <> HC'
-         WHEN SvcLineProcCodeQual <> 'HC' THEN 'INVALID'
          ELSE 'VALID' END CPT_Code1X,
 
 --  HIPPS Code
@@ -411,12 +410,10 @@ MPT_SENDPRO_HIPPS_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC
         THEN 1 ELSE 0 END HIPPS_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
+         WHEN SvcLineProcCodeQual <> 'HP' THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
 		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
---         WHEN SvcLineProcCodeQual <> 'HP' THEN 'SvcLineProcCodeQual <> HP'
-         WHEN SvcLineProcCodeQual <> 'HP' THEN 'INVALID'
          ELSE 'VALID' END HIPPS_Code1X,
-
 
 --  Service Line PROC MOD
 /*
