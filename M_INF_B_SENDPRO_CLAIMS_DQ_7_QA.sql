@@ -94,16 +94,15 @@ Record_Type,
 --         THEN 1 else 0 END CDE_DIAG_ADMIT1,
 
 --  DI
-    CASE WHEN Claim_Type IN ('I') AND AdmittingDiagnosisCode IS NOT NULL 
-	AND AdmittingDiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-')) 
+    CASE WHEN Claim_Type IN ('I') AND DiagnosisCode IS NOT NULL 
+	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-')) 
 	AND DiagnosisCodeQual='ABJ'
         THEN 1 ELSE 0 END AdmittingDiagnosisCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
---	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'DiagnosisCodeQual NOT ABJ'
-	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'INVALID'
-         WHEN AdmittingDiagnosisCode IS NULL THEN 'NULL'
-		 WHEN AdmittingDiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'NOT APP'
+         WHEN DiagnosisCode IS NULL THEN 'NULL'
+		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
          ELSE 'VALID' END AdmittingDiagnosisCode1X,
 		
 --  FACILITY TYPE CODE
@@ -251,7 +250,6 @@ MPT_SENDPRO_OccurrenceCode_Valid	If valid based on the lookup against the CDE_CH
          WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
 		 WHEN ProcedureCode IS NULL THEN 'NULL'
          WHEN ProcedureCode NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_OCCURRENCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
---		 WHEN ProcedureCodeQual <> 'BH' THEN 'ProcedureCodeQual <> BH' 
 		 WHEN ProcedureCodeQual <> 'BH' THEN 'INVALID' 
          ELSE 'VALID' END OccurrenceCode1X,
 
@@ -379,18 +377,18 @@ RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalD
 
 */
 
-/* @@@-2 */
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
 	AND DiagnosisCode IS NOT NULL 
-	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) 
+	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
+    AND DiagnosisCodeQual='ABK'
     AND DiagnosisType = 'ClmPrincipalDiagnosis'	
         THEN 1 ELSE 0 END PrincipalDiagnosisCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN DiagnosisCode IS NULL THEN 'NULL'
+         WHEN DiagnosisCodeQual != 'ABK' THEN 'NOT APP'
 		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
---         WHEN DiagnosisType <> 'ClmPrincipalDiagnosis' THEN 'DiagnosisType <> ClmPrincipalDiagnosis'	
          WHEN DiagnosisType <> 'ClmPrincipalDiagnosis' THEN 'INVALID'	
          ELSE 'VALID' END PrincipalDiagnosisCode1X,
 
@@ -410,14 +408,15 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
     CASE WHEN Claim_Type IN ('L','I','O','M','P')
 	AND DiagnosisCode IS NOT NULL 
 	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
-    AND DiagnosisType = 'ClmOtherDiagnosis'	
+--    AND DiagnosisType = 'ClmOtherDiagnosis'	
+    AND DiagnosisCodeQual IN ('ABK','ABN','ABJ','ABF','APR')
         THEN 1 ELSE 0 END ICD10Diagnosis_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
          WHEN DiagnosisCode IS NULL THEN 'NULL'
 		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
---         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'DiagnosisType <> ClmOtherDiagnosis'	
-         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'INVALID'	
+--         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'INVALID'	
+         WHEN DiagnosisCodeQual NOT IN ('ABK','ABN','ABJ','ABF','APR') THEN 'INVALID'         
          ELSE 'VALID' END ICD10Diagnosis_Code1X,
 
 --  Service Line Procedure Code
@@ -439,7 +438,6 @@ RAW_SPRO_837D_CLAIM_SERVICE_LINE_DETAIL. SvcProcCode
 SvcLineProcCode
 
 */
-/* @@@-3 */
 
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
@@ -1321,8 +1319,6 @@ to_number(d."SvcLineChargeAmt", 12,2) as SvcLineChargeAmt,
 
 h."BillingProvNPI" as BillingProvNPI,
 
-dia."DiagnosisCode" as AdmittingDiagnosisCode,
-
 h."FacilityTypeCode" as FacilityTypeCode,
 h."AdmissionTypeCode" as AdmissionTypeCode,
 h."AdmissionSourceCode" as AdmissionSourceCode,
@@ -1406,7 +1402,6 @@ and d."NumDtl"             = a."NumDtl"
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
 on  h."FileName" = dia."FileName"
 and h."PatientControlNum"  = dia."PatientControlNum"
-and dia."DiagnosisCodeQual" = 'ABJ'
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_ENC_ATTRIBUTE_DTL ctvd
  on  h."FileName" = ctvd."FileName"

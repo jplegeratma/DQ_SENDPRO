@@ -659,8 +659,8 @@ select count(1) from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA_UPDATE;
 -- written by github co-pilot
 UPDATE INF_B_SENDPRO_CLAIMS_DQ_7M_QA
 SET
-    CPT_Code1X = u.CPT_Code1X,
-    HIPPS_Code1X = u.HIPPS_Code1X
+    PrincipalDiagnosisCode1X = u.PrincipalDiagnosisCode1X,
+    ICD10Diagnosis_Code1X    = u.ICD10Diagnosis_Code1X
 FROM INF_B_SENDPRO_CLAIMS_DQ_7M_QA_UPDATE u
 WHERE
     INF_B_SENDPRO_CLAIMS_DQ_7M_QA.PatientControlNum = u.PatientControlNum
@@ -689,57 +689,48 @@ NumDtl,
 FileName,
 Record_Type,
 
---  CPT Code
-/*
-12.7.16.	CDT_Code_ICD10 (MPT_SENDPRO_CPT_Code)
-4.1.1.7.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P
-4.1.1.8.	MPT_SENDPRO_CPT_Code_Valid_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HC'; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HC'
-4.1.1.9.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, 
-
-MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where upper(proc_group) like CPT%' then 1 else 0
-*/
-
 --  DI
     CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND SvcLineProcCode IS NOT NULL 
---	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%')
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
-    AND SvcLineProcCodeQual = 'HC'
-        THEN 1 ELSE 0 END CPT_Code1,
+	AND DiagnosisCode IS NOT NULL 
+	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) 
+	AND DiagnosisCodeQual='ABK'
+    AND DiagnosisType = 'ClmPrincipalDiagnosis'	
+        THEN 1 ELSE 0 END PrincipalDiagnosisCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
-         WHEN SvcLineProcCodeQual <> 'HC' THEN 'NOT APP'
-         WHEN SvcLineProcCode IS NULL THEN 'NULL'
---		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'CPT%') THEN 'INVALID'
-		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
-         ELSE 'VALID' END CPT_Code1X,
+         WHEN DiagnosisCode IS NULL THEN 'NULL'
+		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
+	     WHEN DiagnosisCodeQual != 'ABK' THEN 'INVALID'
+         WHEN DiagnosisType <> 'ClmPrincipalDiagnosis' THEN 'INVALID'	
+         ELSE 'VALID' END PrincipalDiagnosisCode1X,
 
---  HIPPS Code
+--  ICD10 Diagnosis
+
 /*
-12.7.17.	HIPPS_Code_ICD10 (MPT_SENDPRO_HIPPS_Code)
-4.1.1.10.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P
-4.1.1.11.	MPT_SENDPRO_HIPPS_Code_Valid_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HP'; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode, SvcLineProcCodeQual='HP'
-4.1.1.12.	MPT_SENDPRO_StringIsNull_ALL: RAW_SPRO_837I_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode ; RAW_SPRO_837P_CLAIM_SERVICE_LINE_DETAIL. SvcLineProcCode
+12.7.13.	Diagnosis_ICD10 (MPT_SENDPRO_ICD10Diagnosis_Code)
+4.1.1.13.	837I Claims population:  MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_NCPDP
+4.1.1.14.	MPT_SENDPRO_Diagnosis_Code_Valid_ALL: RAW_SPRO_837D_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ClmOtherDiagnosis’
+4.1.1.15.	MPT_SENDPRO_StringIsNull_ALL: STG_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode
 
-MPT_SENDPRO_HIPPS_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where upper(proc_group) like HIPPS%' then 1 else 0
+MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_DIAG from "NW_B_DIAGNOSIS" where CDE_ICD_VERSION=10 then 1 else 0
 
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND SvcLineProcCode IS NOT NULL 
---	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%')
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
-    AND SvcLineProcCodeQual = 'HP'
-        THEN 1 ELSE 0 END HIPPS_Code1,
+    CASE WHEN Claim_Type IN ('L','I','O','M','P')
+	AND DiagnosisCode IS NOT NULL 
+	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
+--    AND DiagnosisType = 'ClmOtherDiagnosis'
+    AND DiagnosisCodeQual IN ('ABK','ABN','ABJ','ABF','APR')
+        THEN 1 ELSE 0 END ICD10Diagnosis_Code1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
-         WHEN SvcLineProcCodeQual <> 'HP' THEN 'NOT APP'
-         WHEN SvcLineProcCode IS NULL THEN 'NULL'
---		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND UPPER(proc_group) LIKE 'HIPPS%') THEN 'INVALID'
-		 WHEN SvcLineProcCode NOT IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') ) THEN 'INVALID'
-         ELSE 'VALID' END HIPPS_Code1X,
-
+    CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
+         WHEN DiagnosisCode IS NULL THEN 'NULL'
+		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
+--         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'INVALID'
+         WHEN DiagnosisCodeQual NOT IN ('ABK','ABN','ABJ','ABF','APR') THEN 'INVALID'         
+         ELSE 'VALID' END ICD10Diagnosis_Code1X
+         
 FROM (
 select * from (
 
