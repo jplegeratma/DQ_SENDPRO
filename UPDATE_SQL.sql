@@ -1,6 +1,11 @@
+select *
+from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
+where "DiagnosisCodeQual" IS NOT NULL
+;
+
+
 select distinct "DiagnosisCodeQual"
 from MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia;
-
 
 select distinct DiagnosisCodeQual
 FROM (
@@ -130,7 +135,6 @@ and d."NumDtl"             = a."NumDtl"
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
 on  h."FileName" = dia."FileName"
 and h."PatientControlNum"  = dia."PatientControlNum"
-and dia."DiagnosisCodeQual" = 'ABJ'
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_ENC_ATTRIBUTE_DTL ctvd
  on  h."FileName" = ctvd."FileName"
@@ -311,7 +315,6 @@ and d."NumDtl"             = a."NumDtl"
 left join MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_DTL dia
 on  h."FileName"            = dia."FileName"
 and h."PatientControlNum"   = dia."PatientControlNum"
-and dia."DiagnosisCodeQual" = 'ABJ'
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_PVT dpvt
 on  h."FileName"           = dpvt."FileName"
@@ -369,9 +372,9 @@ order by
 
 -- 837M
 
-drop table MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA_20250825_1;
+--drop table MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA_20250825_1;
 
-create table MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA_20250825_2
+--create table MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA_20250825_2
 as select * from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7M_QA;
 
 
@@ -618,7 +621,6 @@ and d."NumDtl"             = a."NumDtl"
 left join MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_DTL dia
 on  h."FileName"            = dia."FileName"
 and h."PatientControlNum"   = dia."PatientControlNum"
-and dia."DiagnosisCodeQual" = 'ABJ'
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_PVT dpvt
 on  h."FileName"           = dpvt."FileName"
@@ -994,7 +996,6 @@ and d."NumDtl"             = a."NumDtl"
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
 on  h."FileName" = dia."FileName"
 and h."PatientControlNum"  = dia."PatientControlNum"
-and dia."DiagnosisCodeQual" = 'ABJ'
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_ENC_ATTRIBUTE_DTL ctvd
  on  h."FileName" = ctvd."FileName"
