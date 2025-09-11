@@ -217,6 +217,7 @@ END AS ClaimBilledAmount1X,
          THEN 'INVALID'
          ELSE 'VALID' END BillingProviderInternalId1X,
 
+
 /*
 12.1.7	Billing Provider NPI (MPT_SENDPRO_BillingProviderNPI_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
@@ -338,11 +339,11 @@ BILLING_ENC_CLM_PRV_SEQ
     2.	If ID_MEDICAID IS NOT  NULL Then 1 else 0
 
 */
+
     CASE 
         WHEN FACT_MEM_SEQ IS NULL THEN 'NULL'
         WHEN FACT_MEM_SEQ <= 0 THEN 'INVALID'
-		WHEN NOT EXISTS (SELECT ID_MEDICAID from MHDWQA.NW.NW_MEMBER mem where FACT_MEM_SEQ NOT IN ('#','+','-') AND FACT_MEM_SEQ = mem.MEM_SEQ) 
-        THEN 'INVALID'
+		WHEN NOT EXISTS (SELECT ID_MEDICAID from MHDWQA.NW.NW_MEMBER mem WHERE FACT_MEM_SEQ = mem.MEM_SEQ) THEN 'INVALID'
         ELSE 'VALID'
     END AS MemberID1X,
 
@@ -356,7 +357,8 @@ BILLING_ENC_CLM_PRV_SEQ
         WHEN QTY_UNITS_BILLED IS NULL THEN 'NULL'
         WHEN QTY_UNITS_BILLED <= 0 THEN 'INVALID'
         ELSE 'VALID'
-    END AS Quantity Billed1X,
+    END AS QuantityBilled1X,
+
 /*
 12.1.19	Admitting Diagnosis (MPT_SENDPRO_Admitting_Diagnosis_837I)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP
@@ -548,11 +550,11 @@ SELECT
  
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
-    prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
+    --prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
 
     prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
-    prov_servicing.ID_NPI AS servicing_ProviderNPI,
-    prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+    prov_servicing.ID_NPI AS servicing_ProviderNPI
+    --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
 
 
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_INST_LEG_HIST inst
@@ -573,6 +575,7 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_referring
     ON inst_info.REFERRING_ENC_PRV_SEQ = prov_referring.ENC_PRV_SEQ
 --LEFT JOIN MHDWDEV.SENDPRO.SPRO_B_ENC_TAXONOMY_HIST_07212025 tax
 --    ON inst.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
+WHERE inst.IND_OFFSET = 'N'
+ ) A
 
-)
 LIMIT 100;
