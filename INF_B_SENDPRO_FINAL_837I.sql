@@ -69,7 +69,7 @@ RULES
 58	MPT_SENDPRO_ValidMember	
     1.	Join MEM_SEQ from Fact with NW.NW_MEMBER on MEM_SEQ
     2.	If ID_MEDICAID IS NOT  NULL Then 1 else 0
-59	MPT_SENDPRO_ValidMember	
+DUPLICATE 59	MPT_SENDPRO_ValidMember	
     1.	Join MEM_SEQ from Fact with NW.NW_MEMBER on MEM_SEQ
     2.	If ID_MEDICAID IS NOT  NULL Then 1 else 0
 59	MPT_SENDPRO_ValidEncClmProvider	
@@ -188,19 +188,63 @@ END AS ClaimBilledAmount1X,
 12.1.6	Billing Provider Id (MPT_SENDPRO_BillingProviderID_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidClmEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENCClm_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ: 
+
+55 MPT_SENDPRO_ProviderInternalId_Valid	Validity of Internal ID determined by performing a look up to the following tables 
+    1.	SENDPRO.SPRO_B_ENC837_PROVIDER_HIST on the field ENC_PROV_ID 
+    If valid then 1 else 0
+
+59	MPT_SENDPRO_ValidEncClmProvider	
+    1.	Join ENC_CLM_PRV_SEQ from Fact with sendpro.spro_b_enc_claim_provider on enc_clm_prv_seq
+    2.	NPI: If PROV_NPI  IS NOT  NULL Then 1 else 0
+    3.	Internal Provider ID: IF ENC_PROV_ID IS NOT NULL THEN 1 ELSE 0
+    4.	Provider Type: IF CDE_ENC_CLM_PROV_TYPE IS NOT NULL THEN 1 ELSE 0 
+    5.	Provider Location: If ID_PROVIDER_LOCATION IS NOT NULL THEN 1 ELSE 0
+    6.	Provider Taxonomy: If CDE_PROV_TAXONOMY IS NOT NULL THEN 1 ELSE 0
+
+60	MPT_SENDPRO_ValidEncProvider	
+    1.	Join ENC_PRV_SEQ from Fact with sendpro. SPRO_B_ENC_PROVIDER_HIST on.enc_prv_seq left join spro_b_enc_taxonomy_hist on SPRO_B_ENC_PROVIDER_HIST.enc_prv_seq= spro_b_enc_taxonomy_hist.enc_prv_seq
+    2.	NPI: If ID_NPI  IS NOT  NULL Then 1 else 0
+    3.	Internal Provider ID: IF ENC_PROV_ID IS NOT NULL THEN 1 ELSE 0
+    4.	Provider Type: IF CDE_ENC_PROV_TYPE IS NOT NULL THEN 1 ELSE 0 
+    5.	Provider Location: If COALESCE(ID_PROVIDER_LOCATION,’+’)<>’+’ THEN 1 ELSE 0
+    6.	Provider Taxonomy: If CDE_ENC_TAXONOMY IS NOT NULL THEN 1 ELSE 0
+
 */
+
+    CASE  
+         WHEN (billing_ProviderInternalId IS NULL) THEN 'NULL'
+		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) 
+         THEN 'INVALID'
+         ELSE 'VALID' END BillingProviderInternalId1X,
 
 /*
 12.1.7	Billing Provider NPI (MPT_SENDPRO_BillingProviderNPI_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
-•	MPT_SENDPRO_ ValidClmEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ: 
+•	MPT_SENDPRO_ValidClmEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ: 
+
+11	MPT_SENDPRO_ProviderNPINull_ALL	(null)','0','000000000','0000000000')
+12	MPT_SENDPRO_ProviderNPIValid_ ALL	Validity of  NPI determined by performing a look up to the following tables 
+        1.	SENDPRO.SPRO_B_ENC837_PROVIDER_HIST on the field ID_NPI
+        If valid then 1 else 0
 */
+
+    CASE  
+         WHEN (billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
+		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI) 
+         THEN 'INVALID'
+         ELSE 'VALID' END BillingProviderNPI1X,
 
 /*
 12.1.8	Billing Provider Taxonomy Code (MPT_SENDPRO_BillingProviderTaxonomyALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
-•	MPT_SENDPRO_ ValidClmEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ: 
+•	MPT_SENDPRO_ValidClmEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST.BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_CLM_PRV_SEQ: 
+
+BILLING_ENC_CLM_PRV_SEQ
+
 */
+
+
+
 
 /*
 12.1.9	Servicing Provider Id (MPT_SENDPRO_ServicingProviderID_ALL)
@@ -208,11 +252,23 @@ END AS ClaimBilledAmount1X,
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
 
+    CASE  
+         WHEN (servicing_ProviderInternalId IS NULL) THEN 'NULL'
+		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = servicing_ProviderInternalId) 
+         THEN 'INVALID'
+         ELSE 'VALID' END ServicingProviderInternalId1X,
+
 /*
 12.1.10	Servicing Provider NPI (MPT_SENDPRO_ServicingProviderNPI_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
+
+    CASE  
+         WHEN (servicing_ProviderNPI IS NULL) OR servicing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
+		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI) 
+         THEN 'INVALID'
+         ELSE 'VALID' END ServicingProviderNPI1X,
 
 /*
 12.1.11	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
@@ -276,12 +332,17 @@ END AS ClaimBilledAmount1X,
 12.1.17	Member ID (MPT_SENDPRO_MemberID_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ProviderInternalId_Valid: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.MEM_SEQ>0, SPRO_B_ENC_DNTL_INFO_DTL_HIST. MEM SEQ>0, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.MEM_SEQ>0, SPRO_B_ENC_INST_INFO_DTL_HIST.MEM_SEQ>0
-@@@
-*/
 
+58	MPT_SENDPRO_ValidMember	
+    1.	Join MEM_SEQ from Fact with NW.NW_MEMBER on MEM_SEQ
+    2.	If ID_MEDICAID IS NOT  NULL Then 1 else 0
+
+*/
     CASE 
-        WHEN MEM_SEQ IS NULL THEN 'NULL'
-        WHEN MEM_SEQ <= 0 THEN 'INVALID'
+        WHEN FACT_MEM_SEQ IS NULL THEN 'NULL'
+        WHEN FACT_MEM_SEQ <= 0 THEN 'INVALID'
+		WHEN NOT EXISTS (SELECT ID_MEDICAID from MHDWQA.NW.NW_MEMBER mem where FACT_MEM_SEQ NOT IN ('#','+','-') AND FACT_MEM_SEQ = mem.MEM_SEQ) 
+        THEN 'INVALID'
         ELSE 'VALID'
     END AS MemberID1X,
 
@@ -295,18 +356,42 @@ END AS ClaimBilledAmount1X,
         WHEN QTY_UNITS_BILLED IS NULL THEN 'NULL'
         WHEN QTY_UNITS_BILLED <= 0 THEN 'INVALID'
         ELSE 'VALID'
-    END AS Quantity1X,
+    END AS Quantity Billed1X,
 /*
 12.1.19	Admitting Diagnosis (MPT_SENDPRO_Admitting_Diagnosis_837I)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.DIAG_GRP_SEQ, Admission Diagnosis Code
+
+61	MPT_SENDPRO_ValidEncDiagnosisCode	
+    1.	Join DIAG_GRP_SEQ from Fact with NW.NW_B_DIAGNOSIS_GROUP ON  NW_B_DIAGNOSIS_GROUP.DIAG_GRP_SEQ 
+    2.	Admission Diagnosis Code: If CDE_DIAG_ADMIT  IS NOT  NULL Then 1 else 0
+    3.	Primary Diagnosis Code: IF CDE_DIAG_P1 IS NOT NULL THEN 1 ELSE 0
+
 */
 
+    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
+         WHEN DIAGRP_SEQ IS NULL THEN 'NULL'
+         WHEN NOT EXISTS (SELECT CDE_DIAG_ADMIT from MHDWQA.NW.NW_B_DIAGNOSIS_GROUP grp WHERE CDE_DIAG_ADMIT IS NOT NULL AND DIAGRP_SEQ = grp.DIAGRP_SEQ)
+         THEN 'INVALID'
+         ELSE 'VALID' END AdmittingDiagnosisCode1X,
+
 /*
-12.1.20	Admitting Diagnosis (MPT_SENDPRO_Admitting_Diagnosis_837)
+12.1.20	Primary Diagnosis (MPT_SENDPRO_Primary_Diagnosis_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC. MPT_SENDPRO_ClaiimType_837P
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.DIAG_GRP_SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.DIAG_GRP_SEQ, Primary Diagnosis Code
+
+61	MPT_SENDPRO_ValidEncDiagnosisCode	
+    1.	Join DIAG_GRP_SEQ from Fact with NW. NW_B_DIAGNOSIS_GROUP ON  NW_B_DIAGNOSIS_GROUP .DIAG_GRP_SEQ 
+    2.	Admission Diagnosis Code: If CDE_DIAG_ADMIT  IS NOT  NULL Then 1 else 0
+    3.	Primary Diagnosis Code: IF CDE_DIAG_P1 IS NOT NULL THEN 1 ELSE 0
+
 */
+
+    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
+         WHEN DIAGRP_SEQ IS NULL THEN 'NULL'
+         WHEN NOT EXISTS (SELECT CDE_DIAG_P1 from MHDWQA.NW.NW_B_DIAGNOSIS_GROUP grp WHERE CDE_DIAG_P1 IS NOT NULL AND DIAGRP_SEQ = grp.DIAGRP_SEQ)
+         THEN 'INVALID'
+         ELSE 'VALID' END AdmittingDiagnosisCode1X,
 
 /*
 12.1.21	Discharge Date (MPT_SENDPRO_Discharge_Date_837I)
@@ -372,6 +457,16 @@ END AS ClaimBilledAmount1X,
 12.1.26	Procedure Code (MPT_SENDPRO_ProcedureCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.PROC_SEQ, Procedure Code
+
+61	MPT_SENDPRO_ValidEncDiagnosisCode	
+    1.	Join DIAG_GRP_SEQ from Fact with NW. NW_B_DIAGNOSIS_GROUP ON  NW_B_DIAGNOSIS_GROUP .DIAG_GRP_SEQ 
+    2.	Admission Diagnosis Code: If CDE_DIAG_ADMIT  IS NOT  NULL Then 1 else 0
+    3.	Primary Diagnosis Code: IF CDE_DIAG_P1 IS NOT NULL THEN 1 ELSE 0
+
+62	MPT_SENDPRO_ValidEncDProcedureCode	
+    1.	Join PROC_SEQ from Fact with NW. NW_B_PROCEDURE ON  NW_B_PROCEDURE .PROC_SEQ
+    2.	Procedure Code: If COALESCE(CDE_PROC,’ ‘)  <> ‘ ‘ Then 1 else 0
+
 */
 
 /*
@@ -386,6 +481,11 @@ END AS ClaimBilledAmount1X,
 12.1.27	Procedure Modifier Code (MPT_SENDPRO_ProcedureModCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncProcedureModifierCode SPRO_B_ENC_CLAIM_INST_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. PROCMFR _SEQ, Procedure Modfier` Code
+
+63	MPT_SENDPRO_ValidEncDProcedureModifierCode	
+    1.	Join PROCMFR_SEQ from Fact with NW. NW_B_PROCEDURE_MFR ON  NW_B_PROCEDURE_MFR .PROCMFR_SEQ
+    2.	Procedure Modifier Code: If COALESCE(CDE_PROC_MOD,’ ‘)  <> ‘ ‘ Then 1 else 0
+
 */
 
 /*
@@ -425,9 +525,7 @@ SELECT
     inst.ID_SUBMITTER,
     inst.DOS_FROM_DT,
     inst.CDE_CLM_TYPE,
- --   inst.CDE_BILL_TYPE,
     inst.CDE_CLM_STATUS,
- --   inst.CDE_FACILITY_TYPE,
     inst.CDE_CLM_DISPOSITION,
     inst.IND_OFFSET,
     inst.WH_FROM_DT,
@@ -439,25 +537,23 @@ SELECT
     inst.AMT_BILLED,
     inst.DOS_TO_DT,
     inst.ADMIT_DT_TM,
-    inst.MEM_SEQ,
+    inst.MEM_SEQ AS FACT_MEM_SEQ,
     inst.QTY_UNITS_BILLED,
     inst.DISCHARGE_DT_TM,
     inst.CDE_ADMIT_TYPE,
     inst.CDE_ADMIT_SOURCE,
     inst.CDE_PATIENT_STATUS,
     inst.CDE_TYPE_OF_BILL,
-    --inst.PROC_SEQ,
-    --inst.PROCMFR_SEQ,
-    --inst.CDE_PLACE_OF_SERVICE
+    inst.DIAGRP_SEQ,
+ 
+    prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
+    prov_billing.ID_NPI AS billing_ProviderNPI,
+    prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
 
---    inst_info.*,
---    pharm.*,
---    prov_billing.*,
---    prov_servicing.*,
---    prov_operating.*,
---    prov_other.*,
---    prov_referring.*
---    tax.*
+    prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
+    prov_servicing.ID_NPI AS servicing_ProviderNPI,
+    prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+
 
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_INST_LEG_HIST inst
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_INST_INFO_DTL_HIST inst_info
