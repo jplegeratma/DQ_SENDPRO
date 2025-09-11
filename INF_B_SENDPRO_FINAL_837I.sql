@@ -315,7 +315,11 @@ END AS ClaimBilledAmount1X,
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL SPRO_B_ENC_CLAIM_INST_LEG_HIST. DISCHARGE_DT_TM, SPRO_B_ENC_INST_INFO_DTL_HIST. DISCHARGE_DT
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST. DISCHARGE_DT_TM, SPRO_B_ENC_INST_INFO_DTL_HIST. DISCHARGE_DT
 */
-
+    CASE 
+        WHEN DISCHARGE_DT_TM IS NULL THEN 'NULL'
+        WHEN DISCHARGE_DT_TM = '1900-01-01' THEN 'INVALID'
+        ELSE 'VALID'
+    END AS DischargeDate1X,
 /*
 12.1.22	Type of Admission (MPT_TypeofAdmission_837I)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
@@ -323,6 +327,11 @@ END AS ClaimBilledAmount1X,
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_ADMIT_TYPE
 */
 
+    CASE 
+        WHEN CDE_ADMIT_TYPE IS NULL THEN 'NULL'
+        WHEN CDE_ADMIT_TYPE NOT IN ('1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') THEN 'INVALID'
+        ELSE 'VALID'
+    END AS TypeOfAdmission1X,
 /*
 12.1.23	Source of Admission (MPT_SourceofAdmission_837I)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
@@ -330,6 +339,11 @@ END AS ClaimBilledAmount1X,
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_ADMIT_SOURCE
 */
 
+    CASE 
+        WHEN CDE_ADMIT_SOURCE IS NULL THEN 'NULL'
+        WHEN CDE_ADMIT_SOURCE NOT IN ('1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') THEN 'INVALID'
+        ELSE 'VALID'
+    END AS SourceOfAdmission1X,
 /*
 12.1.24	Patient Status Code (MPT_SENDPRO_PatientStatusCode_837I)
 •	837I Claims population:  MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
@@ -337,6 +351,11 @@ END AS ClaimBilledAmount1X,
 •	MPT_SENDPRO_StringIsNull_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PATIENT_STATUS
 */
 
+    CASE 
+        WHEN CDE_PATIENT_STATUS IS NULL THEN 'NULL'
+        WHEN CDE_PATIENT_STATUS NOT IN ('01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50') THEN 'INVALID'
+        ELSE 'VALID'
+    END AS PatientStatusCode1X,
 /*
 12.1.25	Facility Type Code (MPT_SENDPRO_FacilityTypeCode_837I_837P)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
@@ -344,25 +363,44 @@ END AS ClaimBilledAmount1X,
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_TYPE_OF_BILL
 */
 
+    CASE 
+        WHEN CDE_TYPE_OF_BILL IS NULL THEN 'NULL'
+        WHEN CDE_TYPE_OF_BILL NOT IN ('0111','0112','0113','0114','0115','0116','0117','0118','0121','0122','0123','0124','0125','0126','0127','0128','0131','0132','0133','0134','0135','0136','0137','0138','0141','0142','0143','0144','0145','0146','0147','0148','0211','0212','0213','0214','0215','0216','0217','0218','0221','0222','0223','0224','0225','0226','0227','0228','0231','0232','0233','0234','0235','0236','0237','0238') THEN 'INVALID'
+        ELSE 'VALID'
+    END AS FacilityTypeCode1X,
 /*
 12.1.26	Procedure Code (MPT_SENDPRO_ProcedureCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.PROC_SEQ, Procedure Code
 */
 
+    CASE 
+        WHEN PROC_SEQ IS NULL THEN 'NULL'
+        WHEN PROC_SEQ <= 0 THEN 'INVALID'
+        ELSE 'VALID'
+    END AS ProcedureCode1X,
 /*
 12.1.27	Procedure Modifier Code (MPT_SENDPRO_ProcedureModCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncProcedureModifierCode SPRO_B_ENC_CLAIM_INST_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. PROCMFR _SEQ, Procedure Modfier` Code
 */
 
+    CASE 
+        WHEN PROCMFR_SEQ IS NULL THEN 'NULL'
+        WHEN PROCMFR_SEQ <= 0 THEN 'INVALID'
+        ELSE 'VALID'
+    END AS ProcedureModCode1X,
 /*
 12.1.28	Place of Service (MPT_SENDPRO_PlaceOfServiceCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	MPT_SENDPRO_ValidPlaceOfService_837I: SPRO_B_ENC_CLAIM_PROF_LEG_HIST.CDE_PLACE_OF_SERVICE, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.CDE_PLACE_OF_SERVICE, 
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.CDE_PLACE_OF_SERVICE, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.CDE_PLACE_OF_SERVICE,
 */
-
+    CASE 
+        WHEN CDE_PLACE_OF_SERVICE IS NULL THEN 'NULL'
+        WHEN CDE_PLACE_OF_SERVICE NOT IN ('01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44') THEN 'INVALID'
+        ELSE 'VALID'
+    END AS PlaceOfServiceCode1X,
 
 1 as TOT_REX
 
