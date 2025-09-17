@@ -507,13 +507,12 @@ BILLING_ENC_CLM_PRV_SEQ
 -- Prof and Dntl only as Inst does not have this field
 */
 
-/* 
-    CASE 
-        WHEN CDE_PLACE_OF_SERVICE IS NULL THEN 'NULL'
-        WHEN CDE_PLACE_OF_SERVICE NOT IN ('01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44') THEN 'INVALID'
-        ELSE 'VALID'
+    CASE WHEN CDE_CLM_TYPE NOT IN ('P','D') THEN 'NOT APP'
+         WHEN CDE_PLACE_OF_SERVICE IS NULL THEN 'NULL'
+         WHEN CDE_PLACE_OF_SERVICE NOT IN ('01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44') THEN 'INVALID'
+         ELSE 'VALID'
     END AS PlaceOfServiceCode1X,
-*/
+
 
 1 as TOT_REX
 
