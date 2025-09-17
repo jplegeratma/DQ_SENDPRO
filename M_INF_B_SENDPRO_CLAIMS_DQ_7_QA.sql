@@ -94,12 +94,12 @@ Record_Type,
 --         THEN 1 else 0 END CDE_DIAG_ADMIT1,
 
 --  DI
-    CASE WHEN Claim_Type IN ('I') AND DiagnosisCode IS NOT NULL 
+    CASE WHEN Claim_Type IN ('L','I','O') AND DiagnosisCode IS NOT NULL 
 	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-')) 
 	AND DiagnosisCodeQual='ABJ'
         THEN 1 ELSE 0 END AdmittingDiagnosisCode1,
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
+    CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT APP'
 	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'NOT APP'
          WHEN DiagnosisCode IS NULL THEN 'NULL'
 		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
