@@ -47,7 +47,6 @@ RULES
 43	MPT_SENDPRO_ValueCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’ CDE_VALUE then 1 else 0
 44	MPT_SENDPRO_ConditionCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’ CDE_COND then 1 else 0
 45	MPT_SENDPRO_PatientStatusCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PATIENT_STATUS’ then 1 else 0
-45	MPT_SENDPRO_PatientStatusCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PATIENT_STATUS’ then 1 else 0
 46	MPT_SENDPRO_Procedure_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" then 1 else 0
 47	MPT_SENDPRO_CDT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where CDE_PROC like 'D%' and upper(proc_group) like 'ALPHA%' then 1 else 0
 48	MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where upper(proc_group) like CPT%' then 1 else 0
@@ -98,7 +97,7 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
     2.	Procedure Modifier Code: If COALESCE(CDE_PROC_MOD,’ ‘)  <> ‘ ‘ Then 1 else 0
 64	MPT_SENDPRO_ValidPlaceOfService	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PLACE_OF_SERVICE’ then 1 else 0
 */
-
+CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_FINAL_837I AS
 
 SELECT
 
@@ -129,14 +128,17 @@ MPT_SENDPRO_Claim_Freq_Type_Code_Valid	Should contain one of these values "1”,
 MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
 */
 
-    CASE WHEN CDE_BILL_FREQ IS NULL THEN 'NULL'
+CASE WHEN CDE_BILL_FREQ IS NULL THEN 'NULL'
     WHEN CDE_BILL_FREQ NOT IN ('1','2','3','4','5','7','8') THEN 'INVALID' 
-    ELSE 'VALID' END ClaimFrequencyTypeCode1X,
+    ELSE 'VALID' 
+END AS ClaimFrequencyTypeCode1X,
 
 /*
 12.1.2	Claim Contract Type Code (MPT_SENDPRO_ClaimContractTypeCode_837)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	MPT_SENDPRO_NumberIsNull_ALL: SPRO_B_ENC_CLAIM_PROF_LEG_HIST.CDE_CONTRACT_TYPE, SPRO_B_ENC_PROF_INFO_DTL_HIST, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.CDE_CONTRACT_TYPE, SPRO_B_ENC_DNTL_INFO_DTL_HIST.CDE_CONTRACT_TYPE, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_CONTRACT_TYPE
+
+23	MPT_SENDPRO_ContractTypeCode_Valid	Should contain one of these values "01, 02, 03, 04, 05, 06, 09"
 */
 
 CASE 
@@ -150,6 +152,8 @@ END AS ClaimContractTypeCode1X,
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_NumberIsNull_ALL: SPRO_B_ENC_PROF_INFO_DTL_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_INST_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_INST_INFO_DTL_HIST.AMT_ALLOWED
 •	MPT_SENDPRO_AmountValue_ALLL: SPRO_B_ENC_PROF_INFO_DTL_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_CLAIM_INST_LEG_HIST.AMT_ALLOWED, SPRO_B_ENC_INST_INFO_DTL_HIST.AMT_ALLOWED AND 
+
+4	MPT_SENDPRO_AmountValue_ALL 	Amount is greater than 0 then 1 else 0
 */
 
 CASE
@@ -215,7 +219,8 @@ END AS ClaimBilledAmount1X,
          WHEN (billing_ProviderInternalId IS NULL) THEN 'NULL'
 		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) 
          THEN 'INVALID'
-         ELSE 'VALID' END BillingProviderInternalId1X,
+         ELSE 'VALID' 
+    END AS BillingProviderInternalId1X,
 
 /*
 12.1.7	Billing Provider NPI (MPT_SENDPRO_BillingProviderNPI_ALL)
@@ -232,7 +237,8 @@ END AS ClaimBilledAmount1X,
          WHEN (billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
 		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI) 
          THEN 'INVALID'
-         ELSE 'VALID' END BillingProviderNPI1X,
+         ELSE 'VALID' 
+    END AS BillingProviderNPI1X,
 
 /*
 12.1.8	Billing Provider Taxonomy Code (MPT_SENDPRO_BillingProviderTaxonomyALL)
@@ -261,8 +267,8 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ,
          LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
          where BILLING_ENC_CLM_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-'))
          THEN 'INVALID'
-         ELSE 'VALID' END BillingProviderTaxonomy1X,
-
+         ELSE 'VALID' 
+         END AS BillingProviderTaxonomy1X,
 
 /*
 12.1.9	Servicing Provider Id (MPT_SENDPRO_ServicingProviderID_ALL)
@@ -274,7 +280,8 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ,
          WHEN (servicing_ProviderInternalId IS NULL) THEN 'NULL'
 		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = servicing_ProviderInternalId) 
          THEN 'INVALID'
-         ELSE 'VALID' END ServicingProviderInternalId1X,
+         ELSE 'VALID' 
+         END AS ServicingProviderInternalId1X,
 
 /*
 12.1.10	Servicing Provider NPI (MPT_SENDPRO_ServicingProviderNPI_ALL)
@@ -287,7 +294,8 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
          WHEN (servicing_ProviderNPI IS NULL) OR servicing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
 		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI) 
          THEN 'INVALID'
-         ELSE 'VALID' END ServicingProviderNPI1X,
+         ELSE 'VALID' 
+         END AS ServicingProviderNPI1X,
 
 /*
 12.1.11	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
@@ -310,7 +318,8 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 		 WHEN NOT EXISTS (SELECT prv.CDE_ENC_PROV_TYPE from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
          where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_TYPE IS NOT NULL AND prv.CDE_ENC_PROV_TYPE NOT IN ('#','+','-'))
          THEN 'INVALID'
-         ELSE 'VALID' END ServicingProviderType1X,
+         ELSE 'VALID' 
+         END AS ServicingProviderType1X,
 
 /*
 12.1.12	Servicing Provider Location (MPT_SENDPRO_ServicingProviderLoc_ALL)
@@ -321,7 +330,8 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          WHEN NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
          where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-'))
          THEN 'INVALID'
-         ELSE 'VALID' END ServicingProviderLocation1X,
+         ELSE 'VALID' 
+         END AS ServicingProviderLocation1X,
 
 /*
 12.1.13	Servicing Provider Taxonomy Code (MPT_SENDPRO_ServicingProviderTaxonomyCode_ALL)
@@ -334,13 +344,17 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
          where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-'))
          THEN 'INVALID'
-         ELSE 'VALID' END ServicingProviderTaxonomy1X,
+         ELSE 'VALID' 
+         END AS ServicingProviderTaxonomy1X,
 
 /*
 12.1.14	From Service Date (MPT_SENDPRO_From_Service_Date_ALL)
 •	837P Claims population: MPT_SENDPRO_ClaiimType_ALL 
 •	MPT_SENDPRO_DateIsNotBot_ALL: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_INST_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_INST_INFO_DTL_HIST.DOS_FROM_DT
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_INST_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_INST_INFO_DTL_HIST.DOS_FROM_DT
+
+5	MPT_SENDPRO_DateIsNotBot_ALL	Date is not equal to 1/1/1900 then 1 else 0
+1	MPT_SENDPRO_DateIsNotNull_ALL	Date is not null then 1 else 0
 */
 
     CASE 
@@ -390,7 +404,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
     CASE 
         WHEN FACT_MEM_SEQ IS NULL THEN 'NULL'
         WHEN FACT_MEM_SEQ <= 0 THEN 'INVALID'
-		WHEN NOT EXISTS (SELECT ID_MEDICAID from MHDWQA.NW.NW_MEMBER mem WHERE FACT_MEM_SEQ = mem.MEM_SEQ) THEN 'INVALID'
+		WHEN NOT EXISTS (SELECT ID_MEDICAID from MHDWQA.NW.NW_MEMBER mem WHERE FACT_MEM_SEQ = mem.MEM_SEQ AND ID_MEDICAID NOT IN ('#','+','-',' ')) THEN 'INVALID'
         ELSE 'VALID'
     END AS MemberID1X,
 
@@ -418,11 +432,12 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 
 */
 
-    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
+    CASE WHEN CDE_CLM_TYPE NOT IN ('L','I','O') THEN 'NOT APP'
          WHEN DIAGRP_SEQ IS NULL THEN 'NULL'
          WHEN NOT EXISTS (SELECT CDE_DIAG_ADMIT from MHDWQA.NW.NW_B_DIAGNOSIS_GROUP grp WHERE CDE_DIAG_ADMIT IS NOT NULL AND DIAGRP_SEQ = grp.DIAGRP_SEQ)
          THEN 'INVALID'
-         ELSE 'VALID' END AdmittingDiagnosisCode1X,
+         ELSE 'VALID' 
+         END AS AdmittingDiagnosisCode1X,
 
 /*
 12.1.20	Primary Diagnosis (MPT_SENDPRO_Primary_Diagnosis_837)
@@ -436,11 +451,12 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 
 */
 
-    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
+    CASE --WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
          WHEN DIAGRP_SEQ IS NULL THEN 'NULL'
          WHEN NOT EXISTS (SELECT CDE_DIAG_P1 from MHDWQA.NW.NW_B_DIAGNOSIS_GROUP grp WHERE CDE_DIAG_P1 IS NOT NULL AND DIAGRP_SEQ = grp.DIAGRP_SEQ)
          THEN 'INVALID'
-         ELSE 'VALID' END AdmittingDiagnosisCode1X,
+         ELSE 'VALID' 
+         END AS PrimaryDiagnosisCode1X,
 
 /*
 12.1.21	Discharge Date (MPT_SENDPRO_Discharge_Date_837I)
@@ -459,11 +475,14 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_TypeOfAdmission_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_ADMIT_TYPE
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_ADMIT_TYPE
+
+38	MPT_SENDPRO_TypeOfAdmission_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP= ‘CDE_ADMIT_TYPE' for Type Of Admission
+
 */
 
     CASE 
         WHEN CDE_ADMIT_TYPE IS NULL THEN 'NULL'
-        WHEN CDE_ADMIT_TYPE NOT IN ('1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') THEN 'INVALID'
+        WHEN CDE_ADMIT_TYPE NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_TYPE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
         ELSE 'VALID'
     END AS TypeOfAdmission1X,
 /*
@@ -471,11 +490,12 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_SourceOfAdmission_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_ADMIT_SOURCE
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_ADMIT_SOURCE
+
 */
 
     CASE 
         WHEN CDE_ADMIT_SOURCE IS NULL THEN 'NULL'
-        WHEN CDE_ADMIT_SOURCE NOT IN ('1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') THEN 'INVALID'
+        WHEN CDE_ADMIT_SOURCE NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_SOURCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
         ELSE 'VALID'
     END AS SourceOfAdmission1X,
 /*
@@ -483,11 +503,14 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	837I Claims population:  MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
 •	MPT_SENDPRO_PatientStatusCode_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PATIENT_STATUS
 •	MPT_SENDPRO_StringIsNull_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PATIENT_STATUS
+
+45	MPT_SENDPRO_PatientStatusCode_Valid	If valid based on the lookup against the CDE_CHAR from NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PATIENT_STATUS’ then 1 else 0
+
 */
 
     CASE 
         WHEN CDE_PATIENT_STATUS IS NULL THEN 'NULL'
-        WHEN CDE_PATIENT_STATUS NOT IN ('01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50') THEN 'INVALID'
+        WHEN CDE_PATIENT_STATUS NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PATIENT_STATUS' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
         ELSE 'VALID'
     END AS PatientStatusCode1X,
 /*
@@ -495,11 +518,14 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
 •	MPT_SENDPRO_FacilityTypeCode_837I: SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_TYPE_OF_BILL, 
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_TYPE_OF_BILL
+
+46	MPT_SENDPRO_FacilityTypeCode_Valid	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_TYPE_OF_BILL’ then 1 else 0
+
 */
 
     CASE 
         WHEN CDE_TYPE_OF_BILL IS NULL THEN 'NULL'
-        WHEN CDE_TYPE_OF_BILL NOT IN ('0111','0112','0113','0114','0115','0116','0117','0118','0121','0122','0123','0124','0125','0126','0127','0128','0131','0132','0133','0134','0135','0136','0137','0138','0141','0142','0143','0144','0145','0146','0147','0148','0211','0212','0213','0214','0215','0216','0217','0218','0221','0222','0223','0224','0225','0226','0227','0228','0231','0232','0233','0234','0235','0236','0237','0238') THEN 'INVALID'
+        WHEN CDE_TYPE_OF_BILL NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
         ELSE 'VALID'
     END AS FacilityTypeCode1X,
 /*
@@ -624,6 +650,6 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_servicing
 --LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_referring
 --    ON inst.REFERRING_ENC_PRV_SEQ = prov_referring.ENC_PRV_SEQ
 WHERE inst.IND_OFFSET = 'N'
- ) A
+ ) A;
 
-LIMIT 100;
+--LIMIT 100;
