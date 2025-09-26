@@ -217,8 +217,11 @@ END AS ClaimBilledAmount1X,
 */
 
     CASE  
-         WHEN (billing_ProviderInternalId IS NULL) THEN 'NULL'
-		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) 
+         WHEN (billing_ProviderInternalId IS NULL) AND (dtl_billing_ProviderInternalId IS NULL) THEN 'NULL'
+		 WHEN ( 
+               (NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) )
+           AND (NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = dtl_billing_ProviderInternalId) )
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
     END AS BillingProviderInternalId1X,
@@ -235,8 +238,17 @@ END AS ClaimBilledAmount1X,
 */
 
     CASE  
-         WHEN (billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
-		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI) 
+         WHEN 
+         (
+               ((billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
+           AND ((dtl_billing_ProviderNPI IS NULL) OR dtl_billing_ProviderNPI IN ('0','000000000','0000000000') )
+         )            
+            THEN 'NULL'
+		 WHEN 
+         (
+              (NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
+          AND (NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_billing_ProviderNPI)) 
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
     END AS BillingProviderNPI1X,
@@ -264,9 +276,16 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ,
 */
 
     CASE 
-		 WHEN NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+		 WHEN 
+         (
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
          LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where BILLING_ENC_CLM_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-'))
+         where BILLING_ENC_CLM_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+
+         AND (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+         LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
+         where DTL_BILLING_ENC_CLM_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
@@ -278,8 +297,12 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_CLM_PRV_SEQ,
 */
 
     CASE  
-         WHEN (servicing_ProviderInternalId IS NULL) THEN 'NULL'
-		 WHEN NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = servicing_ProviderInternalId) 
+         WHEN (servicing_ProviderInternalId IS NULL) AND (dtl_servicing_ProviderInternalId IS NULL)THEN 'NULL'
+		 WHEN 
+         (
+              (NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = servicing_ProviderInternalId)) 
+          AND (NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = dtl_servicing_ProviderInternalId))
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderInternalId1X,
@@ -292,8 +315,18 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
 */
 
     CASE  
-         WHEN (servicing_ProviderNPI IS NULL) OR servicing_ProviderNPI IN ('0','000000000','0000000000') THEN 'NULL'
-		 WHEN NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI) 
+         WHEN 
+         (
+                ((servicing_ProviderNPI IS NULL) OR servicing_ProviderNPI IN ('0','000000000','0000000000')) 
+            AND ((dtl_servicing_ProviderNPI IS NULL) OR dtl_servicing_ProviderNPI IN ('0','000000000','0000000000'))
+         )            
+         THEN 'NULL'
+            
+         WHEN 
+         (
+              (NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI)) 
+          AND (NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_servicing_ProviderNPI))
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderNPI1X,
@@ -316,8 +349,13 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 */
 
     CASE 
-		 WHEN NOT EXISTS (SELECT prv.CDE_ENC_PROV_TYPE from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
-         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_TYPE IS NOT NULL AND prv.CDE_ENC_PROV_TYPE NOT IN ('#','+','-'))
+		 WHEN 
+         (
+              (NOT EXISTS (SELECT prv.CDE_ENC_PROV_TYPE from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_TYPE IS NOT NULL AND prv.CDE_ENC_PROV_TYPE NOT IN ('#','+','-')))
+          AND (NOT EXISTS (SELECT prv.CDE_ENC_PROV_TYPE from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+            where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_TYPE IS NOT NULL AND prv.CDE_ENC_PROV_TYPE NOT IN ('#','+','-')))
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderType1X,
@@ -328,8 +366,13 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
     CASE 
-         WHEN NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
-         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-'))
+         WHEN 
+         (
+            (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+        where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+        AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+        where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+            )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderLocation1X,
@@ -341,9 +384,15 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 */
 
     CASE 
-		 WHEN NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+		 WHEN 
+         (
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
          LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-'))
+         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+         AND (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+         LEFT JOIN MHDWDEV.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
+         where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+         )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderTaxonomy1X,
@@ -645,7 +694,7 @@ select DISTINCT
     dtl.AMT_PAID                AS DTL_AMT_PAID,
     dtl.AMT_BILLED              AS DTL_AMT_BILLED,
     dtl.BILLING_ENC_CLM_PRV_SEQ AS DTL_BILLING_ENC_CLM_PRV_SEQ,
-    dtl.SERVICING_ENC_PRV_SEQ   AS DTL_SERVICING_ENC_CLM_PRV_SEQ,
+    dtl.SERVICING_ENC_PRV_SEQ   AS DTL_SERVICING_ENC_PRV_SEQ,
     dtl.DOS_FROM_DT             AS DTL_DOS_FROM_DT,
     dtl.DOS_TO_DT               AS DTL_DOS_TO_DT,
     dtl.MEM_SEQ                 AS DTL_FACT_MEM_SEQ,
@@ -677,7 +726,7 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_servicing
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_billing
     ON DTL_BILLING_ENC_CLM_PRV_SEQ = dtl_prov_billing.ENC_PRV_SEQ
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_servicing
-    ON DTL_SERVICING_ENC_CLM_PRV_SEQ = dtl_prov_servicing.ENC_PRV_SEQ
+    ON DTL_SERVICING_ENC_PRV_SEQ = dtl_prov_servicing.ENC_PRV_SEQ
 
 WHERE inst.IND_OFFSET = 'N'
  ) A;
