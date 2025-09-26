@@ -78,24 +78,38 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
     4.	Provider Type: IF CDE_ENC_CLM_PROV_TYPE IS NOT NULL THEN 1 ELSE 0 
     5.	Provider Location: If ID_PROVIDER_LOCATION IS NOT NULL THEN 1 ELSE 0
     6.	Provider Taxonomy: If CDE_PROV_TAXONOMY IS NOT NULL THEN 1 ELSE 0
-60	MPT_SENDPRO_ValidEncProvider	
+
+60	MPT_SENDPRO_ValidEncClmProvider	1.	Join ENC_CLM_PRV_SEQ from Fact with sendpro.spro_b_enc_claim_provider on enc_clm_prv_seq
+2.	NPI: If PROV_NPI  IS NOT  NULL Then 1 else 0
+3.	Internal Provider ID: IF ENC_PROV_ID IS NOT NULL THEN 1 ELSE 0
+4.	Provider Type: IF CDE_ENC_CLM_PROV_TYPE IS NOT NULL THEN 1 ELSE 0 
+5.	Provider Location: If ID_PROVIDER_LOCATION IS NOT NULL THEN 1 ELSE 0
+6.	Provider Taxonomy: If CDE_PROV_TAXONOMY IS NOT NULL THEN 1 ELSE 0
+
+
+61	MPT_SENDPRO_ValidEncProvider	
     1.	Join ENC_PRV_SEQ from Fact with sendpro. SPRO_B_ENC_PROVIDER_HIST on.enc_prv_seq left join spro_b_enc_taxonomy_hist on SPRO_B_ENC_PROVIDER_HIST.enc_prv_seq= spro_b_enc_taxonomy_hist.enc_prv_seq
     2.	NPI: If ID_NPI  IS NOT  NULL Then 1 else 0
     3.	Internal Provider ID: IF ENC_PROV_ID IS NOT NULL THEN 1 ELSE 0
     4.	Provider Type: IF CDE_ENC_PROV_TYPE IS NOT NULL THEN 1 ELSE 0 
     5.	Provider Location: If COALESCE(ID_PROVIDER_LOCATION,’+’)<>’+’ THEN 1 ELSE 0
     6.	Provider Taxonomy: If CDE_ENC_TAXONOMY IS NOT NULL THEN 1 ELSE 0
-61	MPT_SENDPRO_ValidEncDiagnosisCode	
+
+62	MPT_SENDPRO_ValidEncDiagnosisCode	
     1.	Join DIAG_GRP_SEQ from Fact with NW. NW_B_DIAGNOSIS_GROUP ON  NW_B_DIAGNOSIS_GROUP .DIAG_GRP_SEQ 
     2.	Admission Diagnosis Code: If CDE_DIAG_ADMIT  IS NOT  NULL Then 1 else 0
     3.	Primary Diagnosis Code: IF CDE_DIAG_P1 IS NOT NULL THEN 1 ELSE 0
-62	MPT_SENDPRO_ValidEncDProcedureCode	
+63	MPT_SENDPRO_ValidEncDProcedureCode	
     1.	Join PROC_SEQ from Fact with NW. NW_B_PROCEDURE ON  NW_B_PROCEDURE .PROC_SEQ
     2.	Procedure Code: If COALESCE(CDE_PROC,’ ‘)  <> ‘ ‘ Then 1 else 0
-63	MPT_SENDPRO_ValidEncDProcedureModifierCode	
+64	MPT_SENDPRO_ValidEncDProcedureModifierCode	
     1.	Join PROCMFR_SEQ from Fact with NW. NW_B_PROCEDURE_MFR ON  NW_B_PROCEDURE_MFR .PROCMFR_SEQ
     2.	Procedure Modifier Code: If COALESCE(CDE_PROC_MOD,’ ‘)  <> ‘ ‘ Then 1 else 0
-64	MPT_SENDPRO_ValidPlaceOfService	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PLACE_OF_SERVICE’ then 1 else 0
+65	MPT_SENDPRO_ValidPlaceOfService	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PLACE_OF_SERVICE’ then 1 else 0
+
+66	MPT_SENDPRO_ValidRecordStatus	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_REC_STATUS’ then 1 else 0
+67	MPT_SENDPRO_ValidPrescriptionOriginCode	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PRESC_ORIG then 1 else 0
+
 */
 --CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I AS
 
