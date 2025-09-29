@@ -664,32 +664,70 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	837I Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidRecordStatus_NCPDP: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.CDE_REC_STATUS 
 •	Missing Number Value Parameter: MPT_SENDPRO_NumberIsNull_ALL, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.CDE_REC_STATUS
+
+34	MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
+
+66	MPT_SENDPRO_ValidRecordStatus	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_REC_STATUS’ then 1 else 0
+
 */
 
-
+CASE
+    WHEN CDE_REC_STATUS IS NULL THEN 'NULL'
+    WHEN CDE_REC_STATUS NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REC_STATUS' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+    ELSE 'VALID'
+END AS RecordStatus1X,
 
 /*
 12.1.30	NDC (MPT_SENDPRO_NDC_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NDC_Valid_ALL: sendpro.spro_b_enc_claim_phrm_leg_hist.cde_ndc
 •	Missing String Value Parameter: MPT_StringIsNull_ALL,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
+
+50	MPT_SENDPRO_NDC_Valid_ALL	If valid based on lookup to the column CDE_NDC from "NW_B_DRUG" then 1 else 0
+
+3	MPT_SENDPRO_StringIsNull_ALL	String is not null then 1 else 0
 */
 
+CASE
+    WHEN (IND_SCRIPT_OT = 'O') THEN 'NOT APP'
+    WHEN (PHRM_CDE_NDC IS NULL) AND (IND_SCRIPT_OT <> 'O') THEN 'NULL'
+    WHEN NOT EXISTS (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = PHRM_CDE_NDC AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) 
+	THEN 'INVALID'
+    ELSE 'VALID'
+END AS NDC1X,
 
 /*
 12.1.31	Compound NDC (MPT_SENDPRO_Compound_NDC_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NDC_Valid_ALL: spro_b_enc_phrm_info_dtl_hist.cde_ndc
+
+50	MPT_SENDPRO_NDC_Valid_ALL	If valid based on lookup to the column CDE_NDC from "NW_B_DRUG" then 1 else 0
 */
 
+CASE
+    WHEN (IND_SCRIPT_OT = 'O') OR (DTL_CDE_NDC IS NULL) THEN 'NOT APP'
+    WHEN NOT EXISTS (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = DTL_CDE_NDC AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) 
+	THEN 'INVALID'
+    ELSE 'VALID'
+END AS CompoundNDC1X,
 
 /*
 12.1.32	Script Written Date (MPT_SENDPRO_Script_Written_Date_NCPDP)
 •	837P Claims population: MPT_SENDPRO_ClaiimType_NCPDP 
 •	MPT_SENDPRO_DateIsNotBot_ALL: spro_b_enc_claim_phrm_leg_hist. SCRIPT_WRITTEN_DTSPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: spro_b_enc_claim_phrm_leg_hist. SCRIPT_WRITTEN_DTSPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
+
+1	MPT_SENDPRO_DateIsNotNull_ALL	Date is not null then 1 else 0
+
+5	MPT_SENDPRO_DateIsNotBot_ALL	Date is not equal to 1/1/1900 then 1 else 0
 */
 
+CASE 
+    WHEN (IND_SCRIPT_OT = 'O') THEN 'NOT APP'
+    WHEN DOS_FROM_DT IS NULL AND SCRIPT_WRITTEN_DT IS NULL THEN 'NULL'
+    WHEN DOS_FROM_DT = '1900-01-01' AND SCRIPT_WRITTEN_DT = '1900-01-01' THEN 'INVALID'
+    ELSE 'VALID'
+    END AS ScriptWrittenDate1X,
 
 /*
 12.1.33	DAW (MPT_SENDPRO_DAW_NCPDP)
@@ -697,13 +735,23 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	Missing String Value Parameter: spro_b_enc_phrm_info_dtl_hist.CDE_DAWPROD_SEL
 */
 
+CASE
+    WHEN CDE_DAWPROD_SEL IS NULL THEN 'NULL'
+    ELSE 'VALID'
+END AS DAW1X,
 
 /*
 12.1.34	Dispense Fee (MPT_SENDPRO_DispenseFee_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NumberIsNull_ALL: spro_b_enc_claim_phrm_leg_hist. AMT_DISP_FEE
+
+34	MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
 */
 
+CASE
+    WHEN AMT_DISP_FEE IS NULL THEN 'NULL'
+    ELSE 'VALID'
+END AS DispenseFee1X,
 
 /*
 12.1.35	Prescribing Provider Id (MPT_SENDPRO_PrescribingProviderID_NCPDP)
@@ -712,12 +760,37 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 */
 
 
+    CASE  
+         WHEN (prescribing_ProviderInternalId IS NULL) THEN 'NULL'
+		 WHEN 
+         (
+              (NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = prescribing_ProviderInternalId)) 
+         )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS PrescribingProviderInternalId1X,
+
+
 /*
 12.1.36	Prescribing Provider NPI (MPT_SENDPRO_PrescribingProviderNPI__NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. PRESCRIBING_ENC_PRV_SEQ
 */
 
+    CASE  
+         WHEN 
+         (
+                ((prescribing_ProviderNPI IS NULL) OR prescribing_ProviderNPI IN ('0','000000000','0000000000')) 
+         )            
+         THEN 'NULL'
+            
+         WHEN 
+         (
+              (NOT EXISTS (SELECT ID_NPI from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = prescribing_ProviderNPI))
+         )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS PrescribingProviderNPI1X,
 
 /*
 12.1.37	Prescribing Provider Location (MPT_SENDPRO_PrescribingProviderLoc_ALL)
@@ -725,35 +798,71 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. PRESCRIBING_ENC_PRV_SEQ
 */
 
+    CASE 
+         WHEN 
+         (
+            (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from MHDWDEV.SENDPRO.spro_b_enc_provider_hist as prv
+        where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+            )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS PrescribingProviderLocation1X,
 
 /*
 12.1.38	Prescription Number (MPT_SENDPRO_PrescriptionNumber_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	Missing String Value Parameter: MPT_StringIsNull_ALL,, NUM_SCRIPT_SERV_REF
+
+3	MPT_SENDPRO_StringIsNull_ALL	String is not null then 1 else 0
 */
 
+CASE
+    WHEN NUM_SCRIPT_SERV_REF IS NULL THEN 'NULL'
+    ELSE 'VALID'
+END AS PrescriptionNumber1X,
 
 /*
 12.1.39	Refill Indicator (MPT_SENDPRO_RefillIndicator_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPFDP
 •	MPT_SENDPRO_NumberIsNull_ALL: raw_spro_ncpdp_claim.NUM_FILL 
+
+34	MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
 */
 
+CASE
+    WHEN NUM_SCRIPT_SERV_REF IS NULL THEN 'NULL'
+    ELSE 'VALID'
+END AS RefillIndicator1X,
 
 /*
 12.1.40	Prescription Origin (MPT_SENDPRO_PrescriptionOriginCode_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPFDP
 •	Missing String Value Parameter: MPT_StringIsNull_ALL: raw_spro_ncpdp_claim. CDE_PRESC_ORIG
 •	MPT_SENDPRO_ValidPrescriptionOriginCode: raw_spro_ncpdp_claim. CDE_PRESC_ORIG
+
+3	MPT_SENDPRO_StringIsNull_ALL	String is not null then 1 else 0
+
+67	MPT_SENDPRO_ValidPrescriptionOriginCode	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PRESC_ORIG then 1 else 0
 */
 
+CASE
+    WHEN CDE_PRESC_ORIG IS NULL THEN 'NULL'
+    WHEN CDE_PRESC_ORIG NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PRESC_ORIG' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+    ELSE 'VALID'
+END AS PrescriptionOrigin1X,
 
 /*
 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NumberIsNull_ALL: spro_b_enc_claim_phrm_leg_hist. QTY_DISPD
+
+34	MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
 */
 
+CASE
+    WHEN QTY_DISPD IS NULL THEN 'NULL'
+    ELSE 'VALID'
+END AS DispenseQuantity1X,
 
 
 1 as TOT_REX
@@ -792,17 +901,32 @@ select DISTINCT
 
     phrm.BILLING_ENC_CLM_PRV_SEQ,
 --    phrm.SERVICING_ENC_PRV_SEQ,
+    phrm.PRESCRIBING_ENC_PRV_SEQ,
     NULL AS CDE_PLACE_OF_SERVICE,
 
     phrm.PROC_SEQ,
 
+    phrm.CDE_REC_STATUS,
+    phrm.CDE_NDC AS PHRM_CDE_NDC,
+    phrm.IND_SCRIPT_OT,
+    phrm.SCRIPT_WRITTEN_DT,
+    phrm.CDE_DAWPROD_SEL,
+    phrm.AMT_DISP_FEE,
+    phrm.NUM_SCRIPT_SERV_REF,
+    phrm.CDE_PRESC_ORIG,
+    phrm.QTY_DISPD,
+
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
-    --prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
+--    prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
 
-    --prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
-    --prov_servicing.ID_NPI AS servicing_ProviderNPI,
-    --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+--    prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
+--    prov_servicing.ID_NPI AS servicing_ProviderNPI,
+--    prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+
+    prov_prescribing.ENC_PROV_ID AS prescribing_ProviderInternalId,
+    prov_prescribing.ID_NPI AS prescribing_ProviderNPI,
+--    prov_prescribing.CDE_PROVIDER_TYPE AS prescribing_ProviderType
 
 --    dtl.PROC_SEQ,
 --    dtl.PROCMFRGRP_SEQ,
@@ -825,6 +949,9 @@ select DISTINCT
 --    dtl_prov_servicing.ENC_PROV_ID AS dtl_servicing_ProviderInternalId,
 --    dtl_prov_servicing.ID_NPI      AS dtl_servicing_ProviderNPI
 
+    dtl.CDE_NDC                 AS DTL_CDE_NDC
+
+
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_PHRM_LEG_HIST phrm
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PHRM_INFO_DTL_HIST dtl
     ON phrm.NUM_ICN = dtl.NUM_ICN
@@ -840,6 +967,8 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_billing
 --    ON phrm.OTHER_ENC_CLM_PRV_SEQ = prov_other.ENC_PRV_SEQ
 --LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_referring
 --    ON phrm.REFERRING_ENC_PRV_SEQ = prov_referring.ENC_PRV_SEQ
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_prescribing
+    ON phrm.PRESCRIBING_ENC_PRV_SEQ = prov_prescribing.ENC_PRV_SEQ
 
 --LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_billing
 --    ON DTL_BILLING_ENC_CLM_PRV_SEQ = dtl_prov_billing.ENC_PRV_SEQ
