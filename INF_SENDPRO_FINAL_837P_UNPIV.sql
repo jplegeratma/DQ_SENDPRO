@@ -1,7 +1,7 @@
 
 USE MHTEAM.DWDQ;
 
--- DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
+DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
 
 CREATE VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV AS
 
@@ -38,7 +38,7 @@ FROM (
                 NDC1X AS NDC,
                 CompoundNDC1X AS Compound_NDC,
                 ScriptWrittenDate1X AS Script_Written_Date,
-                DAW1X AS DAW,
+                DAW1X AS Dispense_As_Written,
                 DispenseFee1X AS Dispense_Fee,
                 PrescribingProviderInternalId1X AS Prescriber_Provider_ID,
                 PrescribingProviderNPI1X AS Prescriber_Provider_NPI,
@@ -67,7 +67,7 @@ FROM (
                 NDC,
                 Compound_NDC,
                 Script_Written_Date,
-                DAW,
+                Dispense_As_Written,
                 Dispense_Fee,
                 Prescriber_Provider_ID,
                 Prescriber_Provider_NPI,
