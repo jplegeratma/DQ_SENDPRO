@@ -1,7 +1,13 @@
 
 USE MHTEAM.DWDQ;
 
+--- DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
+
 CREATE VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV AS
+
+SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, MEASURE, TYPE, REC_CNT,
+L.BENCHMARK_THRESHOLD
+FROM (
 
 SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, MEASURE, TYPE, REC_CNT
 FROM (
@@ -32,9 +38,9 @@ FROM (
                 ScriptWrittenDate1X AS Script_Written_Date,
                 DAW1X AS DAW,
                 DispenseFee1X AS Dispense_Fee,
-                PrescribingProviderInternalId1X AS Prescribing_Provider_ID,
-                PrescribingProviderNPI1X AS Prescribing_Provider_NPI,
-                PrescribingProviderLocation1X AS Prescribing_Provider_Location,
+                PrescribingProviderInternalId1X AS Prescriber_Provider_ID,
+                PrescribingProviderNPI1X AS Prescriber_Provider_NPI,
+                PrescribingProviderLocation1X AS Prescriber_Provider_Location,
                 PrescriptionNumber1X AS Prescription_Number,
                 RefillIndicator1X AS Refill_Indicator,
                 PrescriptionOrigin1X AS Prescription_Origin,
@@ -61,9 +67,9 @@ FROM (
                 Script_Written_Date,
                 DAW,
                 Dispense_Fee,
-                Prescribing_Provider_ID,
-                Prescribing_Provider_NPI,
-                Prescribing_Provider_Location,
+                Prescriber_Provider_ID,
+                Prescriber_Provider_NPI,
+                Prescriber_Provider_Location,
                 Prescription_Number,
                 Refill_Indicator,
                 Prescription_Origin,
@@ -73,4 +79,7 @@ FROM (
     )
     GROUP BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, MEASURE, TYPE
 )
-ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, MEASURE, TYPE;
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, MEASURE, TYPE
+
+) AS A
+LEFT JOIN MHTEAM.DWDQ.INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK;
