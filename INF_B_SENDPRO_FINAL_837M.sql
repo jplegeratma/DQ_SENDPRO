@@ -661,7 +661,6 @@ FROM (
 select DISTINCT
     CURRENT_DATE() AS RUN_DATE,
     prof.NUM_ICN,
-    prof.NUM_DTL,
     prof.CDE_ENTITY_MODEL,
     prof.CDE_ENC_MCO,
     prof.CDE_ENC_ACO,
@@ -701,6 +700,7 @@ select DISTINCT
     prov_servicing.ID_NPI AS servicing_ProviderNPI,
     --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
 
+    dtl.NUM_DTL,
     dtl.PROC_SEQ,
     dtl.PROCMFRGRP_SEQ,
 

@@ -660,7 +660,6 @@ FROM (
 select DISTINCT
     CURRENT_DATE() AS RUN_DATE,
     inst.NUM_ICN,
-    inst.NUM_DTL,
     inst.CDE_ENTITY_MODEL,
     inst.CDE_ENC_MCO,
     inst.CDE_ENC_ACO,
@@ -699,6 +698,8 @@ select DISTINCT
     prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
     prov_servicing.ID_NPI AS servicing_ProviderNPI,
     --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+
+    dtl.NUM_DTL,
 
     dtl.PROC_SEQ,
     dtl.PROCMFRGRP_SEQ,

@@ -871,7 +871,6 @@ FROM (
 select DISTINCT
     CURRENT_DATE() AS RUN_DATE,
     phrm.NUM_ICN,
-    phrm.NUM_DTL,
     phrm.CDE_ENTITY_MODEL,
     phrm.CDE_ENC_MCO,
     phrm.CDE_ENC_ACO,
@@ -927,6 +926,8 @@ select DISTINCT
     prov_prescribing.ENC_PROV_ID AS prescribing_ProviderInternalId,
     prov_prescribing.ID_NPI AS prescribing_ProviderNPI,
 --    prov_prescribing.CDE_PROVIDER_TYPE AS prescribing_ProviderType
+
+    dtl.NUM_DTL,
 
 --    dtl.PROC_SEQ,
 --    dtl.PROCMFRGRP_SEQ,
