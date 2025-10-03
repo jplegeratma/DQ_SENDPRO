@@ -544,7 +544,7 @@ ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_C
 
 -- only first claim line
 )
-WHERE NUM_DTL = 1    
+WHERE NUM_DTL IN (0,1)     -- NCPDP can have 0 detail records (header only claims)
 )
 -- add rank
 )

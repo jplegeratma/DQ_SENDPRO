@@ -927,7 +927,7 @@ select DISTINCT
     prov_prescribing.ID_NPI AS prescribing_ProviderNPI,
 --    prov_prescribing.CDE_PROVIDER_TYPE AS prescribing_ProviderType
 
-    dtl.NUM_DTL,
+    CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
 
 --    dtl.PROC_SEQ,
 --    dtl.PROCMFRGRP_SEQ,
