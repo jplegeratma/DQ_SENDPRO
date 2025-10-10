@@ -1,17 +1,60 @@
 
-DROP VIEW MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV_DETAIL
+DROP VIEW MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV_DETAIL;
 
--- latest view
+CREATE VIEW INF_SENDPRO_TARGET_837I_UNPIV_DETAIL
+AS
 
- CREATE VIEW INF_SENDPRO_TARGET_837I_UNPIV_DETAIL
- AS
+SELECT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
 
 -- limit rank to 10 lines
-SELECT DISTINCT *
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
 FROM (
 -- rank
-  SELECT *,
-                                            RANK ()
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
                                             OVER (PARTITION BY RUN_DATE,
                                                                CDE_ENTITY_MODEL, 
                                                                CDE_ENC_MCO, 
@@ -19,6 +62,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE
                                                   ORDER BY
                                                                RUN_DATE,
@@ -28,6 +72,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE,
                                                                TYPE,
                                                                NUM_ICN,
@@ -37,12 +82,37 @@ FROM (
 
 -- only first claim line
 
-SELECT *
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
   FROM (
 
 -- core unpiv
 
-        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE, NUM_ICN, NUM_DTL
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
 
         FROM (
             SELECT
@@ -53,6 +123,7 @@ SELECT *
                 CLAIM_TYPE,
                 CDE_CLM_DISPOSITION,
                 CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
                 ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
                 ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
                 ClaimAllowableAmount1X AS Allowed_Amount,
@@ -141,7 +212,8 @@ ORDER BY
                                                                TYPE,
                                                                NUM_ICN,
                                                                RNK
-;
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
 -----------------
 
 DROP VIEW INF_SENDPRO_TARGET_837M_UNPIV_DETAIL;
@@ -149,12 +221,57 @@ DROP VIEW INF_SENDPRO_TARGET_837M_UNPIV_DETAIL;
 CREATE VIEW INF_SENDPRO_TARGET_837M_UNPIV_DETAIL
 AS
 
+SELECT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
 -- limit rank to 10 lines
-SELECT DISTINCT *
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
 FROM (
 -- rank
-  SELECT *,
-                                            RANK ()
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
                                             OVER (PARTITION BY RUN_DATE,
                                                                CDE_ENTITY_MODEL, 
                                                                CDE_ENC_MCO, 
@@ -162,6 +279,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE
                                                   ORDER BY
                                                                RUN_DATE,
@@ -171,6 +289,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE,
                                                                TYPE,
                                                                NUM_ICN,
@@ -180,12 +299,37 @@ FROM (
 
 -- only first claim line
 
-SELECT *
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
   FROM (
 
 -- core unpiv
 
-        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE, NUM_ICN, NUM_DTL
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
 
         FROM (
             SELECT
@@ -196,6 +340,7 @@ SELECT *
                 CLAIM_TYPE,
                 CDE_CLM_DISPOSITION,
                 CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
                 ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
                 ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
                 ClaimAllowableAmount1X AS Allowed_Amount,
@@ -284,7 +429,9 @@ ORDER BY
                                                                TYPE,
                                                                NUM_ICN,
                                                                RNK
-;
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
+
 -----------------
 
 DROP VIEW INF_SENDPRO_TARGET_837D_UNPIV_DETAIL;
@@ -292,12 +439,57 @@ DROP VIEW INF_SENDPRO_TARGET_837D_UNPIV_DETAIL;
 CREATE VIEW INF_SENDPRO_TARGET_837D_UNPIV_DETAIL
 AS
 
+SELECT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
 -- limit rank to 10 lines
-SELECT DISTINCT *
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
 FROM (
 -- rank
-  SELECT *,
-                                            RANK ()
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
                                             OVER (PARTITION BY RUN_DATE,
                                                                CDE_ENTITY_MODEL, 
                                                                CDE_ENC_MCO, 
@@ -305,6 +497,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE
                                                   ORDER BY
                                                                RUN_DATE,
@@ -314,6 +507,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE,
                                                                TYPE,
                                                                NUM_ICN,
@@ -323,12 +517,37 @@ FROM (
 
 -- only first claim line
 
-SELECT *
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
   FROM (
 
 -- core unpiv
 
-        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE, NUM_ICN, NUM_DTL
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
 
         FROM (
             SELECT
@@ -339,6 +558,7 @@ SELECT *
                 CLAIM_TYPE,
                 CDE_CLM_DISPOSITION,
                 CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
                 ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
                 ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
                 ClaimAllowableAmount1X AS Allowed_Amount,
@@ -427,7 +647,8 @@ ORDER BY
                                                                TYPE,
                                                                NUM_ICN,
                                                                RNK
-;
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
 
 -----------------
 
@@ -436,11 +657,56 @@ DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV_DETAIL;
 CREATE VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV_DETAIL
 AS
 
+SELECT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
 -- limit rank to 10 lines
-SELECT DISTINCT *
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
 FROM (
 -- rank
-  SELECT *,
+  SELECT
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
                                             RANK ()
                                             OVER (PARTITION BY RUN_DATE,
                                                                CDE_ENTITY_MODEL, 
@@ -449,6 +715,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE
                                                   ORDER BY
                                                                RUN_DATE,
@@ -458,6 +725,7 @@ FROM (
                                                                CLAIM_TYPE,
                                                                CDE_CLM_DISPOSITION,
                                                                CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
                                                                MEASURE,
                                                                TYPE,
                                                                NUM_ICN,
@@ -467,12 +735,38 @@ FROM (
 
 -- only first claim line
 
-SELECT *
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
   FROM (
 
 -- core unpiv
 
-        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE, NUM_ICN, NUM_DTL
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
 
         FROM (
             SELECT
@@ -483,6 +777,7 @@ SELECT *
                 CLAIM_TYPE,
                 CDE_CLM_DISPOSITION,
                 CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
                 ClaimAllowableAmount1X AS Allowed_Amount,
                 ClaimPaidAmount1X AS Paid_Amount,
                 ClaimBilledAmount1X AS Billed_Amount,
@@ -563,4 +858,5 @@ ORDER BY
                                                                TYPE,
                                                                NUM_ICN,
                                                                RNK
-;
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
