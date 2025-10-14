@@ -24,6 +24,7 @@ FROM (
 
 
 -- limit rank to 10 lines
+-- 10/14/2024 - limit to 3 lines
 SELECT DISTINCT 
                RUN_DATE, 
                CDE_ENTITY_MODEL, 
@@ -197,8 +198,8 @@ WHERE NUM_DTL = 1
 )
 -- add rank
 )
--- limit rank to 10 line
-WHERE rnk <= 10
+-- limit rank to 3 lines
+WHERE rnk <= 3
 
 ORDER BY 
                                                                RUN_DATE,
