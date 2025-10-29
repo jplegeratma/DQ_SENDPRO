@@ -115,7 +115,7 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
 
 -- CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP AS
 
--- TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
+TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP
 SELECT DISTINCT
@@ -235,7 +235,7 @@ END AS ClaimBilledAmount1X,
 */
 
     CASE  
-         WHEN (billing_ProviderInternalId IS NULL) THEN 'NULL'
+         WHEN (billing_ProviderInternalId IS NULL OR billing_ProviderInternalId IN ('#','+','-')) THEN 'NULL'
 		 WHEN 
          ( 
                (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) )
@@ -258,7 +258,7 @@ END AS ClaimBilledAmount1X,
     CASE  
          WHEN 
          (
-               ((billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
+               ((billing_ProviderNPI IS NULL) OR (billing_ProviderNPI IN ('#','+','-')) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
          )            
             THEN 'NULL'
 		 WHEN 
@@ -616,7 +616,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
 */
 
     CASE 
-        WHEN PROC_SEQ IS NULL THEN 'NULL'
+        WHEN PROC_SEQ IS NULL OR PROC_SEQ IN (-1,-4,-5) THEN 'NULL'
         WHEN NOT EXISTS (SELECT CDE_PROC from MHDWQA.NW.NW_B_PROCEDURE proc WHERE PROC_SEQ = proc.PROC_SEQ 
             AND CDE_PROC IS NOT NULL AND CDE_PROC NOT IN ('#','+','-',' ')) 
         THEN 'INVALID'
@@ -677,7 +677,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
 */
 
 CASE
-    WHEN CDE_REC_STATUS IS NULL THEN 'NULL'
+    WHEN CDE_REC_STATUS IS NULL OR CDE_REC_STATUS IN ('#','+','-') THEN 'NULL'
     WHEN CDE_REC_STATUS NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REC_STATUS' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
     ELSE 'VALID'
 END AS RecordStatus1X,
@@ -695,7 +695,7 @@ END AS RecordStatus1X,
 
 CASE
     WHEN (IND_SCRIPT_OT = 'O') THEN 'NOT APP'
-    WHEN (PHRM_CDE_NDC IS NULL) AND (IND_SCRIPT_OT <> 'O') THEN 'NULL'
+    WHEN (PHRM_CDE_NDC IS NULL OR PHRM_CDE_NDC IN ('#','+','-')) AND (IND_SCRIPT_OT <> 'O') THEN 'NULL'
     WHEN NOT EXISTS (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = PHRM_CDE_NDC AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) 
 	THEN 'INVALID'
     ELSE 'VALID'
@@ -710,7 +710,7 @@ END AS NDC1X,
 */
 
 CASE
-    WHEN (IND_SCRIPT_OT = 'O') OR (DTL_CDE_NDC IS NULL) THEN 'NOT APP'
+    WHEN (IND_SCRIPT_OT = 'O') OR (DTL_CDE_NDC IS NULL OR DTL_CDE_NDC IN ('#','+','-')) THEN 'NOT APP'
     WHEN NOT EXISTS (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = DTL_CDE_NDC AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) 
 	THEN 'INVALID'
     ELSE 'VALID'
@@ -741,7 +741,7 @@ CASE
 */
 
 CASE
-    WHEN CDE_DAWPROD_SEL IS NULL THEN 'NULL'
+    WHEN CDE_DAWPROD_SEL IS NULL OR CDE_DAWPROD_SEL IN ('#','+','-') THEN 'NULL'
     ELSE 'VALID'
 END AS DAW1X,
 
@@ -754,7 +754,7 @@ END AS DAW1X,
 */
 
 CASE
-    WHEN AMT_DISP_FEE IS NULL THEN 'NULL'
+    WHEN AMT_DISP_FEE IS NULL OR AMT_DISP_FEE < 0 THEN 'NULL'
     ELSE 'VALID'
 END AS DispenseFee1X,
 
@@ -766,7 +766,7 @@ END AS DispenseFee1X,
 
 
     CASE  
-         WHEN (prescribing_ProviderInternalId IS NULL) THEN 'NULL'
+         WHEN (prescribing_ProviderInternalId IS NULL OR prescribing_ProviderInternalId IN ('#','+','-')) THEN 'NULL'
 		 WHEN 
          (
               (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = prescribing_ProviderInternalId)) 
@@ -785,7 +785,7 @@ END AS DispenseFee1X,
     CASE  
          WHEN 
          (
-                ((prescribing_ProviderNPI IS NULL) OR prescribing_ProviderNPI IN ('0','000000000','0000000000')) 
+                ((prescribing_ProviderNPI IS NULL) OR (prescribing_ProviderNPI IN ('#','+','-')) OR prescribing_ProviderNPI IN ('0','000000000','0000000000')) 
          )            
          THEN 'NULL'
             
@@ -822,7 +822,7 @@ END AS DispenseFee1X,
 */
 
 CASE
-    WHEN NUM_SCRIPT_SERV_REF IS NULL THEN 'NULL'
+    WHEN NUM_SCRIPT_SERV_REF IS NULL OR NUM_SCRIPT_SERV_REF IN (-1,-4,-5) THEN 'NULL'
     ELSE 'VALID'
 END AS PrescriptionNumber1X,
 
@@ -835,7 +835,8 @@ END AS PrescriptionNumber1X,
 */
 
 CASE
-    WHEN NUM_SCRIPT_SERV_REF IS NULL THEN 'NULL'
+    WHEN NUM_REFILLS_AUTH IS NULL THEN 'NULL'
+    WHEN NUM_REFILLS_AUTH < 0 THEN 'INVALID'
     ELSE 'VALID'
 END AS RefillIndicator1X,
 
@@ -851,7 +852,7 @@ END AS RefillIndicator1X,
 */
 
 CASE
-    WHEN CDE_PRESC_ORIG IS NULL THEN 'NULL'
+    WHEN CDE_PRESC_ORIG IS NULL OR CDE_PRESC_ORIG IN ('#','+','-') THEN 'NULL'
     WHEN CDE_PRESC_ORIG NOT IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PRESC_ORIG' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
     ELSE 'VALID'
 END AS PrescriptionOrigin1X,
@@ -918,6 +919,7 @@ select DISTINCT
     phrm.CDE_DAWPROD_SEL,
     phrm.AMT_DISP_FEE,
     phrm.NUM_SCRIPT_SERV_REF,
+    phrm.NUM_REFILLS_AUTH,
     phrm.CDE_PRESC_ORIG,
     phrm.QTY_PRESCRIBED,
     phrm.QTY_DISPD,
