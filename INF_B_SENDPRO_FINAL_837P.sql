@@ -110,6 +110,11 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
 66	MPT_SENDPRO_ValidRecordStatus	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_REC_STATUS’ then 1 else 0
 67	MPT_SENDPRO_ValidPrescriptionOriginCode	If valid based on the lookup against the CDE_CHAR from NW.NW_SUP_CODE_REF where CDE_GROUP=’ CDE_PRESC_ORIG then 1 else 0
 
+68	MPT_SENDPRO_ValidEncInternalProvider	1.	Join ENC_PRV_SEQ from Fact with sendpro. spro_b_enc_provider_hist on enc_prv_seq
+2.	NPI: If ID_NPI  IS NOT  NULL Then 1 else 0
+3.	Internal Provider Address Location: IF CDE_ENC_PROV_ID_LOC IS NOT NULL THEN 1 ELSE 0
+4.	Internal Provider ID: IF ENC_PROV_ID IS NOT NULL THEN 1 ELSE 0
+
 */
 -- DROP TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
 
@@ -303,8 +308,18 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
 
+/* 
+10/31/25 NEW
+
+12.1.9	Billing Internal Provider Address Location (MPT_SENDPRO_BillingInternalProviderAddressLocALL)
+•	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
+•	MPT_SENDPRO_ ValidEncInternalProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ:
+
+*/
+
+
 /*
-12.1.9	Servicing Provider Id (MPT_SENDPRO_ServicingProviderID_ALL)
+12.1.10	Servicing Provider Id (MPT_SENDPRO_ServicingProviderID_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
@@ -320,8 +335,9 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
          ELSE 'VALID' 
          END AS ServicingProviderInternalId1X,
 */
+
 /*
-12.1.10	Servicing Provider NPI (MPT_SENDPRO_ServicingProviderNPI_ALL)
+12.1.11	Servicing Provider NPI (MPT_SENDPRO_ServicingProviderNPI_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ, 
 SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ: 
@@ -345,7 +361,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
          END AS ServicingProviderNPI1X,
 */
 /*
-12.1.11	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
+12.1.12	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ, 
 SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ: 
@@ -374,7 +390,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          END AS ServicingProviderType1X,
 */
 /*
-12.1.12	Servicing Provider Location (MPT_SENDPRO_ServicingProviderLoc_ALL)
+12.1.13	Servicing Provider Location (MPT_SENDPRO_ServicingProviderLoc_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
@@ -392,7 +408,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          END AS ServicingProviderLocation1X,
 */
 /*
-12.1.13	Servicing Provider Taxonomy Code (MPT_SENDPRO_ServicingProviderTaxonomyCode_ALL)
+12.1.14	Servicing Provider Taxonomy Code (MPT_SENDPRO_ServicingProviderTaxonomyCode_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ: 
 */
@@ -411,8 +427,18 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          ELSE 'VALID' 
          END AS ServicingProviderTaxonomy1X,
 */
+
+/* 
+10/31/25 NEW
+12.1.15	Servicing Internal Provider Address Location (MPT_SENDPRO_ServicingInternalProviderAddressLocALL)
+•	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
+•	MPT_SENDPRO_ ValidEncInternalProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING _ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. SERVICING _ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. SERVICING _ENC_PRV_SEQ:
+
+*/
+
+
 /*
-12.1.14	From Service Date (MPT_SENDPRO_From_Service_Date_ALL)
+12.1.16	From Service Date (MPT_SENDPRO_From_Service_Date_ALL)
 •	837P Claims population: MPT_SENDPRO_ClaiimType_ALL 
 •	MPT_SENDPRO_DateIsNotBot_ALL: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_INST_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_INST_INFO_DTL_HIST.DOS_FROM_DT
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_CLAIM_INST_LEG_HIST.DOS_FROM_DT, SPRO_B_ENC_INST_INFO_DTL_HIST.DOS_FROM_DT
@@ -428,7 +454,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
     END AS FromServiceDate1X,
 
 /*
-12.1.15	To Service Date (MPT_SENDPRO_To_Service_Date_ALL)
+12.1.17	To Service Date (MPT_SENDPRO_To_Service_Date_ALL)
 •	837P Claims population: MPT_SENDPRO_ClaiimType_ALL 
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.DOS_TO_DT, SPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_ TO _DT, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.DOS_ TO _DT, SPRO_B_ENC_CLAIM_INST_LEG_HIST.DOS_ TO _DT, SPRO_B_ENC_INST_INFO_DTL_HIST.DOS_ TO _DT
 */
@@ -440,7 +466,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
     END AS ToServiceDate1X,
 
 /*
-12.1.16	Admission Date (MPT_SENDPRO_Admission_Date_837I)
+12.1.18	Admission Date (MPT_SENDPRO_Admission_Date_837I)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_DateIsNotBot_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST.ADMIT_DT_TM
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL SPRO_B_ENC_CLAIM_INST_LEG_HIST.ADMIT_DT_TM
@@ -455,7 +481,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 */
 
 /*
-12.1.17	Member ID (MPT_SENDPRO_MemberID_ALL)
+12.1.19	Member ID (MPT_SENDPRO_MemberID_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ProviderInternalId_Valid: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.MEM_SEQ>0, SPRO_B_ENC_DNTL_INFO_DTL_HIST. MEM SEQ>0, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.MEM_SEQ>0, SPRO_B_ENC_INST_INFO_DTL_HIST.MEM_SEQ>0
 
@@ -477,12 +503,15 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
     END AS MemberID1X,
 
 /*
-12.1.18	Quantity (MPT_SENDPRO_ClaimAllowableAmt_ALL)
+12.1.20	Quantity (MPT_SENDPRO_ClaimAllowableAmt_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_NumberIsNull_ALL: SPRO_B_ENC_CLAIM_PROF_LEG_HIST,QTY_UNITS_BILLED,  SPRO_B_ENC_PROF_INFO_DTL_HIST.QTY_UNITS_BILLED, SPRO_B_ENC_CLAIM_INST_LEG_HIST,QTY_UNITS_BILLED,  SPRO_B_ENC_ INST_INFO_DTL_HIST.QTY_UNITS_BILLED, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST,QTY_UNITS_BILLED,  
 *   SPRO_B_ENC_DNTL_INFO_DTL_HIST.QTY_UNITS_BILLED, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST, QTY_DISPD,  SPRO_B_ENC_PROF_INFO_DTL_HIST. QTY_PRESCRIBED
 
 QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
+
+10/31/25 Removed validation for QTY_PRESCRIBED from SPRO_B_ENC_PHRM_INFO_DTL_HIST and the Qty_units_billed from LEG_HIST tables for PROF and INST
+
 */
 
     CASE 
@@ -491,7 +520,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS QuantityBilled1X,
 
 /*
-12.1.19	Admitting Diagnosis (MPT_SENDPRO_Admitting_Diagnosis_837I)
+12.1.21	Admitting Diagnosis (MPT_SENDPRO_Admitting_Diagnosis_837I)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.DIAG_GRP_SEQ, Admission Diagnosis Code
 
@@ -510,7 +539,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
          END AS AdmittingDiagnosisCode1X,
 */
 /*
-12.1.20	Primary Diagnosis (MPT_SENDPRO_Primary_Diagnosis_837)
+12.1.22	Primary Diagnosis (MPT_SENDPRO_Primary_Diagnosis_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC. MPT_SENDPRO_ClaiimType_837P
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.DIAG_GRP_SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.DIAG_GRP_SEQ, Primary Diagnosis Code
 
@@ -529,7 +558,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
          END AS PrimaryDiagnosisCode1X,
 */
 /*
-12.1.21	Discharge Date (MPT_SENDPRO_Discharge_Date_837I)
+12.1.23	Discharge Date (MPT_SENDPRO_Discharge_Date_837I)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_DateIsNotBot_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST. DISCHARGE_DT_TM, SPRO_B_ENC_INST_INFO_DTL_HIST. DISCHARGE_DT
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL SPRO_B_ENC_CLAIM_INST_LEG_HIST. DISCHARGE_DT_TM, SPRO_B_ENC_INST_INFO_DTL_HIST. DISCHARGE_DT
@@ -543,7 +572,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS DischargeDate1X,
 */
 /*
-12.1.22	Type of Admission (MPT_TypeofAdmission_837I)
+12.1.24	Type of Admission (MPT_TypeofAdmission_837I)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_TypeOfAdmission_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_ADMIT_TYPE
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_ADMIT_TYPE
@@ -559,7 +588,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS TypeOfAdmission1X,
 */
 /*
-12.1.23	Source of Admission (MPT_SourceofAdmission_837I)
+12.1.25	Source of Admission (MPT_SourceofAdmission_837I)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP
 •	MPT_SENDPRO_SourceOfAdmission_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_ADMIT_SOURCE
 •	Missing String Value Parameter: MP_SENDPRO_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_ADMIT_SOURCE
@@ -573,7 +602,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS SourceOfAdmission1X,
 */
 /*
-12.1.24	Patient Status Code (MPT_SENDPRO_PatientStatusCode_837I)
+12.1.26	Patient Status Code (MPT_SENDPRO_PatientStatusCode_837I)
 •	837I Claims population:  MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
 •	MPT_SENDPRO_PatientStatusCode_Valid: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PATIENT_STATUS
 •	MPT_SENDPRO_StringIsNull_ALL: SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PATIENT_STATUS
@@ -589,7 +618,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS PatientStatusCode1X,
 */
 /*
-12.1.25	Facility Type Code (MPT_SENDPRO_FacilityTypeCode_837I_837P)
+12.1.27	Facility Type Code (MPT_SENDPRO_FacilityTypeCode_837I_837P)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP
 •	MPT_SENDPRO_FacilityTypeCode_837I: SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_TYPE_OF_BILL, 
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_TYPE_OF_BILL
@@ -605,7 +634,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS FacilityTypeCode1X,
 */
 /*
-12.1.26	Procedure Code (MPT_SENDPRO_ProcedureCode_837)
+12.1.28	Procedure Code (MPT_SENDPRO_ProcedureCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncDiagnosisCode SPRO_B_ENC_CLAIM_INST_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.PROC_SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.PROC_SEQ, Procedure Code
 
@@ -624,7 +653,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS ProcedureCode1X,
 
 /*
-12.1.27	Procedure Modifier Code (MPT_SENDPRO_ProcedureModCode_837)
+12.1.29	Procedure Modifier Code (MPT_SENDPRO_ProcedureModCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaiimType_837I_INP, MPT_SENDPRO_ClaiimType_837I_OUTP, MPT_SENDPRO_ClaiimType_837I_LTC, MPT_SENDPRO_ClaiimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	SENDPRO_ValidEncProcedureModifierCode SPRO_B_ENC_CLAIM_INST_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. PROCMFR _SEQ, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. PROCMFR _SEQ, Procedure Modfier` Code
 
@@ -643,7 +672,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
     END AS ProcedureModCode1X,
 */
 /*
-12.1.28	Place of Service (MPT_SENDPRO_PlaceOfServiceCode_837)
+12.1.30	Place of Service (MPT_SENDPRO_PlaceOfServiceCode_837)
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaiimType_837D
 •	MPT_SENDPRO_ValidPlaceOfService_837I: SPRO_B_ENC_CLAIM_PROF_LEG_HIST.CDE_PLACE_OF_SERVICE, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.CDE_PLACE_OF_SERVICE, 
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_PROF_LEG_HIST.CDE_PLACE_OF_SERVICE, SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.CDE_PLACE_OF_SERVICE,
@@ -665,7 +694,7 @@ QTY_DISPD in 12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
 -- NCPDP Specific Fields
 
 /*
-12.1.29	Record Status (MPT_SENDPRO_RecordStatus_NCPDP)
+12.1.31	Record Status (MPT_SENDPRO_RecordStatus_NCPDP)
 •	837I Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidRecordStatus_NCPDP: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.CDE_REC_STATUS 
 •	Missing Number Value Parameter: MPT_SENDPRO_NumberIsNull_ALL, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.CDE_REC_STATUS
@@ -683,7 +712,7 @@ CASE
 END AS RecordStatus1X,
 
 /*
-12.1.30	NDC (MPT_SENDPRO_NDC_NCPDP)
+12.1.32	NDC (MPT_SENDPRO_NDC_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NDC_Valid_ALL: sendpro.spro_b_enc_claim_phrm_leg_hist.cde_ndc
 •	Missing String Value Parameter: MPT_StringIsNull_ALL,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
@@ -702,7 +731,7 @@ CASE
 END AS NDC1X,
 
 /*
-12.1.31	Compound NDC (MPT_SENDPRO_Compound_NDC_NCPDP)
+12.1.33	Compound NDC (MPT_SENDPRO_Compound_NDC_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NDC_Valid_ALL: spro_b_enc_phrm_info_dtl_hist.cde_ndc
 
@@ -717,7 +746,7 @@ CASE
 END AS CompoundNDC1X,
 
 /*
-12.1.32	Script Written Date (MPT_SENDPRO_Script_Written_Date_NCPDP)
+12.1.34	Script Written Date (MPT_SENDPRO_Script_Written_Date_NCPDP)
 •	837P Claims population: MPT_SENDPRO_ClaiimType_NCPDP 
 •	MPT_SENDPRO_DateIsNotBot_ALL: spro_b_enc_claim_phrm_leg_hist. SCRIPT_WRITTEN_DTSPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
 •	Valid Date value parameter: MPT_SENDPRO_DateIsNotNull_ALL: spro_b_enc_claim_phrm_leg_hist. SCRIPT_WRITTEN_DTSPRO_B_ENC_DNTL_INFO_DTL_HIST.DOS_FROM_DT,, IND_SCRIPT_OT <>’O’ (NDC should not be null for non-OTC Prescriptions)
@@ -735,7 +764,7 @@ CASE
     END AS ScriptWrittenDate1X,
 
 /*
-12.1.33	DAW (MPT_SENDPRO_DAW_NCPDP)
+12.1.35	DAW (MPT_SENDPRO_DAW_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	Missing String Value Parameter: spro_b_enc_phrm_info_dtl_hist.CDE_DAWPROD_SEL
 */
@@ -746,7 +775,7 @@ CASE
 END AS DAW1X,
 
 /*
-12.1.34	Dispense Fee (MPT_SENDPRO_DispenseFee_NCPDP)
+12.1.36	Dispense Fee (MPT_SENDPRO_DispenseFee_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NumberIsNull_ALL: spro_b_enc_claim_phrm_leg_hist. AMT_DISP_FEE
 
@@ -759,7 +788,7 @@ CASE
 END AS DispenseFee1X,
 
 /*
-12.1.35	Prescribing Provider Id (MPT_SENDPRO_PrescribingProviderID_NCPDP)
+12.1.37	Prescribing Provider Id (MPT_SENDPRO_PrescribingProviderID_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. PRESCRIBING_ENC_PRV_SEQ
 */
@@ -777,7 +806,7 @@ END AS DispenseFee1X,
 
 
 /*
-12.1.36	Prescribing Provider NPI (MPT_SENDPRO_PrescribingProviderNPI__NCPDP)
+12.1.38	Prescribing Provider NPI (MPT_SENDPRO_PrescribingProviderNPI__NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. PRESCRIBING_ENC_PRV_SEQ
 */
@@ -798,7 +827,7 @@ END AS DispenseFee1X,
          END AS PrescribingProviderNPI1X,
 
 /*
-12.1.37	Prescribing Provider Location (MPT_SENDPRO_PrescribingProviderLoc_ALL)
+12.1.39	Prescribing Provider Location (MPT_SENDPRO_PrescribingProviderLoc_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. PRESCRIBING_ENC_PRV_SEQ
 */
@@ -814,7 +843,7 @@ END AS DispenseFee1X,
          END AS PrescribingProviderLocation1X,
 
 /*
-12.1.38	Prescription Number (MPT_SENDPRO_PrescriptionNumber_NCPDP)
+12.1.40	Prescription Number (MPT_SENDPRO_PrescriptionNumber_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
 •	Missing String Value Parameter: MPT_StringIsNull_ALL,, NUM_SCRIPT_SERV_REF
 
@@ -827,7 +856,7 @@ CASE
 END AS PrescriptionNumber1X,
 
 /*
-12.1.39	Refill Indicator (MPT_SENDPRO_RefillIndicator_NCPDP)
+12.1.41	Refill Indicator (MPT_SENDPRO_RefillIndicator_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPFDP
 •	MPT_SENDPRO_NumberIsNull_ALL: raw_spro_ncpdp_claim.NUM_FILL 
 
@@ -841,7 +870,7 @@ CASE
 END AS RefillIndicator1X,
 
 /*
-12.1.40	Prescription Origin (MPT_SENDPRO_PrescriptionOriginCode_NCPDP)
+12.1.42	Prescription Origin (MPT_SENDPRO_PrescriptionOriginCode_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPFDP
 •	Missing String Value Parameter: MPT_StringIsNull_ALL: raw_spro_ncpdp_claim. CDE_PRESC_ORIG
 •	MPT_SENDPRO_ValidPrescriptionOriginCode: raw_spro_ncpdp_claim. CDE_PRESC_ORIG
@@ -858,7 +887,7 @@ CASE
 END AS PrescriptionOrigin1X,
 
 /*
-12.1.41	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
+12.1.43	Dispense Quantity (MPT_SENDPRO_DispenseQty_NCPDP)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
 •	MPT_SENDPRO_NumberIsNull_ALL: spro_b_enc_claim_phrm_leg_hist. QTY_DISPD
 
@@ -869,6 +898,22 @@ CASE
     WHEN QTY_DISPD IS NULL THEN 'NULL'
     ELSE 'VALID'
 END AS DispenseQuantity1X,
+
+/* 
+NEW 10/31/25
+12.1.44	Pricing Method (MPT_SENDPRO_PricingMethod_837)
+•	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaiimType_837I
+•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PRICE_METHOD,
+
+*/
+
+/* 
+NEW 10/31/25
+12.1.45	Tooth Number (MPT_SENDPRO_ToothNumber_837D)
+•	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaiimType_837D
+•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_DNTL_ATTRIBUTE_M2M. cde_tooth_nbr
+
+*/
 
 
 1 as TOT_REX
