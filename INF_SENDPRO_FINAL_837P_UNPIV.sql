@@ -1,7 +1,7 @@
 
 USE MHTEAM.DWDQ;
 
--- DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
+DROP VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
 
 CREATE VIEW INF_SENDPRO_TARGET_837_NCPDP_UNPIV AS
 
@@ -30,6 +30,7 @@ FROM (
                 BillingProviderInternalId1X AS Bill_Provider_Internal_ID,
                 BillingProviderNPI1X AS Bill_Provider_NPI,
                 BillingProviderTaxonomy1X AS Bill_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_PIDSL,
                 FromServiceDate1X AS Statement_Date,
                 ToServiceDate1X AS To_Service_Date,
                 MemberID1X AS Member_ID,
@@ -59,6 +60,7 @@ FROM (
                 Bill_Provider_Internal_ID,
                 Bill_Provider_NPI,
                 Bill_Provider_Taxonomy,
+                Billing_Provider_PIDSL,
                 Statement_Date,
                 To_Service_Date,
                 Member_ID,

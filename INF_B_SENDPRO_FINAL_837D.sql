@@ -124,7 +124,6 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
 TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D
-
 SELECT DISTINCT
     RUN_DATE,
     NUM_ICN,
@@ -327,6 +326,18 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 
 */
 
+    CASE 
+		 WHEN 
+         (
+             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+
+         AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where DTL_BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+         )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS BillingInternalProviderAddressLocation1X,
 
 /*
 12.1.10	Servicing Provider Id (MPT_SENDPRO_ServicingProviderID_ALL)
@@ -443,6 +454,18 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 
 */
 
+    CASE 
+		 WHEN 
+         (
+             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+
+         AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+         )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS ServicingInternalProviderAddressLocation1X,
 
 /*
 12.1.16	From Service Date (MPT_SENDPRO_From_Service_Date_ALL)
@@ -695,6 +718,7 @@ NEW 10/31/25
 •	837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaiimType_837I
 •	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_PROF_LEG_HIST. CDE_PRICE_METHOD, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_PRICE_METHOD,
 
+CDE_ENC_PRICE_METHOD
 */
 
 /* 
@@ -712,6 +736,13 @@ b.clm_dtl_seq = c.clm_dtl_seq;
 
 */
 
+    CASE WHEN CDE_CLM_TYPE NOT IN ('D') THEN 'NOT APP'
+         WHEN DTL_CLAIM_SEQ IS NULL OR DTL_CLAIM_SEQ IN (-1,-4,-5) THEN 'NULL'
+         WHEN NOT EXISTS (SELECT CDE_TOOTH_NBR from MHDWQA.SENDPRO.SPRO_B_ENC_DNTL_ATTRIBUTE_M2M WHERE DTL_CLAIM_SEQ = CLM_DTL_SEQ
+            AND CDE_TOOTH_NBR IS NOT NULL AND CDE_TOOTH_NBR NOT IN ('#','+','-',' '))
+         THEN 'INVALID'
+         ELSE 'VALID'
+    END AS ToothNumber1X,
 
 1 as TOT_REX
 
@@ -723,20 +754,20 @@ select DISTINCT
     dntl.CDE_ENC_MCO,
     dntl.CDE_ENC_ACO,
     dntl.ID_SUBMITTER,
-    dntl.DOS_FROM_DT,
+    DATE(dntl.DOS_FROM_DT) AS DOS_FROM_DT,
     dntl.CDE_CLM_TYPE,
     dntl.CDE_CLM_STATUS,
     dntl.CDE_CLM_DISPOSITION,
     dntl.IND_OFFSET,
-    dntl.WH_FROM_DT,
+    DATE(dntl.WH_FROM_DT) AS WH_FROM_DT,
     dntl.MD_BATCH_SEQ,
 
     dntl.CDE_BILL_FREQ,
     dntl.CDE_CONTRACT_TYPE,
-     NULL AS AMT_ALLOWED,
+    NULL AS AMT_ALLOWED,
     dntl.AMT_PAID,
     dntl.AMT_BILLED,
-    dntl.DOS_TO_DT,
+    DATE(dntl.DOS_TO_DT) AS DOS_TO_DT,
     NULL AS ADMIT_DT,
     dntl.MEM_SEQ AS FACT_MEM_SEQ,
     dntl.QTY_UNITS_BILLED,
@@ -750,7 +781,7 @@ select DISTINCT
     dntl.BILLING_ENC_PRV_SEQ,
     dntl.SERVICING_ENC_PRV_SEQ,
     dntl.CDE_PLACE_OF_SERVICE,
-  
+
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
     --prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
@@ -767,13 +798,14 @@ select DISTINCT
     NULL                        AS  DTL_AMT_ALLOWED,
     dtl.AMT_PAID                AS DTL_AMT_PAID,
     dtl.AMT_BILLED              AS DTL_AMT_BILLED,
-    dtl.BILLING_ENC_PRV_SEQ AS DTL_BILLING_ENC_PRV_SEQ,
+    dtl.BILLING_ENC_PRV_SEQ     AS DTL_BILLING_ENC_PRV_SEQ,
     dtl.SERVICING_ENC_PRV_SEQ   AS DTL_SERVICING_ENC_PRV_SEQ,
-    dtl.DOS_FROM_DT             AS DTL_DOS_FROM_DT,
-    dtl.DOS_TO_DT               AS DTL_DOS_TO_DT,
+    DATE(dtl.DOS_FROM_DT)       AS DTL_DOS_FROM_DT,
+    DATE(dtl.DOS_TO_DT)         AS DTL_DOS_TO_DT,
     dtl.MEM_SEQ                 AS DTL_FACT_MEM_SEQ,
     dtl.QTY_UNITS_BILLED        AS DTL_QTY_UNITS_BILLED,
     NULL                        AS DTL_DISCHARGE_DT,
+    dtl.CLM_SEQ                 AS DTL_CLAIM_SEQ,
 
     dtl_prov_billing.ENC_PROV_ID   AS dtl_billing_ProviderInternalId,
     dtl_prov_billing.ID_NPI        AS dtl_billing_ProviderNPI,
@@ -784,19 +816,10 @@ select DISTINCT
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_DNTL_LEG_HIST dntl
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_DNTL_INFO_DTL_HIST dtl
     ON dntl.NUM_ICN = dtl.NUM_ICN
---LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PHRM_OTHER_PAYMENTS pharm
---    ON dntl.CLM_SEQ = pharm.CLM_SEQ
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_billing
     ON dntl.BILLING_ENC_PRV_SEQ = prov_billing.ENC_PRV_SEQ
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_servicing
     ON dntl.SERVICING_ENC_PRV_SEQ = prov_servicing.ENC_PRV_SEQ
---LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_operating
---    ON dntl.OPERATING_ENC_CLM_PRV_SEQ = prov_operating.ENC_PRV_SEQ
---LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_other
---    ON dntl.OTHER_ENC_CLM_PRV_SEQ = prov_other.ENC_PRV_SEQ
---LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_referring
---    ON dntl.REFERRING_ENC_PRV_SEQ = prov_referring.ENC_PRV_SEQ
-
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_billing
     ON DTL_BILLING_ENC_PRV_SEQ = dtl_prov_billing.ENC_PRV_SEQ
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_servicing
