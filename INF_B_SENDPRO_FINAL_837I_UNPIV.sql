@@ -1,7 +1,7 @@
 
 USE MHTEAM.DWDQ;
 
--- DROP VIEW INF_SENDPRO_TARGET_837I_UNPIV;
+DROP VIEW INF_SENDPRO_TARGET_837I_UNPIV;
 
 CREATE VIEW INF_SENDPRO_TARGET_837I_UNPIV AS
 
@@ -89,7 +89,7 @@ FROM (
                 Facility_Type_Code,
                 Procedure_Code,
                 Procedure_Mod_Code,
-                Place_Of_Service_Code
+                Place_Of_Service_Code,
                 Pricing_Method_Code
             )
         ) AS INF_SENDPRO_TARGET_837I_UNPIV
