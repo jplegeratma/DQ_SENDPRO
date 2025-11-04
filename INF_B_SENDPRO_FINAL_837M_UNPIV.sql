@@ -1,7 +1,7 @@
 
 USE MHTEAM.DWDQ;
 
--- DROP VIEW INF_SENDPRO_TARGET_837M_UNPIV;
+DROP VIEW INF_SENDPRO_TARGET_837M_UNPIV;
 
 CREATE VIEW INF_SENDPRO_TARGET_837M_UNPIV AS
 
@@ -29,9 +29,9 @@ FROM (
                 ClaimAllowableAmount1X AS Allowed_Amount,
                 ClaimPaidAmount1X AS Paid_Amount,
                 ClaimBilledAmount1X AS Billed_Amount,
-                BillingProviderInternalId1X AS Bill_Provider_Internal_ID,
-                BillingProviderNPI1X AS Bill_Provider_NPI,
-                BillingProviderTaxonomy1X AS Bill_Provider_Taxonomy,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_PIDSL,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
@@ -65,9 +65,9 @@ FROM (
                 Allowed_Amount,
                 Paid_Amount,
                 Billed_Amount,
-                Bill_Provider_Internal_ID,
-                Bill_Provider_NPI,
-                Bill_Provider_Taxonomy,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
                 Billing_Provider_PIDSL,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
