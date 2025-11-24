@@ -912,12 +912,16 @@ END AS PrescriptionOrigin1X,
 •	MPT_SENDPRO_NumberIsNull_ALL: spro_b_enc_claim_phrm_leg_hist. QTY_DISPD
 
 34	MPT_SENDPRO_NumberIsNull_ALL	Number is not null then 1 else 0
-*/
 
+-- This field was removed.
+*/
+'NOT APP' AS DispenseQuantity1X,
+/*
 CASE
     WHEN QTY_DISPD IS NULL THEN 'NULL'
     ELSE 'VALID'
 END AS DispenseQuantity1X,
+*/
 
 /* 
 NEW 10/31/25
@@ -991,7 +995,8 @@ select DISTINCT
     phrm.NUM_REFILLS_AUTH,
     phrm.CDE_PRESC_ORIG,
     phrm.QTY_PRESCRIBED,
-    phrm.QTY_DISPD,
+-- QTY_DISPD removed 11/24/25
+    NULL AS QTY_DISPD,
 
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
@@ -1019,7 +1024,8 @@ select DISTINCT
 --    dtl.DOS_FROM_DT             AS DTL_DOS_FROM_DT,
 --    dtl.DOS_TO_DT               AS DTL_DOS_TO_DT,
 --    dtl.MEM_SEQ                 AS DTL_FACT_MEM_SEQ,
-    dtl.QTY_UNITS_BILLED        AS DTL_QTY_UNITS_BILLED,
+--    Removed 11/24/25
+--    dtl.QTY_UNITS_BILLED        AS DTL_QTY_UNITS_BILLED,
 --    dtl.DISCHARGE_DT            AS DTL_DISCHARGE_DT,
 
 --    dtl_prov_billing.ENC_PROV_ID   AS dtl_billing_ProviderInternalId,
