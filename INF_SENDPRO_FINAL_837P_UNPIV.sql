@@ -17,9 +17,9 @@ FROM (
         FROM (
             SELECT
                 RUN_DATE,
-                CDE_ENTITY_MODEL, 
-                CDE_ENC_MCO, 
-                CDE_ENC_ACO, 
+                tar.CDE_ENTITY_MODEL, 
+                tar.CDE_ENC_MCO, 
+                tar.CDE_ENC_ACO, 
                 CLAIM_TYPE,
                 CDE_CLM_DISPOSITION,
                 CDE_CLM_STATUS,
@@ -51,8 +51,11 @@ FROM (
                 PrescriptionOrigin1X AS Prescription_Origin,
                 DispenseQuantity1X AS Dispense_Quantity
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP tar
+            JOIN MHDWQA.NW.NW_ENC_MCE_PIDSL_XREF xref
+            ON tar.cde_enc_mco = xref.cde_enc_mco
             JOIN MHDWQA.SENDPRO.RAW_SPRO_NCPDP_CLAIM h
             ON tar.num_icn = h."TransID"
+            AND xref.entity_pidsl = h."PAHdrSendingEntityID"
         )
         UNPIVOT (
             TYPE

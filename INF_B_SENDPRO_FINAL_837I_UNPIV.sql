@@ -59,6 +59,7 @@ FROM (
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I tar
             JOIN MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM h
             ON tar.num_icn = h."PatientControlNum"
+            AND tar.ID_SUBMITTER = h."SubmitterID"
         )
         UNPIVOT (
             TYPE
