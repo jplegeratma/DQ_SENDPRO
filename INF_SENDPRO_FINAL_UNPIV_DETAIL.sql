@@ -134,6 +134,7 @@ SELECT
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
                 ServicingProviderType1X AS Servicing_Provider_Type,
@@ -156,6 +157,8 @@ SELECT
                 ProcedureModCode1X AS Procedure_Mod_Code,
                 PlaceOfServiceCode1X AS Place_Of_Service_Code,
                 PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code,
+                ServiceLineRevCode1X AS Service_Line_Rev_Code,
                 NUM_ICN,
                 NUM_DTL
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I
@@ -172,6 +175,7 @@ SELECT
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
                 Servicing_Provider_Type,
@@ -193,7 +197,12 @@ SELECT
                 Procedure_Code,
                 Procedure_Mod_Code,
                 Place_Of_Service_Code,
-                Pricing_Method_Code
+                Pricing_Method_Code,
+                Service_Category_Code,
+                Service_Line_Rev_Code,
+                Billing_Provider_Location,
+                Service_Category_Code,
+                Service_Line_Rev_Code
             )
 ) AS UNPIV7I
 ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
@@ -357,6 +366,7 @@ SELECT
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
                 ServicingProviderType1X AS Servicing_Provider_Type,
@@ -379,6 +389,7 @@ SELECT
                 ProcedureModCode1X AS Procedure_Mod_Code,
                 PlaceOfServiceCode1X AS Place_Of_Service_Code,
                 PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code,
                 NUM_ICN,
                 NUM_DTL
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837M
@@ -395,6 +406,7 @@ SELECT
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
                 Servicing_Provider_Type,
@@ -416,7 +428,8 @@ SELECT
                 Procedure_Code,
                 Procedure_Mod_Code,
                 Place_Of_Service_Code,
-                Pricing_Method_Code
+                Pricing_Method_Code,
+                Service_Category_Code
             )
 ) AS UNPIV7M
 ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
@@ -581,6 +594,7 @@ SELECT
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
                 ServicingProviderType1X AS Servicing_Provider_Type,
@@ -603,6 +617,9 @@ SELECT
                 ProcedureModCode1X AS Procedure_Mod_Code,
                 PlaceOfServiceCode1X AS Place_Of_Service_Code,
                 ToothNumber1X AS Tooth_Number,
+                ServiceCategory1X AS Service_Category_Code,
+                OralCategoryDesc1X AS Oral_Category_Desc,
+                ToothSurfaceCode1X AS Tooth_Surface_Code,
                 NUM_ICN,
                 NUM_DTL
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D
@@ -619,6 +636,7 @@ SELECT
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
                 Servicing_Provider_Type,
@@ -640,7 +658,10 @@ SELECT
                 Procedure_Code,
                 Procedure_Mod_Code,
                 Place_Of_Service_Code,
-                Tooth_Number
+                Tooth_Number,
+                Service_Category_Code,
+                Oral_Category_Desc,
+                Tooth_Surface_Code
             )
 ) AS UNPIV7D
 ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
@@ -804,6 +825,7 @@ SELECT
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 FromServiceDate1X AS Statement_Date,
                 ToServiceDate1X AS To_Service_Date,
                 MemberID1X AS Member_ID,
@@ -836,6 +858,7 @@ SELECT
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Statement_Date,
                 To_Service_Date,
                 Member_ID,

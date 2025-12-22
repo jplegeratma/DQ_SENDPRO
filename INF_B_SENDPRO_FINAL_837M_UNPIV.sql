@@ -34,6 +34,7 @@ FROM (
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
                 ServicingProviderType1X AS Servicing_Provider_Type,
@@ -55,7 +56,8 @@ FROM (
                 ProcedureCode1X AS Procedure_Code,
                 ProcedureModCode1X AS Procedure_Mod_Code,
                 PlaceOfServiceCode1X AS Place_Of_Service_Code,
-                PricingMethod1X AS Pricing_Method_Code
+                PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837M tar
             JOIN MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM h
             ON tar.num_icn = h."PatientControlNum"
@@ -73,6 +75,7 @@ FROM (
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
                 Servicing_Provider_Type,
@@ -94,7 +97,8 @@ FROM (
                 Procedure_Code,
                 Procedure_Mod_Code,
                 Place_Of_Service_Code,
-                Pricing_Method_Code
+                Pricing_Method_Code,
+                Service_Category_Code
             )
         ) AS INF_SENDPRO_TARGET_837M_UNPIV
     )

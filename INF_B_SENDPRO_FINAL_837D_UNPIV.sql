@@ -34,6 +34,7 @@ FROM (
                 BillingProviderNPI1X AS Billing_Provider_NPI,
                 BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
                 BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
                 ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
                 ServicingProviderNPI1X AS Servicing_Provider_NPI,
                 ServicingProviderType1X AS Servicing_Provider_Type,
@@ -55,7 +56,10 @@ FROM (
                 ProcedureCode1X AS Procedure_Code,
                 ProcedureModCode1X AS Procedure_Mod_Code,
                 PlaceOfServiceCode1X AS Place_Of_Service_Code,
-                ToothNumber1X AS Tooth_Number
+                ToothNumber1X AS Tooth_Number,
+                ServiceCategory1X AS Service_Category_Code,
+                OralCategoryDesc1X AS Oral_Category_Desc,
+                ToothSurfaceCode1X AS Tooth_Surface_Code
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D tar
             JOIN MHDWQA.SENDPRO.RAW_SPRO_837D_CLAIM h
             ON tar.num_icn = h."PatientControlNum"
@@ -73,6 +77,7 @@ FROM (
                 Billing_Provider_NPI,
                 Billing_Provider_Taxonomy,
                 Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
                 Servicing_Provider_Internal_ID,
                 Servicing_Provider_NPI,
                 Servicing_Provider_Type,
@@ -94,7 +99,10 @@ FROM (
                 Procedure_Code,
                 Procedure_Mod_Code,
                 Place_Of_Service_Code,
-                Tooth_Number
+                Tooth_Number,
+                Service_Category_Code,
+                Oral_Category_Desc,
+                Tooth_Surface_Code
             )
         ) AS INF_SENDPRO_TARGET_837D_UNPIV
     )
