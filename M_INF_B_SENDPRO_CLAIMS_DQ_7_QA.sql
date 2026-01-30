@@ -1,3 +1,5 @@
+TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA;
+
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA
 
 SELECT DISTINCT
@@ -57,7 +59,7 @@ Record_Type,
 --  SUBLINE_ADJ_REASON_CD (2,3,4…) 
 --  This field is in the denied list.
 --  And SERVICE_LINE_AMT = 0 this should be in the denied claim file. Please refer Link
---@@@
+--
 
 		
 --  BILLING PROVIDER CODE
@@ -93,16 +95,19 @@ Record_Type,
 --         case when CLAIM_TYPE IN('I') AND substr(cde_type_of_bill_enc,1,2) not in('12','22','42','62','81','82') AND CDE_DIAG_ADMIT not IN ('+','-', ' ')
 --         THEN 1 else 0 END CDE_DIAG_ADMIT1,
 
+-- moved diag lookup into line and removed diag join in base 1/28/2026
+
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') AND DiagnosisCode IS NOT NULL 
-	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-')) 
-	AND DiagnosisCodeQual='ABJ'
-        THEN 1 ELSE 0 END AdmittingDiagnosisCode1,
+    0 AS AdmittingDiagnosisCode1,
+
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT APP'
-	     WHEN DiagnosisCodeQual != 'ABJ' THEN 'NOT APP'
-         WHEN DiagnosisCode IS NULL THEN 'NULL'
-		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','**','+','-','$','  ')) THEN 'INVALID'
+    CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
+       WHEN NOT EXISTS (
+             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL clm_dia 
+                JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
+                WHERE clm_dia."DiagnosisCode" IS NOT NULL
+                AND clm_dia."DiagnosisCodeQual" IN ('ABJ')
+         ) THEN 'INVALID'
          ELSE 'VALID' END AdmittingDiagnosisCode1X,
 		
 --  FACILITY TYPE CODE
@@ -375,21 +380,21 @@ RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalD
 RAW_SPRO_837P_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalDiagnosis’
 RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalDiagnosis’
 
+-- moved diag lookup into line and removed diag join in base 1/28/2026
+
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND DiagnosisCode IS NOT NULL 
-	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
-    AND DiagnosisCodeQual='ABK'
-    AND DiagnosisType = 'ClmPrincipalDiagnosis'	
-        THEN 1 ELSE 0 END PrincipalDiagnosisCode1,
+    0 AS PrincipalDiagnosisCode1,
+
 --  Ex
-    CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
-         WHEN DiagnosisCode IS NULL THEN 'NULL'
-         WHEN DiagnosisCodeQual != 'ABK' THEN 'NOT APP'
-		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
-         WHEN DiagnosisType <> 'ClmPrincipalDiagnosis' THEN 'INVALID'	
+     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
+       WHEN NOT EXISTS (
+             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL clm_dia 
+                JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
+                WHERE clm_dia."DiagnosisCode" IS NOT NULL
+                AND clm_dia."DiagnosisCodeQual" IN ('ABK')
+         ) THEN 'INVALID'
          ELSE 'VALID' END PrincipalDiagnosisCode1X,
 
 --  ICD10 Diagnosis
@@ -402,21 +407,20 @@ RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalD
 
 MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_DIAG from "NW_B_DIAGNOSIS" where CDE_ICD_VERSION=10 then 1 else 0
 
+-- moved diag lookup into line and removed diag join in base 1/28/2026
+
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M','P')
-	AND DiagnosisCode IS NOT NULL 
-	AND DiagnosisCode IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') )
---    AND DiagnosisType = 'ClmOtherDiagnosis'	
-    AND DiagnosisCodeQual IN ('ABK','ABN','ABJ','ABF','APR')
-        THEN 1 ELSE 0 END ICD10Diagnosis_Code1,
+    0 AS ICD10Diagnosis_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
-         WHEN DiagnosisCode IS NULL THEN 'NULL'
-		 WHEN DiagnosisCode NOT IN (SELECT CDE_DIAG from MHDWQA.NW.NW_B_DIAGNOSIS where CDE_ICD_VERSION=10 and CDE_DIAG NOT IN ('#','+','-') ) THEN 'INVALID'
---         WHEN DiagnosisType <> 'ClmOtherDiagnosis' THEN 'INVALID'	
-         WHEN DiagnosisCodeQual NOT IN ('ABK','ABN','ABJ','ABF','APR') THEN 'INVALID'         
+       WHEN NOT EXISTS (
+             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL clm_dia 
+                JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
+                WHERE clm_dia."DiagnosisCode" IS NOT NULL
+                AND clm_dia."DiagnosisCodeQual" IN ('ABK','ABN','ABJ','ABF','APR')
+         ) THEN 'INVALID'
          ELSE 'VALID' END ICD10Diagnosis_Code1X,
 
 --  Service Line Procedure Code
@@ -589,7 +593,7 @@ STG_SPRO_837I_CLAIM_SVCLN_LINEADJ_INFO.SvcLineAdjRevenueCode,
 4.1.1.3.	MPT_SENDPRO_StringIsNull_ALL: 
 STG_SPRO_837I_CLAIM_SVCLN_LINEADJ_INFO.SvcLineAdjRevenueCode,
 
-@@@ is this still required?
+ is this still required?
 CASE WHEN LEFT(a."SvcLineAdjRevenueCode",1) != '0' then a."SvcLineAdjRevenueCode" ELSE SUBSTR(a."SvcLineAdjRevenueCode",2,3) END as SvcLineAdjRevenueCode,
 
 -- 6
@@ -1323,7 +1327,7 @@ h."FacilityTypeCode" as FacilityTypeCode,
 h."AdmissionTypeCode" as AdmissionTypeCode,
 h."AdmissionSourceCode" as AdmissionSourceCode,
 
-dia."DiagnosisCodeQual" as DiagnosisCodeQual,
+--dia."DiagnosisCodeQual" as DiagnosisCodeQual,
 -- strip off leading 0
 CASE WHEN LEFT(d."SvcLineRevenueCode",1) != '0' then d."SvcLineRevenueCode" ELSE SUBSTR(d."SvcLineRevenueCode",2,3) END as SvcLineRevenueCode,
 
@@ -1346,8 +1350,8 @@ ctvd."ProcedureCodeQual" as ProcedureCodeQual,
 d."SvcLineProcCode" as SvcLineProcCode, 
 d."SvcLineProcCodeQual" as SvcLineProcCodeQual,
 
-dia."DiagnosisCode" as DiagnosisCode,
-dia."DiagnosisType" as DiagnosisType,
+--dia."DiagnosisCode" as DiagnosisCode,
+--dia."DiagnosisType" as DiagnosisType,
 
 h."PatientResEstAmtQual" as PatientResEstAmtQual,
 h."PatientResEstAmt" as PatientResEstAmt,
@@ -1399,9 +1403,9 @@ on  h."FileName" = a."FileName"
 and h."PatientControlNum"  = a."PatientControlNum"
 and d."NumDtl"             = a."NumDtl"
 
-left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
-on  h."FileName" = dia."FileName"
-and h."PatientControlNum"  = dia."PatientControlNum"
+-- left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL dia
+-- on  h."FileName" = dia."FileName"
+-- and h."PatientControlNum"  = dia."PatientControlNum"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_ENC_ATTRIBUTE_DTL ctvd
  on  h."FileName" = ctvd."FileName"
@@ -1444,7 +1448,10 @@ on h."FileName"         = op."FileName" and
    h."NumDtl"           = op."NumDtl"
 
 where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA )
-
+--100
+--and FileName < '110025617h_pacdrp_09112025140928_test_pd_269bdbd7-7042-4593-b334-89a6361e4a91.xml'
+--1
+and FileName < '110025617d_ncpdp_008062025121212_test_de_d85e31dd-6442-472e-935b-70560db54f13.xml'
 order by
     TransSetControlNum,
     h."SubmitterID",
