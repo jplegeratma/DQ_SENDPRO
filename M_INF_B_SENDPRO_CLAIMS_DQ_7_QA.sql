@@ -99,7 +99,7 @@ Record_Type,
 
 --  DI
     0 AS AdmittingDiagnosisCode1,
-
+/*
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -107,9 +107,15 @@ Record_Type,
                 JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
                 WHERE clm_dia."DiagnosisCode" IS NOT NULL
                 AND clm_dia."DiagnosisCodeQual" IN ('ABJ')
+   				AND clm_dia."FileName" = FileName
+				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END AdmittingDiagnosisCode1X,
-		
+
+*/
+
+'NULL' AS AdmittingDiagnosisCode1X,
+
 --  FACILITY TYPE CODE
 /*
 837I Claims population: MPT_SENDPRO_ClaimType_837P, MPT_SENDPRO_ClaimType_837I_LTC, MPT_SENDPRO_ClaiimType_837I_INP, 
@@ -386,7 +392,7 @@ RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalD
 
 --  DI
     0 AS PrincipalDiagnosisCode1,
-
+/*
 --  Ex
      CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -394,8 +400,13 @@ RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL.DiagnosisCode, DiagnosisType=’ ClmPrincipalD
                 JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
                 WHERE clm_dia."DiagnosisCode" IS NOT NULL
                 AND clm_dia."DiagnosisCodeQual" IN ('ABK')
+   				AND clm_dia."FileName" = FileName
+				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END PrincipalDiagnosisCode1X,
+*/
+
+'NULL' AS PrincipalDiagnosisCode1X,
 
 --  ICD10 Diagnosis
 
@@ -413,6 +424,7 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
 
 --  DI
     0 AS ICD10Diagnosis_Code1,
+/*
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -420,8 +432,12 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
                 JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
                 WHERE clm_dia."DiagnosisCode" IS NOT NULL
                 AND clm_dia."DiagnosisCodeQual" IN ('ABK','ABN','ABJ','ABF','APR')
+   				AND clm_dia."FileName" = FileName
+				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END ICD10Diagnosis_Code1X,
+*/
+'NULL' AS ICD10Diagnosis_Code1X,
 
 --  Service Line Procedure Code
 
@@ -1448,10 +1464,8 @@ on h."FileName"         = op."FileName" and
    h."NumDtl"           = op."NumDtl"
 
 where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA )
---100
---and FileName < '110025617h_pacdrp_09112025140928_test_pd_269bdbd7-7042-4593-b334-89a6361e4a91.xml'
---1
-and FileName < '110025617d_ncpdp_008062025121212_test_de_d85e31dd-6442-472e-935b-70560db54f13.xml'
+and FileName < '110025617d_pacdrp_06122025015124_test_pd_2602280f-6c6e-46f7-ba4f-1fcc40e112ee.xml'
+and FileName not like '%ncpdp%'
 order by
     TransSetControlNum,
     h."SubmitterID",
