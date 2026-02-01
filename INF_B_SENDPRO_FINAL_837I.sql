@@ -269,6 +269,7 @@ END AS ClaimBilledAmount1X,
         If valid then 1 else 0
 */
 
+/*
     CASE  
          WHEN 
          (
@@ -285,6 +286,9 @@ END AS ClaimBilledAmount1X,
          ELSE 'VALID' 
     END AS BillingProviderNPI1X,
 
+*/
+
+         'NULL' AS BillingProviderNPI1X,
 /*
 12.1.8	Billing Provider Taxonomy Code (MPT_SENDPRO_BillingProviderTaxonomyALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
@@ -306,7 +310,7 @@ BILLING_ENC_PRV_SEQ
 SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, 
 
 */
-
+/*
     CASE 
 		 WHEN 
          (
@@ -321,7 +325,9 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
+*/
 
+         'NULL' AS BillingProviderTaxonomy1X,
 
 /* 
 10/31/25 NEW
@@ -398,6 +404,7 @@ CDE_ENC_PROV_ID_LOC
 SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ: 
 */
 
+/*
     CASE  
          WHEN 
          (
@@ -414,6 +421,9 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderNPI1X,
+
+*/
+        'NULL' AS ServicingProviderNPI1X,
 
 /*
 12.1.13	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
@@ -467,6 +477,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ: 
 */
 
+/*
     CASE 
 		 WHEN 
          (
@@ -481,7 +492,9 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderTaxonomy1X,
+*/
 
+         'NULL' AS ServicingProviderTaxonomy1X,
 /* 
 10/31/25 NEW
 12.1.16	Servicing Internal Provider Address Location (MPT_SENDPRO_ServicingInternalProviderAddressLocALL)
@@ -565,6 +578,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 
 */
 
+/*
     CASE 
         WHEN FACT_MEM_SEQ IS NULL AND DTL_FACT_MEM_SEQ IS NULL THEN 'NULL'
         WHEN FACT_MEM_SEQ <= 0 AND DTL_FACT_MEM_SEQ <= 0 THEN 'INVALID'
@@ -576,6 +590,9 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
         ELSE 'VALID'
     END AS MemberID1X,
 
+*/
+
+        'NULL' AS MemberID1X,
 /*
 12.1.21	Quantity (MPT_SENDPRO_ClaimAllowableAmt_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
@@ -894,6 +911,7 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_servicing
 
 WHERE inst.IND_OFFSET = 'N'
 AND inst.MD_BATCH_SEQ NOT IN ( SELECT DISTINCT tar.MD_BATCH_SEQ from MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I tar)
+--AND inst.MD_BATCH_SEQ < '1055947'
  ) A;
 
 --LIMIT 100;
