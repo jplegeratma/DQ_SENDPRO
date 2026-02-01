@@ -17,9 +17,7 @@ Record_Type,
 --  Values is not null.
 --  Value is 1-5,7,8
 --  DI
-    CASE WHEN ClaimFrequencyCode IS NOT NULL 
-	AND ClaimFrequencyCode IN ('1','2','3','4','5','7','8') 
-	    THEN 1 ELSE 0 END ClaimFrequencyCode1,
+0 AS ClaimFrequencyCode1,
 --  Ex
     CASE WHEN ClaimFrequencyCode IS NULL THEN 'NULL'
     WHEN ClaimFrequencyCode NOT IN ('1','2','3','4','5','7','8') THEN 'INVALID' 
@@ -28,10 +26,7 @@ Record_Type,
 --  CLAIM_STATEMENT_DTM_PERIOD
 --  If String is of format “YYYYMMDD-YYYYMMDD” then 1 else 0
 --  DI
-    CASE WHEN Claim_Type IN ('I','L') 
-	AND StatementDTP IS NOT NULL 
-	AND ( SUBSTR(StatementDTP, 9, 1) = '-' AND TRY_TO_DATE(SUBSTR(StatementDTP, 1, 8),'YYYYMMDD') IS NOT NULL AND TRY_TO_DATE(SUBSTR(StatementDTP, 10, 8),'YYYYMMDD') IS NOT NULL )  
-        THEN 1 ELSE 0 END StatementDTP1,
+0 AS StatementDTP1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I','L') THEN 'NOT APP' 
          WHEN StatementDTP IS NULL THEN 'NULL'
@@ -43,11 +38,7 @@ Record_Type,
 --  This field should have a value if the Parameter MPT_SENDPRO_Facility_Type_Code_837I = 11
 --  If String is of format “YYYYMMDD-YYYYMMDD” then 1 else 0
 --  DI		 
-    CASE WHEN Claim_Type IN ('I','L') 
-	--AND SUBSTR(FacilityTypeCode,1,2) = '11' 
-	AND AdmissionDTP IS NOT NULL 
---	AND ( SUBSTR(AdmissionDTP, 9, 1) = '-' AND TRY_TO_DATE(SUBSTR(AdmissionDTP, 1, 8),'YYYYMMDD') IS NOT NULL AND TRY_TO_DATE(SUBSTR(AdmissionDTP, 10, 8),'YYYYMMDD') IS NOT NULL )  
-        THEN 1 ELSE 0 END AdmissionDTP1,
+0 AS AdmissionDTP1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I','L') THEN 'NOT APP'
          --WHEN SUBSTR(FacilityTypeCode,1,2) != '11' THEN 'NOT HOSPITAL OR LTC'
@@ -69,12 +60,7 @@ Record_Type,
 --  DI
 --  changing to validate against ID_NPI
 
---  DI
-    CASE
-	    WHEN BillingProvNPI IS NOT NULL
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(BillingProvNPI)        
-        THEN 1 ELSE 0 END BillingProvNPI,
-
+0 AS BillingProvNPI,
 --  Ex
     CASE  
     --all Claim_Types
@@ -134,11 +120,7 @@ If valid based on the lookup against the first 2 characters of CDE_CHAR from NW_
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('M','L','I','O') 
-	AND FacilityTypeCode IS NOT NULL
-    AND FacilityTypeCode IN (SELECT LEFT(CDE_CHAR,2) FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_TYPE_OF_BILL' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END FacilityTypeCode1,
-
+0 AS FacilityTypeCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('M','L','I','O') THEN 'NOT APP'
 	     WHEN FacilityTypeCode IS NULL THEN 'NULL'
@@ -158,11 +140,7 @@ MPT_SENDPRO_TypeOfAdmission_Valid	If valid based on the lookup against the CDE_C
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I') 
-	AND AdmissionTypeCode IS NOT NULL
-    AND AdmissionTypeCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_TYPE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END AdmissionTypeCode1,
-
+0 AS AdmissionTypeCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
 	     WHEN AdmissionTypeCode IS NULL THEN 'NULL'
@@ -180,11 +158,7 @@ MPT_SENDPRO_SourceOfAdmission_Valid	  If valid based on the lookup against the C
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I') 
-	AND AdmissionSourceCode IS NOT NULL
-    AND AdmissionSourceCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_ADMIT_SOURCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END AdmissionSourceCode1,
-
+0 AS AdmissionSourceCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
 	     WHEN AdmissionSourceCode IS NULL THEN 'NULL'
@@ -202,11 +176,7 @@ MPT_SENDPRO_AmountValueNotNegative_ALL	Amount is greater than or equals 0 then 1
 */	 
 		 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M','D') 
-	AND SvcLineChargeAmt IS NOT NULL
-    AND SvcLineChargeAmt >= 0 
-        THEN 1 ELSE 0 END SvcLineChargeAmt1,
-
+0 AS SvcLineChargeAmt1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT APP'
 	     WHEN SvcLineChargeAmt IS NULL THEN 'NULL'
@@ -227,11 +197,7 @@ MPT_SENDPRO_ServiceLineRevenueCode_Valid	If valid based on the lookup against th
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') 
-	AND SvcLineRevenueCode IS NOT NULL
-    AND SvcLineRevenueCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END SvcLineRevenueCode1,
-
+0 AS SvcLineRevenueCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT APP'
 	     WHEN SvcLineRevenueCode IS NULL THEN 'NULL'
@@ -250,12 +216,7 @@ MPT_SENDPRO_OccurrenceCode_Valid	If valid based on the lookup against the CDE_CH
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') 
-	AND ProcedureCode IS NOT NULL
-    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_OCCURRENCE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-    AND ProcedureCodeQual = 'BH'
-        THEN 1 ELSE 0 END OccurrenceCode1,
-
+0 AS OccurrenceCode1,
 --  Ex
     CASE 
          WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
@@ -276,11 +237,7 @@ MPT_SENDPRO_OccurrenceCode_Valid	If valid based on the lookup against the CDE_CH
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') 
-	AND ProcedureCode IS NOT NULL
-    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_OCCURRENCE_SPAN' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END OccurrenceSpanCode1,
-
+0 AS OccurrenceSpanCode1,
 --  Ex
     CASE 
          WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
@@ -301,12 +258,7 @@ MPT_SENDPRO_ValueCode_Valid	If valid based on the lookup against the CDE_CHAR fr
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') 
-	AND ProcedureCode IS NOT NULL
-    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_VALUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-    AND ProcedureCodeQual = 'BE'
-        THEN 1 ELSE 0 END ValueCode1,
-
+0 AS ValueCode1,
 --  Ex
     CASE 
          WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
@@ -328,12 +280,7 @@ MPT_SENDPRO_ConditionCode_Valid	If valid based on the lookup against the CDE_CHA
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O')
-	AND ProcedureCode IS NOT NULL
-    AND ProcedureCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_COND' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-    AND ProcedureCodeQual = 'BG'
-        THEN 1 ELSE 0 END ConditionCode1,
-
+0 AS ConditionCode1,
 --  Ex
     CASE 
          WHEN Claim_Type NOT IN ('L','I') THEN 'NOT APP'
@@ -362,11 +309,7 @@ MPT_SENDPRO_PatientStatusCode_Valid	If valid based on the lookup against the CDE
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O') 
-	AND PatientStatusCode IS NOT NULL
-    AND PatientStatusCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PATIENT_STATUS' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END PatientStatusCode1,
-
+0 AS PatientStatusCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O') THEN 'NOT APP'
 	     WHEN PatientStatusCode IS NULL THEN 'NULL'
@@ -460,10 +403,7 @@ SvcLineProcCode
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND SvcLineProcCode IS NOT NULL 
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-'))
-        THEN 1 ELSE 0 END MultipleProcedureCode1,
+0 AS MultipleProcedureCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCode IS NULL THEN 'NULL'
@@ -484,10 +424,7 @@ If valid based on lookup to the column CDE_PROC from "NW_B_PROCEDURE" where CDE_
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND ProcedureCode IS NOT NULL 
-	AND ProcedureCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') AND CDE_PROC LIKE 'D%' AND UPPER(proc_group) LIKE 'ALPHA%')
-        THEN 1 ELSE 0 END CDT_Code1,
+0 AS CDT_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN ProcedureCode IS NULL THEN 'NULL'
@@ -510,11 +447,7 @@ MPT_SENDPRO_CPT_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC f
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND SvcLineProcCode IS NOT NULL 
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
-    AND SvcLineProcCodeQual = 'HC'
-        THEN 1 ELSE 0 END CPT_Code1,
+0 AS CPT_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCodeQual <> 'HC' THEN 'NOT APP'
@@ -537,11 +470,7 @@ MPT_SENDPRO_HIPPS_Code_Valid_ALL	If valid based on lookup to the column CDE_PROC
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND SvcLineProcCode IS NOT NULL 
-	AND SvcLineProcCode IN (SELECT CDE_PROC FROM MHDWQA.NW.NW_B_PROCEDURE WHERE CDE_PROC NOT IN ('#','+','-') )
-    AND SvcLineProcCodeQual = 'HP'
-        THEN 1 ELSE 0 END HIPPS_Code1,
+0 AS HIPPS_Code1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN SvcLineProcCodeQual <> 'HP' THEN 'NOT APP'
@@ -568,23 +497,7 @@ MPT_SENDPRO_PROC_MOD_Valid_All	If valid based on the lookup against the CDE_CHAR
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')     
-	AND 
-	( 
-	( SvcLineProcMod01 IS NOT NULL
-        AND SvcLineProcMod01 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineProcMod02 IS NOT NULL
-        AND SvcLineProcMod02 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineProcMod03 IS NOT NULL
-        AND SvcLineProcMod03 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineProcMod04 IS NOT NULL
-        AND SvcLineProcMod04 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	)	
-        THEN 1 ELSE 0 END SvcLineProcMod1,
-
+0 AS SvcLineProcMod1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
 	     WHEN SvcLineProcMod01 IS NULL AND SvcLineProcMod02 IS NULL AND SvcLineProcMod03 IS NULL AND SvcLineProcMod04 IS NULL THEN 'NULL'
@@ -628,12 +541,7 @@ MPT_SENDPRO_ServiceLineRevenueCode_Valid	If valid based on the lookup against th
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M','D') 
-    
-	AND SvcLineAdjRevenueCode IS NOT NULL
-    AND SvcLineAdjRevenueCode IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_REVENUE' AND CDE_CHAR NOT IN ('#','**','+','-','$','  '))
-        THEN 1 ELSE 0 END SvcLineAdjRevenueCode1,
-
+0 AS SvcLineAdjRevenueCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','D') THEN 'NOT APP'
 	     WHEN SvcLineAdjRevenueCode IS NULL THEN 'NULL'
@@ -659,10 +567,7 @@ ProcedureCode
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')
-	AND ProcedureCode IS NOT NULL 
-	AND ProcedureCode IN (SELECT CDE_PROC from MHDWQA.NW.NW_B_PROCEDURE where CDE_PROC NOT IN ('#','+','-'))
-        THEN 1 ELSE 0 END ProcedureCode1,
+0 AS ProcedureCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
          WHEN ProcedureCode IS NULL THEN 'NULL'
@@ -704,23 +609,7 @@ MPT_SENDPRO_PROC_MOD_Valid_All	If valid based on the lookup against the CDE_CHAR
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('L','I','O','M')     
-	AND 
-	( 
-	( SvcLineAdjudicationProcMod01 IS NOT NULL
-        AND SvcLineAdjudicationProcMod01 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineAdjudicationProcMod02 IS NOT NULL
-        AND SvcLineAdjudicationProcMod02 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineAdjudicationProcMod03 IS NOT NULL
-        AND SvcLineAdjudicationProcMod03 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( SvcLineAdjudicationProcMod04 IS NOT NULL
-        AND SvcLineAdjudicationProcMod04 IN (SELECT CDE_CHAR FROM MHDWQA.NW.NW_SUP_CODE_REF WHERE CDE_GROUP = 'CDE_PROC_MOD' AND CDE_CHAR NOT IN ('#','**','+','-','$','  ')) )
-	)	
-        THEN 1 ELSE 0 END SvcLineAdjudicationProcMod1,
-
+0 AS SvcLineAdjudicationProcMod1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
 	     WHEN SvcLineAdjudicationProcMod01 IS NULL AND SvcLineAdjudicationProcMod02 IS NULL AND SvcLineAdjudicationProcMod03 IS NULL AND SvcLineAdjudicationProcMod04 IS NULL THEN 'NULL'
@@ -758,14 +647,7 @@ bp."ProviderInternalId" as ProviderInternalId_bp,
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ProviderInternalId IS NOT NULL 
-	    AND ProviderInternalId IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId)
-	    AND ProviderInternalId_bp IS NOT NULL 
-	    AND ProviderInternalId_bp IN (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
-        THEN 1 ELSE 0 END bill_ProviderInternalId1,
-
+0 AS bill_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -804,15 +686,9 @@ bp."ProviderPidsl" as ProviderPidsl_bp
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ProviderPidsl IS NOT NULL
-	    AND ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl)
-	    AND ProviderPidsl_bp IS NOT NULL 
-	    AND ProviderPidsl_bp IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl_bp)
-        THEN 1 ELSE 0 END bill_ProviderPidsl1,
-
+0 AS bill_ProviderPidsl1,
 --  Ex
+/*
     CASE  
     --all Claim_Types
          WHEN (ProviderPidsl IS NULL OR ProviderPidsl_bp IS NULL) THEN 'NULL'
@@ -822,7 +698,8 @@ bp."ProviderPidsl" as ProviderPidsl_bp
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
-
+*/
+'NULL' AS bill_ProviderPidsl1X,
 /*
 
 12.1.34	Attending Provider NPI (MPT_SENDPRO_AttendingProviderNPI_837I)
@@ -837,12 +714,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN at_AttendingProvNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(at_AttendingProvNPI)        
-        THEN 1 ELSE 0 END at_AttendingProvNPI1,
-
+0 AS at_AttendingProvNPI1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -869,21 +741,7 @@ and ad."ProviderLocationCode"= (
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN at_ProviderInternalId IS NOT NULL 
-	    AND at_ProviderInternalId IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = at_ProviderInternalId
-
-          AND at_ProviderLocationCode = (
-            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
-                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
-                 else CDE_ENC_PROV_ID_LOC
-             end)       
-        )
-        THEN 1 ELSE 0 END at_ProviderInternalId1,
-
+0 AS at_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -911,14 +769,7 @@ If valid then 1 else 0
 */
 
 -- DI
-    CASE
-	    WHEN at_ProviderPidsl IS NOT NULL
-        AND at_ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
-            WHERE ID_PROVIDER_LOCATION = at_ProviderPidsl
-        )        
-        THEN 1 ELSE 0 END at_ProviderPidsl1,
-
+0 AS at_ProviderPidsl1,
 --  Ex
     CASE  
          WHEN (at_ProviderPidsl IS NULL ) THEN 'NULL'
@@ -942,12 +793,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ref_ReferringProvNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ref_ReferringProvNPI)        
-        THEN 1 ELSE 0 END ref_ReferringProvNPI1,
-
+0 AS ref_ReferringProvNPI1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -967,23 +813,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ref_ProviderInternalId IS NOT NULL 
-	    AND ref_ProviderInternalId IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
-        
-		
-		          AND ref_ProviderLocationCode = (
-            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
-                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
-                 else CDE_ENC_PROV_ID_LOC
-             end)
-
-        )
-        THEN 1 ELSE 0 END ref_ProviderInternalId1,
-
+0 AS ref_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1010,14 +840,7 @@ If valid then 1 else 0
 */
 
 -- DI
-    CASE
-	    WHEN ref_ProviderPidsl IS NOT NULL
-        AND ref_ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
-            WHERE ID_PROVIDER_LOCATION = ref_ProviderPidsl
-        )        
-        THEN 1 ELSE 0 END ref_ProviderPidsl1,
-
+0 AS ref_ProviderPidsl1,
 --  Ex
     CASE  
          WHEN (ref_ProviderPidsl IS NULL ) THEN 'NULL'
@@ -1041,12 +864,8 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ren_RenderingProvNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ren_RenderingProvNPI)        
-        THEN 1 ELSE 0 END ren_RenderingProvNPI1,
-
+0 AS ren_RenderingProvNPI1,
+    
 --  Ex
     CASE  
     --all Claim_Types
@@ -1067,21 +886,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN ren_ProviderInternalId IS NOT NULL 
-	    AND ren_ProviderInternalId IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
-
-          AND ren_ProviderLocationCode = (
-            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
-                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
-                 else CDE_ENC_PROV_ID_LOC
-             end)        
-        )
-        THEN 1 ELSE 0 END ren_ProviderInternalId1,
-
+0 AS ren_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1111,14 +916,7 @@ If valid then 1 else 0
 */
 
 -- DI
-    CASE
-	    WHEN ren_ProviderPidsl IS NOT NULL
-        AND ren_ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
-            WHERE ID_PROVIDER_LOCATION = ren_ProviderPidsl
-        )        
-        THEN 1 ELSE 0 END ren_ProviderPidsl1,
-
+0 AS ren_ProviderPidsl1,
 --  Ex
     CASE  
          WHEN (ren_ProviderPidsl IS NULL ) THEN 'NULL'
@@ -1141,12 +939,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN oop_OtherOperProvNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(oop_OtherOperProvNPI)        
-        THEN 1 ELSE 0 END oop_OtherOperProvNPI1,
-
+0 AS oop_OtherOperProvNPI1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1162,21 +955,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 */
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN oop_ProviderInternalId IS NOT NULL 
-	    AND oop_ProviderInternalId IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = oop_ProviderInternalId
-        
-		          AND oop_ProviderLocationCode = (
-            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
-                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
-                 else CDE_ENC_PROV_ID_LOC 
-             end)
-        )
-        THEN 1 ELSE 0 END oop_ProviderInternalId1,
-
+0 AS oop_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1200,13 +979,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 */
 
 -- DI
-    CASE
-	    WHEN oop_ProviderPidsl IS NOT NULL
-        AND oop_ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
-            WHERE ID_PROVIDER_LOCATION = oop_ProviderPidsl
-        )        
-        THEN 1 ELSE 0 END oop_ProviderPidsl1,
+0 AS oop_ProviderPidsl1,
 
 --  Ex
     CASE  
@@ -1223,12 +996,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- NPI
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN op_OperatingProvNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(op_OperatingProvNPI)        
-        THEN 1 ELSE 0 END op_OperatingProvNPI1,
-
+0 AS op_OperatingProvNPI1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1239,21 +1007,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- Internal ID 
 
 --  DI
-    CASE
-    --all Claim_Types
-	    WHEN op_ProviderInternalId IS NOT NULL 
-	    AND op_ProviderInternalId IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = op_ProviderInternalId
-        
-		          AND op_ProviderLocationCode = (
-            case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
-                 when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
-                 else CDE_ENC_PROV_ID_LOC 
-             end)
-        )
-        THEN 1 ELSE 0 END op_ProviderInternalId1,
-
+0 AS op_ProviderInternalId1,
 --  Ex
     CASE  
     --all Claim_Types
@@ -1273,14 +1027,7 @@ RAW_SPRO_837I_OTHER_OPERATING_PHYS_PROVIDER_DTL
 -- PIDSL
 
 -- DI
-    CASE
-	    WHEN op_ProviderPidsl IS NOT NULL
-        AND op_ProviderPidsl IN (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_B_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
-            WHERE ID_PROVIDER_LOCATION = op_ProviderPidsl
-        )        
-        THEN 1 ELSE 0 END op_ProviderPidsl1,
-
+0 AS op_ProviderPidsl1,
 --  Ex
     CASE  
          WHEN (op_ProviderPidsl IS NULL ) THEN 'NULL'
@@ -1464,7 +1211,6 @@ on h."FileName"         = op."FileName" and
    h."NumDtl"           = op."NumDtl"
 
 where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7_QA )
-and FileName < '110025617d_pacdrp_06122025015124_test_pd_2602280f-6c6e-46f7-ba4f-1fcc40e112ee.xml'
 and FileName not like '%ncpdp%'
 order by
     TransSetControlNum,
