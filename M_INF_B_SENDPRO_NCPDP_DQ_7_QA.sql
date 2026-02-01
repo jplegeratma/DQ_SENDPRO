@@ -1,3 +1,5 @@
+TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA;
+
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
 
 SELECT DISTINCT
@@ -37,12 +39,7 @@ MPT_SENDPRO_CARDHOLDERID_Valid	If valid based on the lookup against the ID_MEDIC
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('P')     
-	AND SubscriberMemberID IS NOT NULL 
-	AND SubscriberMemberID IN (SELECT ID_MEDICAID FROM MHDWQA.NW.NW_MEMBER WHERE ID_MEDICAID = SubscriberMemberID AND ID_MEDICAID NOT IN ('#','**','+','-','$','  '))
-    THEN 1 ELSE 0 END SubscriberMemberID1,
-
-
+0 AS SubscriberMemberID1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('P') THEN 'NOT PHARMACY'
 	     WHEN SubscriberMemberID IS NULL THEN 'NULL'
@@ -85,23 +82,7 @@ MPT_SENDPRO_NDC_Valid_ALL	If valid based on lookup to the column CDE_NDC from "N
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('P')     
-	AND 
-	( 
-	( NDCServ IS NOT NULL
-        AND NDCServ IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = NDCServ AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( ProdCode01 IS NOT NULL
-        AND ProdCode01 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = ProdCode01 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( ProdCode02 IS NOT NULL
-        AND ProdCode02 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = ProdCode02 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( ProdCode03 IS NOT NULL
-        AND ProdCode03 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = ProdCode03 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	)	
-        THEN 1 ELSE 0 END NDCServ1,
-
+0 AS NDCServ1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('P') THEN 'NOT PHARMACY'
     WHEN NDCServ IS NULL AND ProdCode01 IS NULL AND ProdCode02 IS NULL AND ProdCode02 IS NULL THEN 'NULL'
@@ -126,20 +107,7 @@ MPT_SENDPRO_NDC_Valid_ALL	If valid based on lookup to the column CDE_NDC from "N
 */
 
 --  DI
-    CASE WHEN Claim_Type IN ('P')     
-	AND 
-	( 
-	( CompndProdCode01 IS NOT NULL
-        AND CompndProdCode01 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = CompndProdCode01 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( CompndProdCode02 IS NOT NULL
-        AND CompndProdCode02 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = CompndProdCode02 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	OR 
-	( CompndProdCode03 IS NOT NULL
-        AND CompndProdCode03 IN (SELECT CDE_NDC FROM MHDWQA.NW.NW_B_DRUG WHERE CDE_NDC = CompndProdCode03 AND CDE_NDC NOT IN ('#','**','+','-','$','  ')) )
-	)	
-        THEN 1 ELSE 0 END CompndProdCode1,
-
+0 AS CompndProdCode1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('P') THEN 'NOT PHARMACY'
 	     WHEN CompndProdCode01 IS NULL AND CompndProdCode02 IS NULL AND CompndProdCode03 IS NULL THEN 'NULL'
@@ -165,16 +133,7 @@ Step 2: If newClaim.AdjudicationDate > OrigClm. AdjudicationDate Then 1 else 0 e
 --SELECT
 
 --  DI
-    CASE WHEN Claim_Type IN ('P')     
-	AND AdjudicationDate IS NOT NULL
--- doesn't work
---    AND AdjudicationDate >= (SELECT NVL((SELECT "AdjudicationDate" FROM MHDWQA.SENDPRO.RAW_SPRO_NCPDP_CLAIM i WHERE TransIDCrossRef = i."TransID"),'19700101'))
---    THEN 1 ELSE 0 END AdjudicationDate1,
-
--- sugseted by Snowflake copilot
-    AND AdjudicationDate >= COALESCE((SELECT MAX(i."AdjudicationDate") FROM MHDWQA.SENDPRO.RAW_SPRO_NCPDP_CLAIM AS i WHERE i."TransID" = TransIDCrossRef), '19700101') 
-    THEN 1 ELSE 0 END AdjudicationDate1,
-
+0 AS AdjudicationDate1,
 --  Ex
     CASE WHEN Claim_Type NOT IN ('P') THEN 'NOT PHARMACY'
 	     WHEN AdjudicationDate IS NULL THEN 'NULL'
@@ -217,11 +176,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-	    WHEN ServProvNPI IS NOT NULL
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(ServProvNPI)        
-        THEN 1 ELSE 0 END ServProvNPI1,
-
+0 AS ServProvNPI1,
 --  Ex
     CASE  
          WHEN (ServProvNPI IS NULL ) THEN 'NULL'
@@ -241,15 +196,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-	    WHEN ServProvSecID IS NOT NULL 
-	    AND ServProvSecID IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID
-        
-        )
-        THEN 1 ELSE 0 END ServProvSecID1,
-
+0 AS ServProvSecID1,
 --  Ex
     CASE  
          WHEN (ServProvSecID IS NULL ) THEN 'NULL'
@@ -270,11 +217,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-	    WHEN PrescriberNPI IS NOT NULL 
-		AND MHTEAM.DWDQ.VALIDATE_NPI_LUHN_PY(PrescriberNPI)        
-        THEN 1 ELSE 0 END PrescriberNPI1,
-
+0 AS PrescriberNPI1,
 --  Ex
     CASE  
          WHEN (PrescriberNPI IS NULL ) THEN 'NULL'
@@ -295,15 +238,7 @@ If valid then 1 else 0
 */
 
 --  DI
-    CASE
-	    WHEN PrescriberSecID IS NOT NULL 
-	    AND PrescriberSecID IN (
-        
-        SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID
-        
-        )
-        THEN 1 ELSE 0 END PrescriberSecID1,
-
+0 AS PrescriberSecID1,
 --  Ex
     CASE  
          WHEN (PrescriberSecID IS NULL ) THEN 'NULL'
