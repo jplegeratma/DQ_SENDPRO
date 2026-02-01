@@ -72,7 +72,7 @@ Record_Type,
 
 --  DI
     0 AS AdmittingDiagnosisCode1,
-
+/*
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -84,6 +84,9 @@ Record_Type,
 				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END AdmittingDiagnosisCode1X,
+
+*/--  Ex
+'NULL' AS AdmittingDiagnosisCode1X,
 
 --  FACILITY TYPE CODE
 /*
@@ -250,7 +253,7 @@ dpvt.PrincipalDiagnosisCode
 
 --  DI
     0 AS PrincipalDiagnosisCode1,
-
+/*
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -262,6 +265,8 @@ dpvt.PrincipalDiagnosisCode
 				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END PrincipalDiagnosisCode1X,
+*/
+'NULL' AS PrincipalDiagnosisCode1X,
 
 --  ICD10 Diagnosis
 
@@ -280,6 +285,7 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
 --  DI
     0 AS ICD10Diagnosis_Code1,
 
+/*
 --  Ex
     CASE WHEN Claim_Type NOT IN ('I') THEN 'NOT APP'
        WHEN NOT EXISTS (
@@ -291,6 +297,8 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
 				AND clm_dia."PatientControlNum" = PatientControlNum
          ) THEN 'INVALID'
          ELSE 'VALID' END ICD10Diagnosis_Code1X,
+*/
+'NULL' AS ICD10Diagnosis_Code1X,
 
 --  Service Line Procedure Code
 /*
@@ -556,6 +564,7 @@ bp."ProviderPidsl" as ProviderPidsl_bp
 
 --  DI
 0 AS bill_ProviderPidsl1,
+/*
 --  Ex
     CASE  
     --all Claim_Types
@@ -566,6 +575,8 @@ bp."ProviderPidsl" as ProviderPidsl_bp
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
+*/
+'NULL' AS bill_ProviderPidsl1X,
 
 /*
 12.1.37	Referring Provider NPI (MPT_SENDPRO_ ReferringProviderNPI_837)
