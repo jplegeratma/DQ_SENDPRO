@@ -127,7 +127,7 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
 
 -- CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I AS
 
-TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I;
+-- TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I
 SELECT DISTINCT
@@ -269,7 +269,6 @@ END AS ClaimBilledAmount1X,
         If valid then 1 else 0
 */
 
-/*
     CASE  
          WHEN 
          (
@@ -277,18 +276,11 @@ END AS ClaimBilledAmount1X,
            AND ((dtl_billing_ProviderNPI IS NULL) OR (dtl_billing_ProviderNPI IN ('#','+','-')) OR dtl_billing_ProviderNPI IN ('0','000000000','0000000000') )
          )            
             THEN 'NULL'
-		 WHEN 
-         (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
-          AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_billing_ProviderNPI)) 
-         )
-         THEN 'INVALID'
          ELSE 'VALID' 
     END AS BillingProviderNPI1X,
 
-*/
 
-         'NULL' AS BillingProviderNPI1X,
+--         'NULL' AS BillingProviderNPI1X,
 /*
 12.1.8	Billing Provider Taxonomy Code (MPT_SENDPRO_BillingProviderTaxonomyALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
@@ -310,24 +302,21 @@ BILLING_ENC_PRV_SEQ
 SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, 
 
 */
-/*
+
     CASE 
 		 WHEN 
          (
-             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax 
+              where billing_ProviderInternalId = tax.ENC_PROV_ID AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
 
-         AND (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where DTL_BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+         AND  (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax 
+              where dtl_billing_ProviderInternalId = tax.ENC_PROV_ID AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
          )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
-*/
 
-         'NULL' AS BillingProviderTaxonomy1X,
+--         'NULL' AS BillingProviderTaxonomy1X,
 
 /* 
 10/31/25 NEW
@@ -404,7 +393,6 @@ CDE_ENC_PROV_ID_LOC
 SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ: 
 */
 
-/*
     CASE  
          WHEN 
          (
@@ -413,17 +401,10 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
          )            
          THEN 'NULL'
             
-         WHEN 
-         (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI)) 
-          AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_servicing_ProviderNPI))
-         )
-         THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderNPI1X,
 
-*/
-        'NULL' AS ServicingProviderNPI1X,
+--        'NULL' AS ServicingProviderNPI1X,
 
 /*
 12.1.13	Servicing Provider Type (MPT_SENDPRO_ServicingProviderType_ALL)
@@ -477,24 +458,22 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST.SERVICING_ENC_PRV_SEQ: 
 */
 
-/*
+
     CASE 
 		 WHEN 
          (
-             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
-  
-         AND (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax 
+              where servicing_ProviderInternalId = tax.ENC_PROV_ID AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+
+         AND  (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax 
+              where dtl_servicing_ProviderInternalId = tax.ENC_PROV_ID AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
          )
          THEN 'INVALID'
          ELSE 'VALID' 
          END AS ServicingProviderTaxonomy1X,
-*/
 
-         'NULL' AS ServicingProviderTaxonomy1X,
+
+--         'NULL' AS ServicingProviderTaxonomy1X,
 /* 
 10/31/25 NEW
 12.1.16	Servicing Internal Provider Address Location (MPT_SENDPRO_ServicingInternalProviderAddressLocALL)
@@ -578,7 +557,6 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 
 */
 
-/*
     CASE 
         WHEN FACT_MEM_SEQ IS NULL AND DTL_FACT_MEM_SEQ IS NULL THEN 'NULL'
         WHEN FACT_MEM_SEQ <= 0 AND DTL_FACT_MEM_SEQ <= 0 THEN 'INVALID'
@@ -590,9 +568,7 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
         ELSE 'VALID'
     END AS MemberID1X,
 
-*/
-
-        'NULL' AS MemberID1X,
+--        'NULL' AS MemberID1X,
 /*
 12.1.21	Quantity (MPT_SENDPRO_ClaimAllowableAmt_ALL)
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
