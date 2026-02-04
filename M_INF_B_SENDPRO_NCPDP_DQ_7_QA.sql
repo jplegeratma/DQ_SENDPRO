@@ -1,4 +1,4 @@
-TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA;
+-- TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
 
@@ -200,7 +200,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (ServProvSecID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ServProvSecID) )
          THEN 'INVALID'
          ELSE 'VALID' END ServProvSecID1X,
 
@@ -242,7 +242,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (PrescriberSecID IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID) )
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = PrescriberSecID) )
          THEN 'INVALID'
          ELSE 'VALID' END PrescriberSecID1X,
 

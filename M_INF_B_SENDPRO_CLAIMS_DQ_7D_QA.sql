@@ -1,4 +1,4 @@
-TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA;
+-- TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA
 
@@ -122,9 +122,9 @@ bp."ProviderInternalId" as ProviderInternalId_bp,
     CASE  
     --all Claim_Types
          WHEN (ProviderInternalId IS NULL OR ProviderInternalId_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId) 
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId) 
          OR
-         NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
+         NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ProviderInternalId_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderInternalId1X,
@@ -161,9 +161,9 @@ bp."ProviderPidsl" as ProviderPidsl_bp
     CASE  
     --all Claim_Types
          WHEN (ProviderPidsl IS NULL OR ProviderPidsl_bp IS NULL) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl) 
+		 WHEN ( NOT EXISTS (SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl) 
          OR
-         NOT EXISTS (SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl_bp)
+         NOT EXISTS (SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_PROVIDER_LOCATION NOT IN ('#','+','-') AND ID_PROVIDER_LOCATION = ProviderPidsl_bp)
          )
          THEN 'INVALID'
          ELSE 'VALID' END bill_ProviderPidsl1X,
@@ -205,7 +205,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ref_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ref_ProviderInternalId
             AND ref_ProviderLocationCode = (
             case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
                  when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
@@ -231,9 +231,9 @@ If valid then 1 else 0
     CASE  
          WHEN (ref_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
+         SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist ap 
           WHERE ID_PROVIDER_LOCATION = ref_ProviderPidsl
+          AND ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
          ))         
          THEN 'INVALID'
          ELSE 'VALID' END ref_ProviderPidsl1X,
@@ -275,7 +275,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (ren_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = ren_ProviderInternalId
 		 
 		             AND ren_ProviderLocationCode = (
             case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
@@ -306,9 +306,9 @@ If valid then 1 else 0
     CASE  
          WHEN (ren_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
+         SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist ap 
           WHERE ID_PROVIDER_LOCATION = ren_ProviderPidsl
+          AND ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
          ))         
          THEN 'INVALID'
          ELSE 'VALID' END ren_ProviderPidsl1X,
@@ -333,7 +333,7 @@ If valid then 1 else 0
 --  Ex
     CASE  
          WHEN (asst_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = asst_ProviderInternalId
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = asst_ProviderInternalId
 
 		    AND asst_ProviderLocationCode = (
             case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
@@ -353,9 +353,9 @@ If valid then 1 else 0
     CASE  
          WHEN (asst_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
+         SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist ap 
           WHERE ID_PROVIDER_LOCATION = asst_ProviderPidsl
+          AND ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
          ))         
          THEN 'INVALID'
          ELSE 'VALID' END asst_ProviderPidsl1X,
@@ -382,7 +382,7 @@ If valid then 1 else 0
     CASE  
     --all Claim_Types
          WHEN (sup_ProviderInternalId IS NULL ) THEN 'NULL'
-		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWDEV.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId
+		 WHEN ( NOT EXISTS (SELECT ENC_PROV_ID from MHDWQA.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = sup_ProviderInternalId
 		    AND sup_ProviderLocationCode = (
             case when length(CDE_ENC_PROV_ID_LOC) <3 then lpad(CDE_ENC_PROV_ID_LOC,3,'0')
                  when length(CDE_ENC_PROV_ID_LOC) >3 then substr(CDE_ENC_PROV_ID_LOC,0,3)
@@ -400,9 +400,9 @@ If valid then 1 else 0
     CASE  
          WHEN (sup_ProviderPidsl IS NULL ) THEN 'NULL'
 		 WHEN ( NOT EXISTS (
-         SELECT ID_PROVIDER_LOCATION from MHDWQA.NW.NW_PROVIDER ap 
---          WHERE ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
+         SELECT ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist ap 
           WHERE ID_PROVIDER_LOCATION = sup_ProviderPidsl
+          AND ID_PROVIDER_LOCATION NOT IN ('#','+','-') 
          ))         
          THEN 'INVALID'
          ELSE 'VALID' END sup_ProviderPidsl1X,
@@ -512,6 +512,7 @@ on h."FileName"         = sup."FileName" and
    h."NumDtl"           = sup."NumDtl"
 
 where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_CLAIMS_DQ_7D_QA )
+and FileName not like '%ncpdp%'
    
 order by
     TransSetControlNum,
