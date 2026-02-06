@@ -258,7 +258,7 @@ dpvt.PrincipalDiagnosisCode
 
      CASE WHEN Claim_Type NOT IN ('L','I','O','M') THEN 'NOT APP'
        WHEN NOT EXISTS (
-             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL clm_dia 
+             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_DTL clm_dia 
                 JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
                 WHERE clm_dia."DiagnosisCode" IS NOT NULL
                 AND clm_dia."DiagnosisCodeQual" IN ('ABK')
@@ -288,7 +288,7 @@ MPT_SENDPRO_Diagnosis_Code_Valid_ALL	If valid based on lookup to the column CDE_
 
     CASE WHEN Claim_Type NOT IN ('L','I','O','M','P') THEN 'NOT APP'
        WHEN NOT EXISTS (
-             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM_DIAGNOSIS_DTL clm_dia 
+             SELECT clm_dia."DiagnosisCode" FROM MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM_DIAGNOSIS_DTL clm_dia 
                 JOIN MHDWQA.NW.NW_B_DIAGNOSIS dia ON clm_dia."DiagnosisCode" = dia.CDE_DIAG AND dia.CDE_ICD_VERSION=10 AND dia.CDE_DIAG NOT IN ('#','+','-') 
                 WHERE clm_dia."DiagnosisCode" IS NOT NULL
                 AND clm_dia."DiagnosisCodeQual" IN ('ABK','ABN','ABJ','ABF','APR')
