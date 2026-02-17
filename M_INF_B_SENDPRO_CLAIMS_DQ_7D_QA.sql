@@ -472,9 +472,10 @@ trim(asst."ProviderLocationCode")    as asst_ProviderLocationCode
 from MHDWQA.SENDPRO.RAW_SPRO_837D_CLAIM as h
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837D_CLAIM_SERVICE_DTL as d
-on  h."TransSetControlNum" = d."TransSetControlNum"
-and h."SubmitterID"        = d."SubmitterID"
-and h."PatientControlNum"  = d."PatientControlNum"
+ON  h."RAW_SPRO_CLAIM_SEQ"       = d."RAW_SPRO_CLAIM_SEQ"
+--on  h."TransSetControlNum" = d."TransSetControlNum"
+--and h."SubmitterID"        = d."SubmitterID"
+--and h."PatientControlNum"  = d."PatientControlNum"
 
 left join MHDWQA.SENDPRO.RAW_SPRO_837D_CLAIM_SVCLN_ADJUDICATION_DTL as a
 on  h."TransSetControlNum" = a."TransSetControlNum"

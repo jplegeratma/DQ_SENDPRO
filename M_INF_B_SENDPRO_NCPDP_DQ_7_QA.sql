@@ -280,9 +280,7 @@ SELECT
     FROM MHDWQA.SENDPRO.RAW_SPRO_NCPDP_CLAIM h
 
     LEFT JOIN MHDWQA.SENDPRO.RAW_SPRO_NCPDP_COMPOUND_DTL cd
-    ON  h."SendProTransId"       = cd."SendProTransId" 
-    AND h."FileName"             = cd."FileName" 
-    AND h."PAHdrSendingEntityID" = cd."PAHdrSendingEntityID"   
+    ON  h."RAW_SPRO_CLAIM_SEQ"       = cd."RAW_SPRO_CLAIM_SEQ"
 
     where FileName NOT IN ( SELECT DISTINCT FileName from MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA )
     
