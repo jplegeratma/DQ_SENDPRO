@@ -264,9 +264,12 @@ END AS ClaimBilledAmount1X,
     CASE  
          WHEN 
          (
-               ((billing_ProviderNPI IS NULL) OR (billing_ProviderNPI IN ('#','+','-')) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
+            ( ( (billing_IND_ENC_PROV_ATYPICAL IS NULL) OR (billing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (billing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((billing_ProviderNPI IS NULL) OR (billing_ProviderNPI IN ('#','+','-')) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
+            )
          )            
             THEN 'NULL'
+
 		 WHEN 
          (
               (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
@@ -562,10 +565,12 @@ END AS DispenseFee1X,
     CASE  
          WHEN 
          (
-                ((prescribing_ProviderNPI IS NULL) OR (prescribing_ProviderNPI IN ('#','+','-')) OR prescribing_ProviderNPI IN ('0','000000000','0000000000')) 
+            ( ( (prescribing_IND_ENC_PROV_ATYPICAL IS NULL) OR (prescribing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (prescribing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((prescribing_ProviderNPI IS NULL) OR (prescribing_ProviderNPI IN ('#','+','-')) OR (prescribing_ProviderNPI IN ('0','000000000','0000000000')) ) 
+            )
          )            
-         THEN 'NULL'
-            
+            THEN 'NULL'
+
          WHEN 
          (
               (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = prescribing_ProviderNPI))
@@ -714,6 +719,7 @@ select DISTINCT
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
 --    prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
+    prov_billing.IND_ENC_PROV_ATYPICAL AS billing_IND_ENC_PROV_ATYPICAL,
 
 --    prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
 --    prov_servicing.ID_NPI AS servicing_ProviderNPI,
@@ -722,6 +728,7 @@ select DISTINCT
     prov_prescribing.ENC_PROV_ID AS prescribing_ProviderInternalId,
     prov_prescribing.ID_NPI AS prescribing_ProviderNPI,
 --    prov_prescribing.CDE_PROVIDER_TYPE AS prescribing_ProviderType
+    prov_prescribing.IND_ENC_PROV_ATYPICAL AS prescribing_IND_ENC_PROV_ATYPICAL,
 
     CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
 

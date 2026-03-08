@@ -261,15 +261,23 @@ END AS ClaimBilledAmount1X,
 12	MPT_SENDPRO_ProviderNPIValid_ ALL	Validity of  NPI determined by performing a look up to the following tables 
         1.	SENDPRO.SPRO_B_ENC837_PROVIDER_HIST on the field ID_NPI
         If valid then 1 else 0
+
+        -- 20260308 Added IND_ENC_PROV_ATYPICAL per request by Victoria
 */
 
     CASE  
          WHEN 
          (
-               ((billing_ProviderNPI IS NULL) OR billing_ProviderNPI IN ('#','+','-') OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
-           AND ((dtl_billing_ProviderNPI IS NULL) OR dtl_billing_ProviderNPI IN ('#','+','-') OR dtl_billing_ProviderNPI IN ('0','000000000','0000000000') )
+            ( ( (billing_IND_ENC_PROV_ATYPICAL IS NULL) OR (billing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (billing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((billing_ProviderNPI IS NULL) OR (billing_ProviderNPI IN ('#','+','-')) OR billing_ProviderNPI IN ('0','000000000','0000000000') ) 
+            )
+            AND 
+            ( ( (dtl_billing_IND_ENC_PROV_ATYPICAL IS NULL) OR (dtl_billing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (dtl_billing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((dtl_billing_ProviderNPI IS NULL) OR (dtl_billing_ProviderNPI IN ('#','+','-')) OR dtl_billing_ProviderNPI IN ('0','000000000','0000000000') )
+            )
          )            
             THEN 'NULL'
+
 		 WHEN 
          (
               (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
@@ -383,13 +391,20 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ, 
 SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. SERVICING_ENC_PRV_SEQ: 
+
+-- 20260308 Added IND_ENC_PROV_ATYPICAL per request by Victoria
 */
 
     CASE  
          WHEN 
-         (
-                ((servicing_ProviderNPI IS NULL) OR servicing_ProviderNPI IN ('#','+','-') OR servicing_ProviderNPI IN ('0','000000000','0000000000')) 
-            AND ((dtl_servicing_ProviderNPI IS NULL) OR dtl_servicing_ProviderNPI IN ('#','+','-') OR dtl_servicing_ProviderNPI IN ('0','000000000','0000000000'))
+         ( 
+            ( ( (servicing_IND_ENC_PROV_ATYPICAL IS NULL) OR (servicing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (servicing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((servicing_ProviderNPI IS NULL) OR (servicing_ProviderNPI IN ('#','+','-')) OR servicing_ProviderNPI IN ('0','000000000','0000000000')) 
+            )
+            AND 
+            ( ( (dtl_servicing_IND_ENC_PROV_ATYPICAL IS NULL) OR (dtl_servicing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (dtl_servicing_IND_ENC_PROV_ATYPICAL = 'N') )
+              AND ((dtl_servicing_ProviderNPI IS NULL) OR (dtl_servicing_ProviderNPI IN ('#','+','-')) OR dtl_servicing_ProviderNPI IN ('0','000000000','0000000000'))
+            )
          )            
          THEN 'NULL'
             
@@ -846,10 +861,12 @@ select DISTINCT
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
     --prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
+    prov_billing.IND_ENC_PROV_ATYPICAL AS billing_IND_ENC_PROV_ATYPICAL,
 
     prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
     prov_servicing.ID_NPI AS servicing_ProviderNPI,
     --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
+    prov_servicing.IND_ENC_PROV_ATYPICAL AS servicing_IND_ENC_PROV_ATYPICAL,
 
     dtl.NUM_DTL,
     dtl.PROC_SEQ,
@@ -871,9 +888,11 @@ select DISTINCT
     
     dtl_prov_billing.ENC_PROV_ID   AS dtl_billing_ProviderInternalId,
     dtl_prov_billing.ID_NPI        AS dtl_billing_ProviderNPI,
+    dtl_prov_billing.IND_ENC_PROV_ATYPICAL      AS dtl_billing_IND_ENC_PROV_ATYPICAL,
 
     dtl_prov_servicing.ENC_PROV_ID AS dtl_servicing_ProviderInternalId,
     dtl_prov_servicing.ID_NPI      AS dtl_servicing_ProviderNPI,
+    dtl_prov_servicing.IND_ENC_PROV_ATYPICAL    AS dtl_servicing_IND_ENC_PROV_ATYPICAL,
     dtl.CDE_ORAL_CAVITY_DESIG_01   AS dtl_CDE_ORAL_CAVITY_DESIG_01
 
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_DNTL_LEG_HIST dntl
