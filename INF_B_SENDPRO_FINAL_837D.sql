@@ -494,11 +494,11 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
     CASE 
 		 WHEN 
          (
-             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
 
-         AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+         AND (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
          )
          THEN 'INVALID'
          ELSE 'VALID' 
