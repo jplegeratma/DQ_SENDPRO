@@ -595,6 +595,27 @@ END AS DispenseFee1X,
          ELSE 'VALID' 
          END AS PrescribingProviderLocation1X,
 
+
+/* 
+3/13/26 NEW
+
+12.1.X	Prescribing Internal Provider Address Location (MPT_SENDPRO_PrescribingInternalProviderAddressLocALL)
+•	ALL Claims population: MPT_SENDPRO_ClaimType_NCPDP
+•	MPT_SENDPRO_ ValidEncInternalProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.ENC_PRV_SEQ
+
+*/
+
+    CASE 
+		 WHEN 
+         (
+             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+         where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
+
+         )
+         THEN 'INVALID'
+         ELSE 'VALID' 
+         END AS PrescribingInternalProviderAddressLocation1X,
+
 /*
 12.1.41	Prescription Number (MPT_SENDPRO_PrescriptionNumber_NCPDP)
 •	837I Claims population:  MPT_SENDPRO_ClaimType_NCPDP
@@ -767,6 +788,7 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_prescribing
 
 WHERE phrm.IND_OFFSET = 'N'
 AND phrm.MD_BATCH_SEQ NOT IN ( SELECT DISTINCT tar.MD_BATCH_SEQ from MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP tar)
+AND phrm.WH_FROM_DT <= '2025-11-01'
  ) A;
 
 --LIMIT 100;
