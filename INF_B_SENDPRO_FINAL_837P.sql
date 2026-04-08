@@ -119,7 +119,8 @@ DUPLICATE 59	MPT_SENDPRO_ValidMember
 -- DROP TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
 
 -- CREATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP AS
---TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
+
+-- TRUNCATE TABLE MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP;
 
 INSERT INTO MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP
 SELECT DISTINCT
@@ -242,11 +243,11 @@ END AS ClaimBilledAmount1X,
 
     CASE  
          WHEN (billing_ProviderInternalId IS NULL OR billing_ProviderInternalId IN ('#','+','-')) THEN 'NULL'
-		 WHEN 
-         ( 
-               (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) )
-         )
-         THEN 'INVALID'
+--		 WHEN 
+--         ( 
+--               (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = billing_ProviderInternalId) )
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
     END AS BillingProviderInternalId1X,
 
@@ -270,11 +271,11 @@ END AS ClaimBilledAmount1X,
          )            
             THEN 'NULL'
 
-		 WHEN 
-         (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
-         )
-         THEN 'INVALID'
+--		 WHEN 
+--         (
+--              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
     END AS BillingProviderNPI1X,
 
@@ -300,17 +301,28 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 
 */
 
+/*
     CASE 
+
 		 WHEN 
          (
-             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
-         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax
+         where BILLING_ENC_PRV_SEQ = tax.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
 
          )
          THEN 'INVALID'
+
+--		 WHEN 
+--         (
+--             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+--         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
+--         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
+*/
+         'NULL' AS BillingProviderTaxonomy1X,
 
 /* 
 10/31/25 NEW
@@ -322,13 +334,17 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 */
 
     CASE 
-		 WHEN 
+         WHEN 
          (
-             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
-
+            (billing_CDE_ENC_PROV_ID_LOC IS NULL OR billing_CDE_ENC_PROV_ID_LOC IN ('#','+','-'))
          )
-         THEN 'INVALID'
+         THEN 'NULL'
+--		 WHEN 
+--         (
+--             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+--         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingInternalProviderAddressLocation1X,
 
@@ -341,13 +357,17 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 */
 
     CASE 
-		 WHEN 
+         WHEN 
          (
-             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
-
+            (billing_ID_PROVIDER_LOCATION IS NULL OR billing_ID_PROVIDER_LOCATION IN ('#','+','-'))
          )
-         THEN 'INVALID'
+         THEN 'NULL'
+--		 WHEN 
+--         (
+--             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+--         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderLocation1X,
 
@@ -402,6 +422,8 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
         THEN 'INVALID'
         ELSE 'VALID'
     END AS MemberID1X,
+
+--       'NULL' AS MemberID1X,
 
 /*
 12.1.21	Quantity (MPT_SENDPRO_ClaimAllowableAmt_ALL)
@@ -547,11 +569,11 @@ END AS DispenseFee1X,
 
     CASE  
          WHEN (prescribing_ProviderInternalId IS NULL OR prescribing_ProviderInternalId IN ('#','+','-')) THEN 'NULL'
-		 WHEN 
-         (
-              (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = prescribing_ProviderInternalId)) 
-         )
-         THEN 'INVALID'
+--		 WHEN 
+--         (
+--              (NOT EXISTS (SELECT ENC_PROV_ID from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ENC_PROV_ID NOT IN ('#','+','-') AND ENC_PROV_ID = prescribing_ProviderInternalId)) 
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS PrescribingProviderInternalId1X,
 
@@ -570,12 +592,11 @@ END AS DispenseFee1X,
             )
          )            
             THEN 'NULL'
-
-         WHEN 
-         (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = prescribing_ProviderNPI))
-         )
-         THEN 'INVALID'
+--         WHEN 
+--         (
+--              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = prescribing_ProviderNPI))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS PrescribingProviderNPI1X,
 
@@ -588,10 +609,15 @@ END AS DispenseFee1X,
     CASE 
          WHEN 
          (
-            (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-        where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
-            )
-         THEN 'INVALID'
+            (prescribing_ID_PROVIDER_LOCATION IS NULL OR prescribing_ID_PROVIDER_LOCATION IN ('#','+','-'))
+         )
+         THEN 'NULL'
+--         WHEN 
+--         (
+--            (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+--        where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+--            )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS PrescribingProviderLocation1X,
 
@@ -604,15 +630,18 @@ END AS DispenseFee1X,
 •	MPT_SENDPRO_ ValidEncInternalProvider: SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.ENC_PRV_SEQ
 
 */
-
-    CASE 
-		 WHEN 
+   CASE 
+         WHEN 
          (
-             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
-
+            (prescribing_CDE_ENC_PROV_ID_LOC IS NULL OR prescribing_CDE_ENC_PROV_ID_LOC IN ('#','+','-'))
          )
-         THEN 'INVALID'
+         THEN 'NULL'
+--		 WHEN 
+--         (
+--             (NOT EXISTS (SELECT prv.CDE_ENC_PROV_ID_LOC from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
+--         where PRESCRIBING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.CDE_ENC_PROV_ID_LOC IS NOT NULL AND prv.CDE_ENC_PROV_ID_LOC NOT IN ('#','+','-')))
+--         )
+--         THEN 'INVALID'
          ELSE 'VALID' 
          END AS PrescribingInternalProviderAddressLocation1X,
 
@@ -741,6 +770,8 @@ select DISTINCT
     prov_billing.ID_NPI AS billing_ProviderNPI,
 --    prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
     prov_billing.IND_ENC_PROV_ATYPICAL AS billing_IND_ENC_PROV_ATYPICAL,
+    prov_billing.CDE_ENC_PROV_ID_LOC AS billing_CDE_ENC_PROV_ID_LOC,
+    prov_billing.ID_PROVIDER_LOCATION AS billing_ID_PROVIDER_LOCATION,
 
 --    prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
 --    prov_servicing.ID_NPI AS servicing_ProviderNPI,
@@ -750,6 +781,8 @@ select DISTINCT
     prov_prescribing.ID_NPI AS prescribing_ProviderNPI,
 --    prov_prescribing.CDE_PROVIDER_TYPE AS prescribing_ProviderType
     prov_prescribing.IND_ENC_PROV_ATYPICAL AS prescribing_IND_ENC_PROV_ATYPICAL,
+    prov_prescribing.CDE_ENC_PROV_ID_LOC AS prescribing_CDE_ENC_PROV_ID_LOC,
+    prov_prescribing.ID_PROVIDER_LOCATION AS prescribing_ID_PROVIDER_LOCATION,
 
     CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
 
@@ -788,7 +821,8 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST prov_prescribing
 
 WHERE phrm.IND_OFFSET = 'N'
 AND phrm.MD_BATCH_SEQ NOT IN ( SELECT DISTINCT tar.MD_BATCH_SEQ from MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP tar)
-AND phrm.WH_FROM_DT <= '2025-11-01'
+--AND phrm.WH_FROM_DT BETWEEN TO_DATE('20260201', 'YYYYMMDD') AND TO_DATE('20260228', 'YYYYMMDD')
+--AND phrm.MD_BATCH_SEQ = '1057096'
  ) A;
 
 --LIMIT 100;
