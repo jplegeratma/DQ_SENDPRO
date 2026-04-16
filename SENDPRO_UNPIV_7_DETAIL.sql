@@ -1,109 +1,17 @@
 
--- Use the unpiv with rank filters instead
-
-DROP VIEW MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_DETAIL
-
-
-CREATE VIEW MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_DETAIL
-AS
-SELECT DISTINCT RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE, patientcontrolnum, numdtl
-FROM MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_QA_7_QA
-ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE;
-
-
-CREATE VIEW MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_DETAIL
-AS
-select 
+-- taken from SNOWFALKE QA
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL(
 	RUN_DATE,
 	FILENAME,
 	CLAIM_TYPE,
 	RECORD_TYPE,
+	MEASURE,
+	TYPE,
 	PATIENTCONTROLNUM,
 	NUMDTL,
-	CLAIMFREQUENCYCODE1X,
-	STATEMENTDTP1X,
-	ADMISSIONDTP1X,
-	ADMITTINGDIAGNOSISCODE1X,
-	FACILITYTYPECODE1X,
-	ADMISSIONTYPECODE1X,
-	ADMISSIONSOURCECODE1X,
-	SVCLINECHARGEAMT1X,
-	SVCLINEREVENUECODE1X,
-	OCCURRENCECODE1X,
-	OCCURRENCESPANCODE1X,
-	VALUECODE1X,
-	CONDITIONCODE1X,
-	PATIENTSTATUSCODE1X,
-	PRINCIPALDIAGNOSISCODE1X,
-	ICD10DIAGNOSIS_CODE1X,
-	MULTIPLEPROCEDURECODE1X,
-	CDT_CODE1X,
-	CPT_CODE1X,
-	HIPPS_CODE1X,
-	SVCLINEPROCMOD1X,
-	SVCLINEADJREVENUECODE1X,
-	PROCEDURECODE1X,
-	SVCLINEADJUDICATIONPROCMOD1X,
-	BILLINGPROVNPI1X,
-	BILL_PROVIDERINTERNALID1X,
-	BILL_PROVIDERPIDSL1X,
-	AT_ATTENDINGPROVNPI1X,
-	AT_PROVIDERINTERNALID1X,
-	AT_PROVIDERPIDSL1X,
-	REF_REFERRINGPROVNPI1X,
-	REF_PROVIDERINTERNALID1X,
-	REF_PROVIDERPIDSL1X,
-	REN_RENDERINGPROVNPI1X,
-	REN_PROVIDERINTERNALID1X,
-	REN_PROVIDERPIDSL1X,
-	OOP_OTHEROPERPROVNPI1X,
-	OOP_PROVIDERINTERNALID1X,
-	OOP_PROVIDERPIDSL1X,
-	OP_OPERATINGPROVNPI1X,
-	OP_PROVIDERINTERNALID1X,
-	OP_PROVIDERPIDSL1X
-FROM MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_QA_7_QA
-ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, RECORD_TYPE;
-
-select count(1) from MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_QA_7_QA;
-
---------
-
-
-select distinct filename
-from MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL
-order by filename;
-
-select count(1)
-from MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL
-where type != 'VALID';
-
-select count(1)
-from MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL
-where filename = 
---NCPDP'110088791b_pacdrd_12032025161702_sit_pd_30302539-9d7a-4a48-8f09-8ef9eaa7f71c.xml'
---D'110031447a_pacdrd_03032025155959_test_de_5256a86b-e060-42c7-93eb-85e98a8b3b70.xml'
---M'110031447b_pacdrp_04082025130110_test_pd_587e39fa-99ef-4bdf-bd24-8fc9ab2573a1.xml'
-'110031447b_pacdri_02272025175541_test_pd_4e8fcb4d-61e4-4a7b-bdfe-77362f81a5e4.xml';
-
-
-select *
-from MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_QA_UNPIV
-where filename = 
-'110031447b_pacdri_02272025175541_test_pd_4e8fcb4d-61e4-4a7b-bdfe-77362f81a5e4.xml'
-and measure = 'OTHER_PROVIDER_NPI';
-
-
-GRANT SELECT ON MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL TO DI_TEAM_ROLE;
-GRANT SELECT ON MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837M_UNPIV_DETAIL TO DI_TEAM_ROLE;
-GRANT SELECT ON MHTEAM.DWDQ.INF_SENDPRO_CLAIMS_DQ_7_837D_UNPIV_DETAIL TO DI_TEAM_ROLE;
-
-DROP VIEW INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL;
-
--- latest view
-
-CREATE VIEW INF_SENDPRO_CLAIMS_DQ_7_837I_UNPIV_DETAIL
-AS
+	RNK,
+	SUBMITTERNAME
+) as
 
 SELECT DISTINCT A.*,
 S."SubmitterLastOrgName" AS SUBMITTERNAME
@@ -277,7 +185,6 @@ ORDER BY
                                                                PATIENTCONTROLNUM,
                                                                RNK
 ;
-
 
 -----------------
 
@@ -581,5 +488,146 @@ ORDER BY
                                                                MEASURE,
                                                                TYPE,
                                                                PATIENTCONTROLNUM,
+                                                               RNK
+;
+
+---------
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV_DETAIL(
+	RUN_DATE,
+	FILENAME,
+	CLAIM_TYPE,
+	MEASURE,
+	TYPE,
+	SUBSCRIBERMEMBERID,
+	NUMDTL,
+	PAHDRSENDINGENTITYID,
+	DOS,
+	NDCSERV,
+	PRODCODE01,
+	PRODCODE02,
+	PRODCODE03,
+	COMPNDPRODCODE01,
+	COMPNDPRODCODE02,
+	COMPNDPRODCODE03,
+	ADJUDICATIONDATE,
+	TRANSID,
+	TRANSIDCROSSREF,
+	SERVPROVNPI,
+	SERVPROVSECID,
+	PRESCRIBERNPI,
+	PRESCRIBERSECID,
+	RNK
+) as
+
+-- limit rank to 10 lines
+SELECT *
+FROM (
+-- rank
+  SELECT *,
+                                            RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               SubscriberMemberID,
+                                                               NUMDTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT *
+  FROM (
+
+-- core unpiv
+
+SELECT RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE, SubscriberMemberID, Numdtl,
+PAHdrSendingEntityID,
+DOS,
+NDCServ,
+ProdCode01,
+ProdCode02,
+ProdCode03,
+CompndProdCode01,
+CompndProdCode02,
+CompndProdCode03,
+AdjudicationDate,
+TransID,
+TransIDCrossRef,
+ServProvNPI,
+ServProvSecID,
+PrescriberNPI,
+PrescriberSecID
+
+FROM (
+    SELECT 
+RUN_DATE,
+claim_type,
+PAHdrSendingEntityID,
+Filename,
+DOS,
+NDCServ,
+ProdCode01,
+ProdCode02,
+ProdCode03,
+CompndProdCode01,
+CompndProdCode02,
+CompndProdCode03,
+AdjudicationDate,
+TransID,
+TransIDCrossRef,
+ServProvNPI,
+ServProvSecID,
+PrescriberNPI,
+PrescriberSecID,
+	SUBSCRIBERMEMBERID1X AS Cardholder_Id,
+	NDCSERV1X            AS NDC,
+	COMPNDPRODCODE1X     AS Compound_NDC,
+	ADJUDICATIONDATE1X   AS Adjudication_Date, 
+	SERVPROVNPI1X        AS Service_Provider_NPI,
+	SERVPROVSECID1X      AS Service_Provider_ID,
+    PRESCRIBERNPI1X      AS Prescriber_Provider_NPI,
+    PRESCRIBERSECID1X    AS Prescriber_Provider_ID,
+    SubscriberMemberID,
+    Numdtl
+    FROM MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
+)
+UNPIVOT (
+TYPE
+FOR MEASURE IN (
+ 	Cardholder_Id,
+	NDC,
+	Compound_NDC,
+	Adjudication_Date,
+	Service_Provider_NPI,
+	Service_Provider_ID,
+    Prescriber_Provider_NPI,
+    Prescriber_Provider_ID
+ )
+) AS UNPIV
+ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE
+
+)
+-- only first claim line
+    WHERE NUMDTL = 1
+    )
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+ORDER BY 
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               SubscriberMemberID,
                                                                RNK
 ;
