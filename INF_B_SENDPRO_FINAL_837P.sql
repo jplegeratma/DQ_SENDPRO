@@ -301,29 +301,16 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 
 */
 
-/*
     CASE 
-
 		 WHEN 
          (
-             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax
-         where BILLING_ENC_PRV_SEQ = tax.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
-
+             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax 
+              where billing_ProviderInternalId = tax.ENC_PROV_ID AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
          )
          THEN 'INVALID'
-
---		 WHEN 
---         (
---             (NOT EXISTS (SELECT tax.CDE_ENC_TAXONOMY from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
---         LEFT JOIN mhdwqa.SENDPRO.spro_b_enc_provider_taxonomy_hist tax ON prv.ENC_PRV_SEQ = tax.ENC_PRV_SEQ
---         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND tax.CDE_ENC_TAXONOMY IS NOT NULL AND tax.CDE_ENC_TAXONOMY NOT IN ('#','+','-')))
---         )
---         THEN 'INVALID'
          ELSE 'VALID' 
          END AS BillingProviderTaxonomy1X,
-*/
-         'NULL' AS BillingProviderTaxonomy1X,
-
+         
 /* 
 10/31/25 NEW
 
