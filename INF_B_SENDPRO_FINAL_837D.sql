@@ -276,15 +276,17 @@ END AS ClaimBilledAmount1X,
               AND ((dtl_billing_ProviderNPI IS NULL) OR (dtl_billing_ProviderNPI IN ('#','+','-')) OR dtl_billing_ProviderNPI IN ('0','000000000','0000000000') )
             )
          )            
-            THEN 'NULL'
-
+         THEN 'NULL'
 		 WHEN 
          (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
-          AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_billing_ProviderNPI)) 
+              ( (billing_IND_ENC_PROV_ATYPICAL IS NULL) OR (billing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (billing_IND_ENC_PROV_ATYPICAL = 'N') )
+          AND (
+                 (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = billing_ProviderNPI))
+              AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_billing_ProviderNPI)) 
+              )
          )
-         THEN 'INVALID'
-         ELSE 'VALID' 
+         THEN 'INVALID'            
+    ELSE 'VALID' 
     END AS BillingProviderNPI1X,
 
 /*
@@ -404,14 +406,16 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG
               AND ((dtl_servicing_ProviderNPI IS NULL) OR (dtl_servicing_ProviderNPI IN ('#','+','-')) OR dtl_servicing_ProviderNPI IN ('0','000000000','0000000000'))
             )
          )            
-         THEN 'NULL'
-            
-         WHEN 
+         THEN 'NULL'            
+   		 WHEN 
          (
-              (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI)) 
-          AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_servicing_ProviderNPI))
+              ( (servicing_IND_ENC_PROV_ATYPICAL IS NULL) OR (servicing_IND_ENC_PROV_ATYPICAL IN ('#','+','-')) OR (servicing_IND_ENC_PROV_ATYPICAL = 'N') )
+          AND (
+                 (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = servicing_ProviderNPI))
+              AND (NOT EXISTS (SELECT ID_NPI from mhdwqa.SENDPRO.spro_b_enc_provider_hist where ID_NPI NOT IN ('#','+','-') AND ID_NPI = dtl_servicing_ProviderNPI)) 
+              )
          )
-         THEN 'INVALID'
+         THEN 'INVALID'            
          ELSE 'VALID' 
          END AS ServicingProviderNPI1X,
 
