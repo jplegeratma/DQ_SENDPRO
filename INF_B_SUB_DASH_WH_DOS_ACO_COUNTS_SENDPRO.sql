@@ -1,0 +1,214 @@
+drop TABLE MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO;
+
+create or replace TABLE MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO (
+	RUN_DATE DATE,
+    SEND_LEGACY VARCHAR(1),
+    WH_MON VARCHAR(4),
+	DOS_MON VARCHAR(4),
+	REMIT_MON VARCHAR(4),
+	CLAIM_MCE VARCHAR(10),
+	CLAIM_ACO_MCE VARCHAR(10),
+	CDE_ENTITY_MODEL VARCHAR(10),
+	ENTITY_PIDSL VARCHAR(20),
+	ENTITY_NAME VARCHAR(100),
+	CDE_CLM_TYPE VARCHAR(1),
+	CDE_CLM_DISPOSITION VARCHAR(2),
+    CDE_CLM_STATUS VARCHAR(2),
+	RECORD_COUNT NUMBER(38,0),
+    CLAIM_LINE_COUNT NUMBER(38,0),
+	TOTAL_PAID NUMBER(33,2)
+);
+
+truncate table MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO;
+
+INSERT INTO MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO
+
+SELECT RUN_DATE, SEND_LEGACY, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, COUNT(DISTINCT ENC_CLAIM_NO) AS RECORD_COUNT, 
+COUNT(DISTINCT ENC_CLAIM_NO || ENC_CLAIM_SUFFIX) AS CLAIM_LINE_COUNT, SUM(AMT_PAID) AS TOTAL_PAID
+FROM (
+SELECT
+DISTINCT 
+CURRENT_DATE() AS RUN_DATE,
+                'L' AS SEND_LEGACY,
+                 cw.MCO_CURRENT AS CLAIM_MCE,
+                 CASE WHEN cw.ACO_CURRENT in('#','+','-') 
+                     THEN cw.MCO_CURRENT ELSE cw.ACO_CURRENT END AS CLAIM_ACO_MCE,
+                 cw.CDE_ENTITY_MODEL, 
+                 cw.ENTITY_PIDSL,
+                 cw.ENTITY_NAME,
+                 CDE_CLM_TYPE,
+                 CDE_CLM_DISPOSITION,
+                 CDE_CLM_STATUS,
+                 TO_CHAR(DOS_FROM_DT,'YYMM') AS DOS_MON,
+                 TO_CHAR(WH_FROM_DT,'YYMM') AS WH_MON,
+                 TO_CHAR(REMIT_FROM_DT,'YYMM') AS REMIT_MON,
+                 AMT_PAID,
+                 ENC_CLAIM_NO,
+                 ENC_CLAIM_SUFFIX
+         FROM mhdwprod.nw.nw_encounter_hist e
+         left join mhteam.dwdq.INF_B_MCE_PIDSL_CROSSWALK cw on cw.mco = e.cde_enc_mco and cw.aco = e.cde_enc_aco            
+         WHERE e.dos_from_dt >= '01-JAN-2022'
+         AND e.IND_OFFSET = 'N'
+)
+GROUP BY RUN_DATE, SEND_LEGACY, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS
+ORDER BY RUN_DATE, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS;
+
+
+INSERT INTO MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO
+
+SELECT RUN_DATE, SEND_LEGACY, WH_MON, DOS_MON, REMIT_MON, 
+CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, count(DISTINCT NUM_ICN) AS RECORD_COUNT, 
+COUNT(DISTINCT NUM_ICN || NUM_DTL) AS CLAIM_LINE_COUNT, SUM(DTL_AMT_PAID) AS TOTAL_PAID
+FROM (
+SELECT 
+DISTINCT
+                 RUN_DATE,
+                'S' AS SEND_LEGACY,
+                 cw.MCO_CURRENT AS CLAIM_MCE,
+                 CASE WHEN cw.ACO_CURRENT in('#','+','-') 
+                     THEN cw.MCO_CURRENT ELSE cw.ACO_CURRENT END AS CLAIM_ACO_MCE,
+                 cw.CDE_ENTITY_MODEL, 
+                 cw.ENTITY_PIDSL,
+                 cw.ENTITY_NAME,
+                 CLAIM_TYPE AS CDE_CLM_TYPE,
+                 CDE_CLM_DISPOSITION,
+                 CDE_CLM_STATUS,
+                 TO_CHAR(DOS_FROM_DT,'YYMM') AS DOS_MON,
+                 TO_CHAR(WH_FROM_DT,'YYMM') AS WH_MON,
+                 TO_CHAR(REMIT_DT,'YYMM') AS REMIT_MON,
+                 AMT_PAID,
+                 DTL_AMT_PAID,
+                 NUM_ICN,
+                 NUM_DTL
+--         FROM MHTEAM.DWDQ.INF_B_SENDPRO_PP_TMSIS_EXTRACT_HDR e
+           FROM (
+------
+select DISTINCT
+    CURRENT_DATE()                 AS RUN_DATE,
+    'INST'                         AS CLAIM_LEG_TYPE,
+    inst.NUM_ICN,
+    inst.CDE_ENTITY_MODEL,
+    inst.CDE_ENC_MCO,
+    inst.CDE_ENC_ACO,
+    inst.DOS_FROM_DT,
+    inst.CDE_CLM_TYPE              AS Claim_Type,
+    inst.CDE_CLM_STATUS,
+    inst.CDE_CLM_DISPOSITION,
+    inst.IND_OFFSET,
+    inst.IND_CROSSOVER,
+    inst.WH_FROM_DT,
+    inst.REMIT_DT,
+    inst.MD_BATCH_SEQ,
+
+    inst.AMT_PAID,
+
+    dtl.NUM_DTL,
+    dtl.AMT_PAID                   AS DTL_AMT_PAID,
+    dtl.WH_FROM_DT                 AS DTL_WH_FROM_DT
+
+FROM MHDWPP.SENDPRO.SPRO_B_ENC_CLAIM_INST_LEG_HIST inst
+LEFT JOIN MHDWPP.SENDPRO.SPRO_B_ENC_INST_INFO_DTL_HIST dtl
+    ON inst.CLM_SEQ = dtl.CLM_SEQ AND dtl.IND_OFFSET = 'N'
+
+WHERE inst.IND_OFFSET = 'N'
+
+UNION
+
+select DISTINCT
+    CURRENT_DATE()                 AS RUN_DATE,
+    'PROF'                         AS CLAIM_LEG_TYPE,
+    prof.NUM_ICN,
+    prof.CDE_ENTITY_MODEL,
+    prof.CDE_ENC_MCO,
+    prof.CDE_ENC_ACO,
+    prof.DOS_FROM_DT,
+    prof.CDE_CLM_TYPE              AS Claim_Type,
+    prof.CDE_CLM_STATUS,
+    prof.CDE_CLM_DISPOSITION,
+    prof.IND_OFFSET,
+    prof.IND_CROSSOVER,
+    prof.WH_FROM_DT,
+    prof.REMIT_DT,
+    prof.MD_BATCH_SEQ,
+
+    prof.AMT_PAID,
+    
+    dtl.NUM_DTL,
+    dtl.AMT_PAID                   AS DTL_AMT_PAID,
+    dtl.WH_FROM_DT                 AS DTL_WH_FROM_DT
+
+FROM MHDWPP.SENDPRO.SPRO_B_ENC_CLAIM_PROF_LEG_HIST prof
+LEFT JOIN MHDWPP.SENDPRO.SPRO_B_ENC_PROF_INFO_DTL_HIST dtl
+    ON prof.CLM_SEQ = dtl.CLM_SEQ AND dtl.IND_OFFSET = 'N'
+
+WHERE prof.IND_OFFSET = 'N' 
+
+UNION
+
+select DISTINCT
+    CURRENT_DATE()                 AS RUN_DATE,
+    'DNTL'                         AS CLAIM_LEG_TYPE,
+    dntl.NUM_ICN,
+    dntl.CDE_ENTITY_MODEL,
+    dntl.CDE_ENC_MCO,
+    dntl.CDE_ENC_ACO,
+    dntl.DOS_FROM_DT,
+    dntl.CDE_CLM_TYPE              AS Claim_Type,
+    dntl.CDE_CLM_STATUS,
+    dntl.CDE_CLM_DISPOSITION,
+    dntl.IND_OFFSET,
+    dntl.IND_CROSSOVER,
+    dntl.WH_FROM_DT,
+    dntl.REMIT_DT,
+    dntl.MD_BATCH_SEQ,
+
+    dntl.AMT_PAID,
+
+    dtl.NUM_DTL,
+    dtl.AMT_PAID                   AS DTL_AMT_PAID,
+    dtl.WH_FROM_DT                 AS DTL_WH_FROM_DT
+
+FROM MHDWPP.SENDPRO.SPRO_B_ENC_CLAIM_DNTL_LEG_HIST dntl
+LEFT JOIN MHDWPP.SENDPRO.SPRO_B_ENC_DNTL_INFO_DTL_HIST dtl
+    ON dntl.CLM_SEQ = dtl.CLM_SEQ AND dtl.IND_OFFSET = 'N'
+
+WHERE dntl.IND_OFFSET = 'N'
+
+UNION
+
+select DISTINCT
+    CURRENT_DATE() AS RUN_DATE,
+    'PHRM'                         AS CLAIM_LEG_TYPE,
+    phrm.NUM_ICN,
+    phrm.CDE_ENTITY_MODEL,
+    phrm.CDE_ENC_MCO,
+    phrm.CDE_ENC_ACO,
+    phrm.DOS_FROM_DT,
+    phrm.CDE_CLM_TYPE              AS Claim_Type,
+    phrm.CDE_CLM_STATUS,
+    phrm.CDE_CLM_DISPOSITION,
+    phrm.IND_OFFSET,
+    phrm.IND_CROSSOVER,
+    phrm.WH_FROM_DT,
+    phrm.REMIT_DT,
+    phrm.MD_BATCH_SEQ,
+
+    phrm.AMT_PAID,
+
+    CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
+    NULL                           AS DTL_AMT_PAID,
+    dtl.WH_FROM_DT                 AS DTL_WH_FROM_DT
+
+FROM MHDWPP.SENDPRO.SPRO_B_ENC_CLAIM_PHRM_LEG_HIST phrm
+LEFT JOIN MHDWPP.SENDPRO.SPRO_B_ENC_PHRM_INFO_DTL_HIST dtl
+    ON phrm.CLM_SEQ = dtl.CLM_SEQ AND dtl.IND_OFFSET = 'N'
+
+WHERE phrm.IND_OFFSET = 'N'
+------
+
+           ) AS e
+         left join mhteam.dwdq.INF_B_MCE_PIDSL_CROSSWALK cw on cw.mco = e.cde_enc_mco and cw.aco = e.cde_enc_aco            
+         WHERE e.dos_from_dt >= '01-JAN-2022'
+)
+GROUP BY RUN_DATE, SEND_LEGACY, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS
+ORDER BY RUN_DATE, WH_MON, DOS_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS;
