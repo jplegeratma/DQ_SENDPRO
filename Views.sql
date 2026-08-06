@@ -2323,6 +2323,197 @@ claim_type,
 Filename
 ;
 
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV(
+	RUN_DATE,
+	FILENAME,
+	CLAIM_TYPE,
+	MEASURE,
+	PAHDRSENDINGENTITYID,
+	TYPE,
+	REC_CNT,
+	BENCHMARK_THRESHOLD
+) as
 
+SELECT DISTINCT RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, PAHdrSendingEntityID, TYPE, REC_CNT,
+L.BENCHMARK_THRESHOLD
+FROM (
+SELECT DISTINCT RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, PAHdrSendingEntityID, TYPE, COUNT(TYPE) AS REC_CNT
+FROM (
+SELECT RUN_DATE, FILENAME, CLAIM_TYPE, PAHdrSendingEntityID, MEASURE, TYPE
+FROM (
+    SELECT
+    RUN_DATE,
+    FILENAME, 
+    CLAIM_TYPE,
+    PAHdrSendingEntityID,
+	SUBSCRIBERMEMBERID1X AS Cardholder_Id,
+	NDCSERV1X            AS NDC,
+	COMPNDPRODCODE1X     AS Compound_NDC,
+	ADJUDICATIONDATE1X   AS Adjudication_Date, 
+	SERVPROVNPI1X        AS Service_Provider_NPI,
+	SERVPROVSECID1X      AS Service_Provider_ID,
+    PRESCRIBERNPI1X      AS Prescriber_Provider_NPI,
+    PRESCRIBERSECID1X    AS Prescriber_Provider_ID
+    
+    FROM MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_QA_7_QA
+)
+UNPIVOT (
+TYPE
+FOR MEASURE IN (
+	Cardholder_Id,
+	NDC,
+	Compound_NDC,
+	Adjudication_Date, 
+	Service_Provider_NPI,
+	Service_Provider_ID,
+    Prescriber_Provider_NPI,
+    Prescriber_Provider_ID
+)
+) AS INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV
+ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE
+)
+GROUP BY RUN_DATE, FILENAME, CLAIM_TYPE, PAHdrSendingEntityID, MEASURE, TYPE
+) A
+JOIN INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK
+ORDER BY FILENAME, CLAIM_TYPE, MEASURE, TYPE;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_NCPDP_DQ_QA_7_UNPIV_DETAIL(
+	RUN_DATE,
+	FILENAME,
+	CLAIM_TYPE,
+	MEASURE,
+	TYPE,
+	SUBSCRIBERMEMBERID,
+	NUMDTL,
+	PAHDRSENDINGENTITYID,
+	DOS,
+	NDCSERV,
+	PRODCODE01,
+	PRODCODE02,
+	PRODCODE03,
+	COMPNDPRODCODE01,
+	COMPNDPRODCODE02,
+	COMPNDPRODCODE03,
+	ADJUDICATIONDATE,
+	TRANSID,
+	TRANSIDCROSSREF,
+	SERVPROVNPI,
+	SERVPROVSECID,
+	PRESCRIBERNPI,
+	PRESCRIBERSECID,
+	RNK
+) as
+
+-- limit rank to 10 lines
+SELECT *
+FROM (
+-- rank
+  SELECT *,
+                                            RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               SubscriberMemberID,
+                                                               NUMDTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT *
+  FROM (
+
+-- core unpiv
+
+SELECT RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE, SubscriberMemberID, Numdtl,
+PAHdrSendingEntityID,
+DOS,
+NDCServ,
+ProdCode01,
+ProdCode02,
+ProdCode03,
+CompndProdCode01,
+CompndProdCode02,
+CompndProdCode03,
+AdjudicationDate,
+TransID,
+TransIDCrossRef,
+ServProvNPI,
+ServProvSecID,
+PrescriberNPI,
+PrescriberSecID
+
+FROM (
+    SELECT 
+RUN_DATE,
+claim_type,
+PAHdrSendingEntityID,
+Filename,
+DOS,
+NDCServ,
+ProdCode01,
+ProdCode02,
+ProdCode03,
+CompndProdCode01,
+CompndProdCode02,
+CompndProdCode03,
+AdjudicationDate,
+TransID,
+TransIDCrossRef,
+ServProvNPI,
+ServProvSecID,
+PrescriberNPI,
+PrescriberSecID,
+	SUBSCRIBERMEMBERID1X AS Cardholder_Id,
+	NDCSERV1X            AS NDC,
+	COMPNDPRODCODE1X     AS Compound_NDC,
+	ADJUDICATIONDATE1X   AS Adjudication_Date, 
+	SERVPROVNPI1X        AS Service_Provider_NPI,
+	SERVPROVSECID1X      AS Service_Provider_ID,
+    PRESCRIBERNPI1X      AS Prescriber_Provider_NPI,
+    PRESCRIBERSECID1X    AS Prescriber_Provider_ID,
+    SubscriberMemberID,
+    Numdtl
+    FROM MHTEAM.DWDQ.INF_B_SENDPRO_NCPDP_DQ_7_QA
+)
+UNPIVOT (
+TYPE
+FOR MEASURE IN (
+ 	Cardholder_Id,
+	NDC,
+	Compound_NDC,
+	Adjudication_Date,
+	Service_Provider_NPI,
+	Service_Provider_ID,
+    Prescriber_Provider_NPI,
+    Prescriber_Provider_ID
+ )
+) AS UNPIV
+ORDER BY RUN_DATE, FILENAME, CLAIM_TYPE, MEASURE, TYPE
+
+)
+-- only first claim line
+    WHERE NUMDTL = 1
+    )
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+ORDER BY 
+                                                               RUN_DATE,
+                                                               FILENAME,
+                                                               CLAIM_TYPE,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               SubscriberMemberID,
+                                                               RNK
+;
 
 
