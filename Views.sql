@@ -2516,4 +2516,1466 @@ ORDER BY
                                                                RNK
 ;
 
+-- Target
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837D_UNPIV;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837D_UNPIV(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	REC_CNT,
+	FILE_NAME,
+	PROCESS_START_TM,
+	BENCHMARK_THRESHOLD
+) as
+
+SELECT DISTINCT RUN_DATE, A.CDE_ENTITY_MODEL, A.CDE_ENC_MCO, A.CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, A.MD_BATCH_SEQ,MEASURE, TYPE, REC_CNT,
+s.FILE_NAME, s.PROCESS_START_TM, L.BENCHMARK_THRESHOLD
+FROM (
+
+SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, REC_CNT
+FROM (
+    SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, COUNT(TYPE) AS REC_CNT
+    FROM (
+        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                h."FileName" AS FILE_NAME,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                ToothNumber1X AS Tooth_Number,
+                ServiceCategory1X AS Service_Category_Code,
+                OralCategoryDesc1X AS Oral_Category_Desc,
+                ToothSurfaceCode1X AS Tooth_Surface_Code
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D tar
+            JOIN MHDWQA.SENDPRO.RAW_SPRO_837D_CLAIM h
+            ON tar.num_icn = h."PatientControlNum"
+            AND tar.ID_SUBMITTER = h."SubmitterID"
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Tooth_Number,
+                Service_Category_Code,
+                Oral_Category_Desc,
+                Tooth_Surface_Code
+            )
+        ) AS INF_SENDPRO_TARGET_837D_UNPIV
+    )
+    GROUP BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+)
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO AND A.FILE_NAME = S.FILE_NAME
+LEFT JOIN MHTEAM.DWDQ.INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837D_UNPIV_DETAIL;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837D_UNPIV_DETAIL(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	NUM_ICN,
+	NUM_DTL,
+	RNK,
+	FILE_NAME,
+	PROCESS_START_TM
+) as
+
+SELECT DISTINCT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
+-- limit rank to 10 lines
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
+FROM (
+-- rank
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               NUM_DTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+  FROM (
+
+-- core unpiv
+
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                ToothNumber1X AS Tooth_Number,
+                ServiceCategory1X AS Service_Category_Code,
+                OralCategoryDesc1X AS Oral_Category_Desc,
+                ToothSurfaceCode1X AS Tooth_Surface_Code,
+                NUM_ICN,
+                NUM_DTL
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837D
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Tooth_Number,
+                Service_Category_Code,
+                Oral_Category_Desc,
+                Tooth_Surface_Code
+            )
+) AS UNPIV7D
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
+
+-- only first claim line
+)
+WHERE NUM_DTL = 1    
+)
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+
+ORDER BY 
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               RNK
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	REC_CNT,
+	FILE_NAME,
+	PROCESS_START_TM,
+	BENCHMARK_THRESHOLD
+) as
+
+SELECT DISTINCT RUN_DATE, A.CDE_ENTITY_MODEL, A.CDE_ENC_MCO, A.CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, A.MD_BATCH_SEQ, MEASURE, TYPE, REC_CNT,
+s.FILE_NAME, s.PROCESS_START_TM, L.BENCHMARK_THRESHOLD
+FROM (
+
+SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, REC_CNT
+FROM (
+    SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, COUNT(TYPE) AS REC_CNT
+    FROM (
+        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                h."FileName" AS FILE_NAME,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code,
+                ServiceLineRevCode1X AS Service_Line_Rev_Code
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I tar
+            JOIN MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM h
+            ON tar.num_icn = h."PatientControlNum"
+            AND tar.ID_SUBMITTER = h."SubmitterID"
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Pricing_Method_Code,
+                Service_Category_Code,
+                Service_Line_Rev_Code
+            )
+        ) AS INF_SENDPRO_TARGET_837I_UNPIV
+    )
+    GROUP BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+)
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = S.MD_BATCH_SEQ_SPRO AND A.FILE_NAME = S.FILE_NAME
+LEFT JOIN MHTEAM.DWDQ.INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV_DETAIL;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837I_UNPIV_DETAIL(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	NUM_ICN,
+	NUM_DTL,
+	RNK,
+	FILE_NAME,
+	PROCESS_START_TM
+) as
+
+SELECT DISTINCT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
+-- limit rank to 10 lines
+-- 10/14/2024 - limit to 3 lines
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
+FROM (
+-- rank
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               NUM_DTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+  FROM (
+
+-- core unpiv
+
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code,
+                ServiceLineRevCode1X AS Service_Line_Rev_Code,
+                NUM_ICN,
+                NUM_DTL
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Pricing_Method_Code,
+                Service_Category_Code,
+                Service_Line_Rev_Code,
+                Billing_Provider_Location,
+                Service_Category_Code,
+                Service_Line_Rev_Code
+            )
+) AS UNPIV7I
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
+
+-- only first claim line
+)
+WHERE NUM_DTL = 1    
+)
+-- add rank
+)
+-- limit rank to 3 lines
+WHERE rnk <= 3
+
+ORDER BY 
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               RNK
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837M_UNPIV;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837M_UNPIV(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	REC_CNT,
+	FILE_NAME,
+	PROCESS_START_TM,
+	BENCHMARK_THRESHOLD
+) as
+
+SELECT DISTINCT RUN_DATE, A.CDE_ENTITY_MODEL, A.CDE_ENC_MCO, A.CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, A.MD_BATCH_SEQ, MEASURE, TYPE, REC_CNT,
+s.FILE_NAME, s.PROCESS_START_TM, L.BENCHMARK_THRESHOLD
+FROM (
+
+SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, REC_CNT
+FROM (
+    SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, COUNT(TYPE) AS REC_CNT
+    FROM (
+        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                h."FileName" AS FILE_NAME,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837M tar
+            JOIN MHDWQA.SENDPRO.RAW_SPRO_837P_CLAIM h
+            ON tar.num_icn = h."PatientControlNum"
+            AND tar.ID_SUBMITTER = h."SubmitterID"
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Pricing_Method_Code,
+                Service_Category_Code
+            )
+        ) AS INF_SENDPRO_TARGET_837M_UNPIV
+    )
+    GROUP BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+)
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO AND A.FILE_NAME = S.FILE_NAME
+LEFT JOIN MHTEAM.DWDQ.INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837M_UNPIV_DETAIL;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837M_UNPIV_DETAIL(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	NUM_ICN,
+	NUM_DTL,
+	RNK,
+	FILE_NAME,
+	PROCESS_START_TM
+) as
+
+SELECT DISTINCT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
+-- limit rank to 10 lines
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
+FROM (
+-- rank
+  SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                          RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               NUM_DTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+  FROM (
+
+-- core unpiv
+
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                ClaimFrequencyTypeCode1X AS Claim_Frequency_Code,
+                ClaimContractTypeCode1X AS Claim_Contract_Type_Code,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                ServicingProviderInternalId1X AS Servicing_Provider_Internal_ID,
+                ServicingProviderNPI1X AS Servicing_Provider_NPI,
+                ServicingProviderType1X AS Servicing_Provider_Type,
+                ServicingProviderLocation1X AS Servicing_Provider_Location,
+                ServicingProviderTaxonomy1X AS Servicing_Provider_Taxonomy,
+                ServicingInternalProviderAddressLocation1X AS Servicing_Provider_Internal_Address_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                AdmissionDate1X AS Admission_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                AdmittingDiagnosisCode1X AS Admitting_Diagnosis_Code,
+                PrimaryDiagnosisCode1X AS Principal_Diag_Code,
+                DischargeDate1X AS Discharge_Date,
+                TypeOfAdmission1X AS Admission_Type_Code,
+                SourceOfAdmission1X AS Admission_Source_Code,
+                PatientStatusCode1X AS Patient_Status_Code,
+                FacilityTypeCode1X AS Facility_Type_Code,
+                ProcedureCode1X AS Procedure_Code,
+                ProcedureModCode1X AS Procedure_Mod_Code,
+                PlaceOfServiceCode1X AS Place_Of_Service_Code,
+                PricingMethod1X AS Pricing_Method_Code,
+                ServiceCategory1X AS Service_Category_Code,
+                NUM_ICN,
+                NUM_DTL
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837M
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Claim_Frequency_Code,
+                Claim_Contract_Type_Code,
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Servicing_Provider_Internal_ID,
+                Servicing_Provider_NPI,
+                Servicing_Provider_Type,
+                Servicing_Provider_Location,
+                Servicing_Provider_Taxonomy,
+                Servicing_Provider_Internal_Address_Location,
+                Statement_Date,
+                To_Service_Date,
+                Admission_Date,
+                Member_ID,
+                Quantity_Billed,
+                Admitting_Diagnosis_Code,
+                Principal_Diag_Code,
+                Discharge_Date,
+                Admission_Type_Code,
+                Admission_Source_Code,
+                Patient_Status_Code,
+                Facility_Type_Code,
+                Procedure_Code,
+                Procedure_Mod_Code,
+                Place_Of_Service_Code,
+                Pricing_Method_Code,
+                Service_Category_Code
+            )
+) AS UNPIV7M
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
+
+-- only first claim line
+)
+WHERE NUM_DTL = 1    
+)
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+
+ORDER BY 
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               RNK
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837_NCPDP_UNPIV;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837_NCPDP_UNPIV(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	REC_CNT,
+	FILE_NAME,
+	PROCESS_START_TM,
+	BENCHMARK_THRESHOLD
+) as
+
+SELECT DISTINCT RUN_DATE, A.CDE_ENTITY_MODEL, A.CDE_ENC_MCO, A.CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, A.MD_BATCH_SEQ, MEASURE, TYPE, REC_CNT,
+s.FILE_NAME, s.PROCESS_START_TM, L.BENCHMARK_THRESHOLD
+FROM (
+
+SELECT DISTINCT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, REC_CNT
+FROM (
+    SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE, COUNT(TYPE) AS REC_CNT
+    FROM (
+        SELECT RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+        FROM (
+            SELECT
+                RUN_DATE,
+                tar.CDE_ENTITY_MODEL, 
+                tar.CDE_ENC_MCO, 
+                tar.CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                h."FileName" AS FILE_NAME,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                ProcedureCode1X AS Procedure_Code,
+                RecordStatus1X AS Record_Status,
+                NDC1X AS NDC,
+                CompoundNDC1X AS Compound_NDC,
+                ScriptWrittenDate1X AS Script_Written_Date,
+                DAW1X AS Dispense_As_Written,
+                DispenseFee1X AS Dispense_Fee,
+                PrescribingProviderInternalId1X AS Prescriber_Provider_ID,
+                PrescribingProviderNPI1X AS Prescriber_Provider_NPI,
+                PrescribingProviderLocation1X AS Prescriber_Provider_Location,
+                PrescribingInternalProviderAddressLocation1X AS Prescriber_Provider_Internal_Address_Location,
+                PrescriptionNumber1X AS Prescription_Number,
+                RefillIndicator1X AS Refill_Indicator,
+                PrescriptionOrigin1X AS Prescription_Origin,
+                DispenseQuantity1X AS Dispense_Quantity
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP tar
+            JOIN MHDWQA.NW.NW_ENC_MCE_PIDSL_XREF xref
+            ON tar.cde_enc_mco = xref.cde_enc_mco
+            JOIN MHDWQA.SENDPRO.RAW_SPRO_NCPDP_CLAIM h
+            ON tar.num_icn = h."TransID"
+            AND xref.entity_pidsl = h."PAHdrSendingEntityID"
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Statement_Date,
+                To_Service_Date,
+                Member_ID,
+                Quantity_Billed,
+                Procedure_Code,
+                Record_Status,
+                NDC,
+                Compound_NDC,
+                Script_Written_Date,
+                Dispense_As_Written,
+                Dispense_Fee,
+                Prescriber_Provider_ID,
+                Prescriber_Provider_NPI,
+                Prescriber_Provider_Location,
+                Prescriber_Provider_Internal_Address_Location,
+                Prescription_Number,
+                Refill_Indicator,
+                Prescription_Origin,
+                Dispense_Quantity
+            )
+        ) AS INF_SENDPRO_TARGET_837_NCPDP_UNPIV
+    )
+    GROUP BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+)
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MD_BATCH_SEQ, FILE_NAME, MEASURE, TYPE
+
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO AND A.FILE_NAME = S.FILE_NAME
+LEFT JOIN MHTEAM.DWDQ.INF_B_SENDPRO_LOOKUP L ON A.MEASURE = L.BENCHMARK;
+
+drop view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837_NCPDP_UNPIV_DETAIL;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_837_NCPDP_UNPIV_DETAIL(
+	RUN_DATE,
+	CDE_ENTITY_MODEL,
+	CDE_ENC_MCO,
+	CDE_ENC_ACO,
+	CLAIM_TYPE,
+	CDE_CLM_DISPOSITION,
+	CDE_CLM_STATUS,
+	MD_BATCH_SEQ,
+	MEASURE,
+	TYPE,
+	NUM_ICN,
+	NUM_DTL,
+	RNK,
+	FILE_NAME,
+	PROCESS_START_TM
+) as
+
+SELECT DISTINCT 
+               a.RUN_DATE, 
+               a.CDE_ENTITY_MODEL, 
+               a.CDE_ENC_MCO, 
+               a.CDE_ENC_ACO, 
+               a.CLAIM_TYPE, 
+               a.CDE_CLM_DISPOSITION, 
+               a.CDE_CLM_STATUS, 
+               a.MD_BATCH_SEQ, 
+               a.MEASURE, 
+               a.TYPE, 
+               a.NUM_ICN, 
+               a.NUM_DTL,
+               a.RNK,
+               s.FILE_NAME, 
+               s.PROCESS_START_TM
+FROM (
+
+
+-- limit rank to 10 lines
+SELECT DISTINCT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+               RNK
+
+FROM (
+-- rank
+  SELECT
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL,
+                                            RANK ()
+                                            OVER (PARTITION BY RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE
+                                                  ORDER BY
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MD_BATCH_SEQ,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               NUM_DTL)    AS rnk
+
+  FROM (
+
+-- only first claim line
+
+SELECT 
+
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
+  FROM (
+
+-- core unpiv
+
+        SELECT 
+               RUN_DATE, 
+               CDE_ENTITY_MODEL, 
+               CDE_ENC_MCO, 
+               CDE_ENC_ACO, 
+               CLAIM_TYPE, 
+               CDE_CLM_DISPOSITION, 
+               CDE_CLM_STATUS, 
+               MD_BATCH_SEQ, 
+               MEASURE, 
+               TYPE, 
+               NUM_ICN, 
+               NUM_DTL
+
+        FROM (
+            SELECT
+                RUN_DATE,
+                CDE_ENTITY_MODEL, 
+                CDE_ENC_MCO, 
+                CDE_ENC_ACO, 
+                CLAIM_TYPE,
+                CDE_CLM_DISPOSITION,
+                CDE_CLM_STATUS,
+                MD_BATCH_SEQ,
+                ClaimAllowableAmount1X AS Allowed_Amount,
+                ClaimPaidAmount1X AS Paid_Amount,
+                ClaimBilledAmount1X AS Billed_Amount,
+                BillingProviderInternalId1X AS Billing_Provider_Internal_ID,
+                BillingProviderNPI1X AS Billing_Provider_NPI,
+                BillingProviderTaxonomy1X AS Billing_Provider_Taxonomy,
+                BillingInternalProviderAddressLocation1X AS Billing_Provider_Internal_Address_Location,
+                BillingProviderLocation1X AS Billing_Provider_Location,
+                FromServiceDate1X AS Statement_Date,
+                ToServiceDate1X AS To_Service_Date,
+                MemberID1X AS Member_ID,
+                QuantityBilled1X AS Quantity_Billed,
+                ProcedureCode1X AS Procedure_Code,
+                RecordStatus1X AS Record_Status,
+                NDC1X AS NDC,
+                CompoundNDC1X AS Compound_NDC,
+                ScriptWrittenDate1X AS Script_Written_Date,
+                DAW1X AS Dispense_As_Written,
+                DispenseFee1X AS Dispense_Fee,
+                PrescribingProviderInternalId1X AS Prescriber_Provider_ID,
+                PrescribingProviderNPI1X AS Prescriber_Provider_NPI,
+                PrescribingProviderLocation1X AS Prescriber_Provider_Location,
+                PrescribingInternalProviderAddressLocation1X AS Prescriber_Provider_Internal_Address_Location,
+                PrescriptionNumber1X AS Prescription_Number,
+                RefillIndicator1X AS Refill_Indicator,
+                PrescriptionOrigin1X AS Prescription_Origin,
+                DispenseQuantity1X AS Dispense_Quantity,
+                NUM_ICN,
+                NUM_DTL
+            FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837_NCPDP
+        )
+        UNPIVOT (
+            TYPE
+            FOR MEASURE IN (
+                Allowed_Amount,
+                Paid_Amount,
+                Billed_Amount,
+                Billing_Provider_Internal_ID,
+                Billing_Provider_NPI,
+                Billing_Provider_Taxonomy,
+                Billing_Provider_Internal_Address_Location,
+                Billing_Provider_Location,
+                Statement_Date,
+                To_Service_Date,
+                Member_ID,
+                Quantity_Billed,
+                Procedure_Code,
+                Record_Status,
+                NDC,
+                Compound_NDC,
+                Script_Written_Date,
+                Dispense_As_Written,
+                Dispense_Fee,
+                Prescriber_Provider_ID,
+                Prescriber_Provider_NPI,
+                Prescriber_Provider_Location,
+                Prescriber_Provider_Internal_Address_Location,
+                Prescription_Number,
+                Refill_Indicator,
+                Prescription_Origin,
+                Dispense_Quantity
+            )
+) AS UNPIV7P
+ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
+
+-- only first claim line
+)
+WHERE NUM_DTL IN (0,1)     -- NCPDP can have 0 detail records (header only claims)
+)
+-- add rank
+)
+-- limit rank to 10 line
+WHERE rnk <= 10
+
+ORDER BY 
+                                                               RUN_DATE,
+                                                               CDE_ENTITY_MODEL, 
+                                                               CDE_ENC_MCO, 
+                                                               CDE_ENC_ACO,
+                                                               CLAIM_TYPE,
+                                                               CDE_CLM_DISPOSITION,
+                                                               CDE_CLM_STATUS,
+                                                               MEASURE,
+                                                               TYPE,
+                                                               NUM_ICN,
+                                                               RNK
+) AS A
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_STATISTIC S ON A.MD_BATCH_SEQ = s.MD_BATCH_SEQ_SPRO;
+
+create or replace view MHTEAM.DWDQ.INF_SENDPRO_TARGET_RUN_DATE(
+	RUN_DATE
+) as
+SELECT RUN_DATE 
+FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_DATE_RUN;
 
