@@ -2,7 +2,7 @@ drop TABLE MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO;
 
 create or replace TABLE MHTEAM.DWDQ.INF_B_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO (
 	RUN_DATE DATE,
-    SEND_LEGACY VARCHAR(2),
+    SEND_LEGACY VARCHAR(20),
     WH_MON VARCHAR(4),
 	DOS_MON VARCHAR(4),
 	REMIT_MON VARCHAR(4),
@@ -45,7 +45,7 @@ CURRENT_DATE() AS RUN_DATE,
                  AMT_PAID,
                  ENC_CLAIM_NO,
                  ENC_CLAIM_SUFFIX
-         FROM mhdwprod.nw.nw_encounter_hist e
+         FROM mhdwpp.nw.nw_encounter_hist e
          left join mhteam.dwdq.INF_B_MCE_PIDSL_CROSSWALK cw on cw.mco = e.cde_enc_mco and cw.aco = e.cde_enc_aco            
          WHERE e.dos_from_dt >= '01-JAN-2022'
          AND e.IND_OFFSET = 'N'
@@ -281,3 +281,110 @@ CURRENT_DATE() AS RUN_DATE,
 )
 GROUP BY RUN_DATE, SEND_LEGACY, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS
 ORDER BY RUN_DATE, WH_MON, DOS_MON, REMIT_MON, CLAIM_MCE, CLAIM_ACO_MCE, CDE_ENTITY_MODEL, ENTITY_PIDSL, ENTITY_NAME, CDE_CLM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS;
+
+-- L+S
+
+INSERT INTO MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO
+
+SELECT 
+case when l.RUN_DATE is NULL then s.RUN_DATE else l.RUN_DATE end as RUN_DATE, 
+'L+S' AS SEND_LEGACY, 
+case when l.WH_MON is NULL then s.WH_MON else l.WH_MON end as WH_MON,
+case when l.DOS_MON is NULL then s.DOS_MON else l.DOS_MON end as DOS_MON,
+case when l.REMIT_MON is NULL then s.REMIT_MON else l.REMIT_MON end as REMIT_MON,
+case when l.CLAIM_MCE is NULL then s.CLAIM_MCE else l.CLAIM_MCE end as CLAIM_MCE,
+case when l.CLAIM_ACO_MCE is NULL then s.CLAIM_ACO_MCE else l.CLAIM_ACO_MCE end as CLAIM_ACO_MCE,
+case when l.CDE_ENTITY_MODEL is NULL then s.CDE_ENTITY_MODEL else l.CDE_ENTITY_MODEL end as CDE_ENTITY_MODEL,
+case when l.ENTITY_PIDSL is NULL then s.ENTITY_PIDSL else l.ENTITY_PIDSL end as ENTITY_PIDSL,
+case when l.ENTITY_NAME is NULL then s.ENTITY_NAME else l.ENTITY_NAME end as ENTITY_NAME,
+case when l.CDE_CLM_TYPE is NULL then s.CDE_CLM_TYPE else l.CDE_CLM_TYPE end as CDE_CLM_TYPE,
+case when l.CDE_CLM_DISPOSITION is NULL then s.CDE_CLM_DISPOSITION else l.CDE_CLM_DISPOSITION end as CDE_CLM_DISPOSITION,
+case when l.CDE_CLM_STATUS is NULL then s.CDE_CLM_STATUS else l.CDE_CLM_STATUS end as CDE_CLM_STATUS,
+
+case when l.RECORD_COUNT is NULL then 0 else l.RECORD_COUNT end +
+case when s.RECORD_COUNT is NULL then 0 else s.RECORD_COUNT end  AS RECORD_COUNT,
+
+case when l.CLAIM_LINE_COUNT is NULL then 0 else l.CLAIM_LINE_COUNT end +
+case when s.CLAIM_LINE_COUNT is NULL then 0 else s.CLAIM_LINE_COUNT end  AS CLAIM_LINE_COUNT,
+
+case when l.TOTAL_PAID is NULL then 0 else l.TOTAL_PAID end +
+case when s.TOTAL_PAID is NULL then 0 else s.TOTAL_PAID end  AS TOTAL_PAID
+----
+from (
+select DISTINCT *
+from MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO l
+where l.SEND_LEGACY = 'L'
+) l
+full outer join
+(
+select DISTINCT *
+from MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO s
+where s.SEND_LEGACY = 'S'
+) s
+
+on l.RUN_DATE            = s.RUN_DATE
+and l.WH_MON              = s.WH_MON 
+and l.DOS_MON             = s.DOS_MON 
+and l.REMIT_MON           = s.REMIT_MON 
+and l.CLAIM_MCE           = s.CLAIM_MCE
+and l.CLAIM_ACO_MCE       = s.CLAIM_ACO_MCE 
+and l.CDE_CLM_TYPE        = s.CDE_CLM_TYPE
+and l.CDE_CLM_DISPOSITION = s.CDE_CLM_DISPOSITION
+and l.CDE_CLM_STATUS      = s.CDE_CLM_STATUS 
+----
+;
+
+-- UL+US
+
+INSERT INTO MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO
+
+SELECT 
+case when l.RUN_DATE is NULL then s.RUN_DATE else l.RUN_DATE end as RUN_DATE, 
+'UL+US' AS SEND_LEGACY, 
+case when l.WH_MON is NULL then s.WH_MON else l.WH_MON end as WH_MON,
+case when l.DOS_MON is NULL then s.DOS_MON else l.DOS_MON end as DOS_MON,
+case when l.REMIT_MON is NULL then s.REMIT_MON else l.REMIT_MON end as REMIT_MON,
+case when l.CLAIM_MCE is NULL then s.CLAIM_MCE else l.CLAIM_MCE end as CLAIM_MCE,
+case when l.CLAIM_ACO_MCE is NULL then s.CLAIM_ACO_MCE else l.CLAIM_ACO_MCE end as CLAIM_ACO_MCE,
+case when l.CDE_ENTITY_MODEL is NULL then s.CDE_ENTITY_MODEL else l.CDE_ENTITY_MODEL end as CDE_ENTITY_MODEL,
+case when l.ENTITY_PIDSL is NULL then s.ENTITY_PIDSL else l.ENTITY_PIDSL end as ENTITY_PIDSL,
+case when l.ENTITY_NAME is NULL then s.ENTITY_NAME else l.ENTITY_NAME end as ENTITY_NAME,
+case when l.CDE_CLM_TYPE is NULL then s.CDE_CLM_TYPE else l.CDE_CLM_TYPE end as CDE_CLM_TYPE,
+case when l.CDE_CLM_DISPOSITION is NULL then s.CDE_CLM_DISPOSITION else l.CDE_CLM_DISPOSITION end as CDE_CLM_DISPOSITION,
+case when l.CDE_CLM_STATUS is NULL then s.CDE_CLM_STATUS else l.CDE_CLM_STATUS end as CDE_CLM_STATUS,
+
+case when l.RECORD_COUNT is NULL then 0 else l.RECORD_COUNT end +
+case when s.RECORD_COUNT is NULL then 0 else s.RECORD_COUNT end  AS RECORD_COUNT,
+
+case when l.CLAIM_LINE_COUNT is NULL then 0 else l.CLAIM_LINE_COUNT end +
+case when s.CLAIM_LINE_COUNT is NULL then 0 else s.CLAIM_LINE_COUNT end  AS CLAIM_LINE_COUNT,
+
+case when l.TOTAL_PAID is NULL then 0 else l.TOTAL_PAID end +
+case when s.TOTAL_PAID is NULL then 0 else s.TOTAL_PAID end  AS TOTAL_PAID
+
+----
+from (
+select DISTINCT *
+from MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO l
+where l.SEND_LEGACY = 'UL'
+) l
+full outer join
+(
+select DISTINCT *
+from MHTEAM.DWDQ.INF_B_PP_SUB_DASH_WH_DOS_ACO_COUNTS_SENDPRO s
+where s.SEND_LEGACY = 'US'
+) s
+
+on l.RUN_DATE            = s.RUN_DATE
+and l.WH_MON              = s.WH_MON 
+and l.DOS_MON             = s.DOS_MON 
+and l.REMIT_MON           = s.REMIT_MON 
+and l.CLAIM_MCE           = s.CLAIM_MCE
+and l.CLAIM_ACO_MCE       = s.CLAIM_ACO_MCE 
+and l.CDE_CLM_TYPE        = s.CDE_CLM_TYPE
+and l.CDE_CLM_DISPOSITION = s.CDE_CLM_DISPOSITION
+and l.CDE_CLM_STATUS      = s.CDE_CLM_STATUS 
+----
+;
+
+
