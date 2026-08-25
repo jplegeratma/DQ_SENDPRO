@@ -195,8 +195,9 @@ select DISTINCT
     phrm.MD_BATCH_SEQ,
 
     phrm.AMT_PAID,
-
-    CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
+    dtl.NUM_DTL,
+--  8/25/26 - JPL    
+--    CASE WHEN dtl.NUM_DTL IS NULL THEN 0 ELSE dtl.NUM_DTL END AS NUM_DTL,
     NULL                           AS DTL_AMT_PAID,
     dtl.WH_FROM_DT                 AS DTL_WH_FROM_DT
 
