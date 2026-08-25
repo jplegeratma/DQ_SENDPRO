@@ -355,16 +355,14 @@ SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ,
 
 */
 
-    CASE 
-		 WHEN 
+     CASE 
+         WHEN 
          (
-             (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
-
-         AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-         where DTL_BILLING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
+            ( billing_ProviderLocation IS NULL OR billing_ProviderLocation IN ('#','+','-'))
+        AND 
+            ( dtl_billing_ProviderLocation IS NULL OR dtl_billing_ProviderLocation IN ('#','+','-'))
          )
-         THEN 'INVALID'
+         THEN 'NULL'
          ELSE 'VALID' 
          END AS BillingProviderLocation1X,
 
@@ -453,15 +451,15 @@ SPRO_B_ENC_CLAIM_PHRM_LEG_HIST.SERVICING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_
 •	ALL Claims population: MPT_SENDPRO_ClaimType_ALL
 •	MPT_SENDPRO_ValidEncProvider: SPRO_B_ENC_CLAIM_DNTL_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_DNTL_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_PHRM_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_CLAIM_INST_LEG_HIST. BILLING_ENC_PRV_SEQ, SPRO_B_ENC_INST_INFO_DTL_HIST. BILLING_ENC_PRV_SEQ: 
 */
+
     CASE 
          WHEN 
          (
-            (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-        where SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
-        AND (NOT EXISTS (SELECT prv.ID_PROVIDER_LOCATION from mhdwqa.SENDPRO.spro_b_enc_provider_hist as prv
-        where DTL_SERVICING_ENC_PRV_SEQ = prv.ENC_PRV_SEQ AND prv.ID_PROVIDER_LOCATION IS NOT NULL AND prv.ID_PROVIDER_LOCATION NOT IN ('#','+','-')))
-            )
-         THEN 'INVALID'
+            ( servicing_ProviderLocation IS NULL OR servicing_ProviderLocation IN ('#','+','-'))
+        AND 
+            ( dtl_servicing_ProviderLocation IS NULL OR dtl_servicing_ProviderLocation IN ('#','+','-'))
+         )
+         THEN 'NULL'
          ELSE 'VALID' 
          END AS ServicingProviderLocation1X,
 
@@ -864,11 +862,13 @@ select DISTINCT
     prov_billing.ID_NPI AS billing_ProviderNPI,
     --prov_billing.CDE_PROVIDER_TYPE AS billing_ProviderType,
     prov_billing.IND_ENC_PROV_ATYPICAL AS billing_IND_ENC_PROV_ATYPICAL,
+    prov_billing.ID_PROVIDER_LOCATION AS billing_ProviderLocation,
 
     prov_servicing.ENC_PROV_ID AS servicing_ProviderInternalId,
     prov_servicing.ID_NPI AS servicing_ProviderNPI,
     --prov_servicing.CDE_PROVIDER_TYPE AS servicing_ProviderType
     prov_servicing.IND_ENC_PROV_ATYPICAL AS servicing_IND_ENC_PROV_ATYPICAL,
+    prov_servicing.ID_PROVIDER_LOCATION AS servicing_ProviderLocation,
 
     dtl.NUM_DTL,
     dtl.PROC_SEQ,
@@ -891,11 +891,13 @@ select DISTINCT
     dtl_prov_billing.ENC_PROV_ID   AS dtl_billing_ProviderInternalId,
     dtl_prov_billing.ID_NPI        AS dtl_billing_ProviderNPI,
     dtl_prov_billing.IND_ENC_PROV_ATYPICAL      AS dtl_billing_IND_ENC_PROV_ATYPICAL,
+    dtl_prov_billing.ID_PROVIDER_LOCATION AS dtl_billing_ProviderLocation,
 
     dtl_prov_servicing.ENC_PROV_ID AS dtl_servicing_ProviderInternalId,
     dtl_prov_servicing.ID_NPI      AS dtl_servicing_ProviderNPI,
     dtl_prov_servicing.IND_ENC_PROV_ATYPICAL    AS dtl_servicing_IND_ENC_PROV_ATYPICAL,
-    dtl.CDE_ORAL_CAVITY_DESIG_01   AS dtl_CDE_ORAL_CAVITY_DESIG_01
+    dtl.CDE_ORAL_CAVITY_DESIG_01   AS dtl_CDE_ORAL_CAVITY_DESIG_01,
+    dtl_prov_servicing.ID_PROVIDER_LOCATION AS dtl_servicing_ProviderLocation
 
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_DNTL_LEG_HIST dntl
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_DNTL_INFO_DTL_HIST dtl
