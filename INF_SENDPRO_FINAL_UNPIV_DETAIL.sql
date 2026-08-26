@@ -159,6 +159,8 @@ SELECT
                 PricingMethod1X AS Pricing_Method_Code,
                 ServiceCategory1X AS Service_Category_Code,
                 ServiceLineRevCode1X AS Service_Line_Rev_Code,
+                DiagnosisRelatedGroup1X AS Diagnosis_Related_Group,
+                AdjudicatedDiagnosisRelatedGroup1X AS Adj_Diagnosis_Related_Group,
                 NUM_ICN,
                 NUM_DTL
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I
@@ -202,7 +204,9 @@ SELECT
                 Service_Line_Rev_Code,
                 Billing_Provider_Location,
                 Service_Category_Code,
-                Service_Line_Rev_Code
+                Service_Line_Rev_Code,
+                Diagnosis_Related_Group,
+                Adj_Diagnosis_Related_Group
             )
 ) AS UNPIV7I
 ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE

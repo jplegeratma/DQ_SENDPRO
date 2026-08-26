@@ -826,6 +826,32 @@ SPRO_B_ENC_DNTL_INFO_DTL_HIST. CDE_ENC_SVC_CAT
          ELSE 'VALID'
     END AS ServiceLineRevCode1X,
 
+/* 
+12.1.51	Diagnosis Related Group (MPT_SENDPRO_DRG_937I)
+•	837I Claims population: MPT_SENDPRO_ClaimType_837I
+•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_DRG
+*/
+
+    CASE 
+         WHEN (CDE_DRG IS NULL OR CDE_DRG IN ('#','+','-'))
+         THEN 'NULL'
+         ELSE 'VALID'
+    END AS DiagnosisRelatedGroup1X,
+
+/*
+12.1.52	Adjudicated Diagnosis Related Group (MPT_SENDPRO_ADJDRG_937I)
+•	837I Claims population: MPT_SENDPRO_ClaimType_837I
+•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_SBR_PYR_M2M. ADJ_DRG_NUM 
+(Join with SPRO_B_ENC_CLAIM_INST_LEG_HIST  on clm_seq=pyrm2m.clm_seq and pyrm2m.cde_id_oth_payer=l.id_submitter 
+and pyrm2m.cde_claim_filing_ind='MC')
+ */
+
+    CASE 
+         WHEN (ADJ_DRG_NUM IS NULL OR ADJ_DRG_NUM IN ('#','+','-'))
+         THEN 'NULL'
+         ELSE 'VALID'
+    END AS AdjudicatedDiagnosisRelatedGroup1X,
+
 1 as TOT_REX
 
 FROM (
@@ -864,6 +890,7 @@ select DISTINCT
     inst.SERVICING_ENC_PRV_SEQ,
     NULL AS CDE_PLACE_OF_SERVICE,
     inst.CDE_ENC_PRICE_METHOD,
+    inst.CDE_DRG,
   
     prov_billing.ENC_PROV_ID AS billing_ProviderInternalId,
     prov_billing.ID_NPI AS billing_ProviderNPI,
@@ -906,7 +933,9 @@ select DISTINCT
     dtl_prov_servicing.ENC_PROV_ID AS dtl_servicing_ProviderInternalId,
     dtl_prov_servicing.ID_NPI      AS dtl_servicing_ProviderNPI,
     dtl_prov_servicing.IND_ENC_PROV_ATYPICAL    AS dtl_servicing_IND_ENC_PROV_ATYPICAL,
-    dtl_prov_servicing.ID_PROVIDER_LOCATION AS dtl_servicing_ProviderLocation
+    dtl_prov_servicing.ID_PROVIDER_LOCATION AS dtl_servicing_ProviderLocation,
+
+    pyrm2m.ADJ_DRG_NUM
 
 FROM MHDWQA.SENDPRO.SPRO_B_ENC_CLAIM_INST_LEG_HIST inst
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_INST_INFO_DTL_HIST dtl
@@ -919,6 +948,8 @@ LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_billing
     ON DTL_BILLING_ENC_PRV_SEQ = dtl_prov_billing.ENC_PRV_SEQ
 LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_PROVIDER_HIST dtl_prov_servicing
     ON DTL_SERVICING_ENC_PRV_SEQ = dtl_prov_servicing.ENC_PRV_SEQ
+LEFT JOIN MHDWQA.SENDPRO.SPRO_B_ENC_SBR_PYR_M2M pyrm2m 
+    ON inst.CLM_SEQ=pyrm2m.clm_seq AND pyrm2m.cde_id_oth_payer=inst.id_submitter AND pyrm2m.cde_claim_filing_ind='MC'
 
 WHERE inst.IND_OFFSET = 'N'
 AND   inst.MD_BATCH_SEQ NOT IN ( SELECT DISTINCT tar.MD_BATCH_SEQ from MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I tar)
