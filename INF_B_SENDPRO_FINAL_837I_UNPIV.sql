@@ -60,7 +60,9 @@ FROM (
                 ServiceCategory1X AS Service_Category_Code,
                 ServiceLineRevCode1X AS Service_Line_Rev_Code,
                 DiagnosisRelatedGroup1X AS Diagnosis_Related_Group,
-                AdjudicatedDiagnosisRelatedGroup1X AS Adj_Diagnosis_Related_Group
+                AdjudicatedDiagnosisRelatedGroup1X AS Adj_Diagnosis_Related_Group,
+                DiagnosisRelatedGroupCont1X AS Diagnosis_Related_Group_Contract,
+                AdjudicatedDiagnosisRelatedGroupCont1X AS Adj_Diagnosis_Related_Group_Contract
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I tar
             JOIN MHDWQA.SENDPRO.RAW_SPRO_837I_CLAIM h
             ON tar.num_icn = h."PatientControlNum"
@@ -104,7 +106,9 @@ FROM (
                 Service_Category_Code,
                 Service_Line_Rev_Code,
                 Diagnosis_Related_Group,
-                Adj_Diagnosis_Related_Group
+                Adj_Diagnosis_Related_Group,
+                Diagnosis_Related_Group_Contract,
+                Adj_Diagnosis_Related_Group_Contract
             )
         ) AS INF_SENDPRO_TARGET_837I_UNPIV
     )

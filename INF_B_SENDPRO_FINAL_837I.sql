@@ -826,13 +826,17 @@ SPRO_B_ENC_DNTL_INFO_DTL_HIST. CDE_ENC_SVC_CAT
          ELSE 'VALID'
     END AS ServiceLineRevCode1X,
 
-/* 
-12.1.51	Diagnosis Related Group (MPT_SENDPRO_DRG_937I)
-•	837I Claims population: MPT_SENDPRO_ClaimType_837I
-•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_DRG
-*/
+-- moved because of alters to create following fields
+1 as TOT_REX,
 
-    CASE 
+/*
+12.1.51	Diagnosis Related Group (MPT_SENDPRO_DRG_937I)
+837I Claims population: MPT_SENDPRO_ClaimType_837I
+Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_DRG
+and CLE_CLM_TYPE='I'
+ */
+
+    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
          WHEN (CDE_DRG IS NULL OR CDE_DRG IN ('#','+','-'))
          THEN 'NULL'
          ELSE 'VALID'
@@ -840,19 +844,48 @@ SPRO_B_ENC_DNTL_INFO_DTL_HIST. CDE_ENC_SVC_CAT
 
 /*
 12.1.52	Adjudicated Diagnosis Related Group (MPT_SENDPRO_ADJDRG_937I)
-•	837I Claims population: MPT_SENDPRO_ClaimType_837I
-•	Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_SBR_PYR_M2M. ADJ_DRG_NUM 
-(Join with SPRO_B_ENC_CLAIM_INST_LEG_HIST  on clm_seq=pyrm2m.clm_seq and pyrm2m.cde_id_oth_payer=l.id_submitter 
-and pyrm2m.cde_claim_filing_ind='MC')
+837I Claims population: MPT_SENDPRO_ClaimType_837I
+Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_SBR_PYR_M2M.ADJ_DRG_NUM 
+(Join with SPRO_B_ENC_CLAIM_INST_LEG_HIST on clm_seq=pyrm2m.clm_seq and pyrm2m.cde_id_oth_payer=l.id_submitter 
+and pyrm2m.cde_claim_filing_ind='MC' 
+and CLE_CLM_TYPE='I'
  */
 
-    CASE 
+    CASE WHEN CDE_CLM_TYPE NOT IN ('I') THEN 'NOT APP'
          WHEN (ADJ_DRG_NUM IS NULL OR ADJ_DRG_NUM IN ('#','+','-'))
          THEN 'NULL'
          ELSE 'VALID'
     END AS AdjudicatedDiagnosisRelatedGroup1X,
 
-1 as TOT_REX
+/*
+12.1.53	Diagnosis Related Group Contract (MPT_SENDPRO_DRG_937I)
+837I Claims population: MPT_SENDPRO_ClaimType_837I
+Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_CLAIM_INST_LEG_HIST. CDE_DRG
+SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_CONTRACT_TYPE IN ('01','09')
+and CLE_CLM_TYPE='I'
+ */
+
+    CASE WHEN (CDE_CLM_TYPE NOT IN ('I')) OR (CDE_CONTRACT_TYPE NOT IN ('01','09')) THEN 'NOT APP'
+         WHEN (CDE_DRG IS NULL OR CDE_DRG IN ('#','+','-'))
+         THEN 'NULL'
+         ELSE 'VALID'
+    END AS DiagnosisRelatedGroupCont1X,
+
+/*
+12.1.52	Adjudicated Diagnosis Related Group Contract (MPT_SENDPRO_ADJDRG_937I)
+837I Claims population: MPT_SENDPRO_ClaimType_837I
+Missing String Value Parameter: MPT_StringIsNull_ALL, SPRO_B_ENC_SBR_PYR_M2M.ADJ_DRG_NUM 
+(Join with SPRO_B_ENC_CLAIM_INST_LEG_HIST on clm_seq=pyrm2m.clm_seq and pyrm2m.cde_id_oth_payer=l.id_submitter 
+and pyrm2m.cde_claim_filing_ind='MC' and SPRO_B_ENC_CLAIM_INST_LEG_HIST.CDE_CONTRACT_TYPE IN ('01','09')) 
+and CLE_CLM_TYPE='I'
+ */
+
+    CASE WHEN (CDE_CLM_TYPE NOT IN ('I')) OR (CDE_CONTRACT_TYPE NOT IN ('01','09')) THEN 'NOT APP'
+         WHEN (ADJ_DRG_NUM IS NULL OR ADJ_DRG_NUM IN ('#','+','-'))
+         THEN 'NULL'
+         ELSE 'VALID'
+    END AS AdjudicatedDiagnosisRelatedGroupCont1X
+
 
 FROM (
 select DISTINCT

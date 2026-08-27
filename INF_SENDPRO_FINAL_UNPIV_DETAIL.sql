@@ -161,6 +161,8 @@ SELECT
                 ServiceLineRevCode1X AS Service_Line_Rev_Code,
                 DiagnosisRelatedGroup1X AS Diagnosis_Related_Group,
                 AdjudicatedDiagnosisRelatedGroup1X AS Adj_Diagnosis_Related_Group,
+                DiagnosisRelatedGroupCont1X AS Diagnosis_Related_Group_Contract,
+                AdjudicatedDiagnosisRelatedGroupCont1X AS Adj_Diagnosis_Related_Group_Contract,
                 NUM_ICN,
                 NUM_DTL
             FROM MHTEAM.DWDQ.INF_B_SENDPRO_TARGET_837I
@@ -206,7 +208,9 @@ SELECT
                 Service_Category_Code,
                 Service_Line_Rev_Code,
                 Diagnosis_Related_Group,
-                Adj_Diagnosis_Related_Group
+                Adj_Diagnosis_Related_Group,
+                Diagnosis_Related_Group_Contract,
+                Adj_Diagnosis_Related_Group_Contract
             )
 ) AS UNPIV7I
 ORDER BY RUN_DATE, CDE_ENTITY_MODEL, CDE_ENC_MCO, CDE_ENC_ACO, CLAIM_TYPE, CDE_CLM_DISPOSITION, CDE_CLM_STATUS, MEASURE, TYPE
